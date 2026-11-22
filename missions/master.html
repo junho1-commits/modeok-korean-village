@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도전! 우리말 달인 퀴즈</title>
+    <!-- Tailwind CSS 불러오기 -->
+    <script src="../vendor/tailwind.js"></script>
+    <style>
+        /* 웹폰트 적용 */
+        700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0fdf4; /* 연한 녹색 배경 */
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* 부드러운 화면 전환 애니메이션 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 보기 버튼 호버 효과 */
+        .option-btn {
+            transition: all 0.2s;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .option-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+<style>.hidden{display:none!important}button:focus-visible{outline:3px solid #b77142;outline-offset:3px}</style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- 게임 컨테이너 -->
+    <div id="game-container" class="bg-white rounded-3xl shadow-xl w-full max-w-2xl p-6 sm:p-10 relative overflow-hidden fade-in">
+        
+        <!-- 시작 화면 -->
+        <div id="start-screen" class="text-center flex flex-col items-center justify-center py-10">
+            <div class="text-6xl mb-4">🏆</div>
+            <h1 class="text-3xl sm:text-4xl font-black text-green-700 mb-4 word-keep">도전! 우리말 달인 퀴즈</h1>
+            <p class="text-gray-600 mb-8 sm:text-lg">일상 속에 숨어있는 일본어 잔재를 찾아<br>아름다운 우리말로 순화해 볼까요?</p>
+            <button onclick="startGame()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transition-transform transform hover:scale-105 active:scale-95">
+                퀴즈 시작하기
+            </button>
+        </div>
+
+        <!-- 퀴즈 화면 -->
+        <div id="quiz-screen" class="hidden flex-col h-full fade-in">
+            <!-- 상단 상태바 -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="text-green-600 font-bold text-lg" id="question-progress">문제 1 / 25</div>
+                <div class="text-gray-500 font-bold text-lg">점수: <span id="score-display" class="text-green-600">0</span></div>
+            </div>
+
+            <!-- 진행률 바 -->
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+                <div id="progress-bar" class="bg-green-600 h-2.5 rounded-full" style="width: 4%"></div>
+            </div>
+
+            <!-- 질문 영역 -->
+            <div class="mb-8 min-h-[120px] flex items-center">
+                <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-gray-800 leading-snug break-keep">
+                    여기에 질문이 표시됩니다.
+                </h2>
+            </div>
+
+            <!-- 보기 영역 -->
+            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- 자바스크립트로 버튼들이 생성됩니다 -->
+            </div>
+            
+            <!-- 피드백 메시지 (정답/오답 표시) -->
+            <div id="feedback-message" class="hidden mt-6 text-center font-bold text-lg p-4 rounded-xl">
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="result-screen" class="hidden text-center py-10 fade-in">
+            <div id="result-emoji" class="text-6xl mb-4">🎉</div>
+            <h1 class="text-3xl sm:text-4xl font-black text-gray-800 mb-2">퀴즈 종료!</h1>
+            <p class="text-lg text-gray-600 mb-6">수고하셨습니다. 당신의 점수는...</p>
+            
+            <div class="text-5xl font-black text-green-600 mb-4">
+                <span id="final-score">0</span> / 25
+            </div>
+            
+            <p id="result-comment" class="text-xl font-bold text-gray-700 mb-10">
+                평가 코멘트가 여기에 표시됩니다.
+            </p>
+
+            <button onclick="resetGame()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105 active:scale-95">
+                다시 도전하기
+            </button>
+        </div>
+
+    </div>
+
+    <!-- 퀴즈 데이터 및 로직 -->
+    <script>
+        // 사용자가 요청한 25개의 단어를 바탕으로 구성한 퀴즈 데이터
+        const quizData = [
+            {
+                question: "\"김장 배추를 씻으려면 다라이가 필요하다.\"라는 문장에서 일본어 '다라이(たらい)'를 대체할 가장 알맞은 우리말은 무엇일까요?",
+                options: ["큰 대야", "바구니", "항아리", "냄비"],
+                answer: "큰 대야"
+            },
+            {
+                question: "\"아직 견습(見習い) 기간이라 업무가 서투릅니다.\"에서 쓰인 '견습'을 올바르게 순화한 우리말은 무엇일까요?",
+                options: ["수습", "연습", "실습", "복습"],
+                answer: "수습"
+            },
+            {
+                question: "\"정해진 수순(手順)을 밟아 일을 처리하다.\"에서 일본어 투 표현인 '수순'을 올바르게 대체한 우리말은 무엇일까요?",
+                options: ["차례", "방법", "규칙", "방향"],
+                answer: "차례"
+            },
+            {
+                question: "\"급전이 필요해서 월급을 가불(仮払い)했다.\"라는 표현에서 '가불'을 우리말로 바르게 순화한 것은 무엇일까요?",
+                options: ["선지급", "후지급", "보너스", "대출"],
+                answer: "선지급"
+            },
+            {
+                question: "사이가 아주 좋은 부부를 일컬어 흔히 '잉꼬(鸚哥)부부'라고 합니다. 여기서 '잉꼬' 대신 써야 할 올바른 우리말 새의 이름은 무엇일까요?",
+                options: ["원앙", "비둘기", "제비", "까치"],
+                answer: "원앙"
+            },
+            {
+                question: "\"소풍 갈 때 어머니가 벤또(弁当)를 싸 주셨다.\"에서 '벤또'의 올바른 우리말은 무엇일까요?",
+                options: ["도시락", "식판", "밥통", "찬합"],
+                answer: "도시락"
+            },
+            {
+                question: "식당에서 식사를 마친 후 치아 사이에 낀 것을 뺄 때 찾는 '요지(楊枝)'를 올바른 우리말로 바꾼 것은 무엇일까요?",
+                options: ["이쑤시개", "면봉", "귀개", "칫솔"],
+                answer: "이쑤시개"
+            },
+            {
+                question: "\"무거운 짐을 구루마(車)에 실어서 옮겼다.\"에서 '구루마'를 우리말로 바르게 순화한 것은 무엇일까요?",
+                options: ["손수레", "자전거", "유모차", "썰매"],
+                answer: "손수레"
+            },
+            {
+                question: "\"지각을 해서 선생님께 기합(気合)을 받았다.\"에서 '기합'을 우리말로 올바르게 다듬은 것은 무엇일까요?",
+                options: ["얼차려", "벌청소", "체벌", "훈육"],
+                answer: "얼차려"
+            },
+            {
+                question: "식당 메뉴판에서 흔히 볼 수 있는 '닭도리탕(鳥·とり)'에서 일본어 잔재를 없애고 올바르게 순화한 단어는 무엇일까요?",
+                options: ["닭볶음탕", "닭매운탕", "닭조림", "닭백숙"],
+                answer: "닭볶음탕"
+            },
+            {
+                question: "\"비싸서 정식 서비스 대신 야매(やみ)로 수리했다.\"에서 '야매'를 대체할 수 있는 올바른 우리말은 무엇일까요?",
+                options: ["무허가 (뒷거래)", "신상품", "정품", "중고품"],
+                answer: "무허가 (뒷거래)"
+            },
+            {
+                question: "\"어제 산 새 휴대전화에 기스(きず)가 났다.\"에서 '기스'를 올바르게 고친 우리말은 무엇일까요?",
+                options: ["흠집", "얼룩", "파손", "고장"],
+                answer: "흠집"
+            },
+            {
+                question: "길거리에서 아르바이트생들이 나누어 주는 '찌라시(ちらし)'의 올바른 우리말 순화어는 무엇일까요?",
+                options: ["낱장 광고", "신문", "잡지", "명함"],
+                answer: "낱장 광고"
+            },
+            {
+                question: "\"오늘 여기서 쇼부(しょうぶ)를 보자.\"라는 표현에서 사용된 '쇼부'를 대체할 올바른 우리말은 무엇일까요?",
+                options: ["승부 (결판)", "내기", "화해", "흥정"],
+                answer: "승부 (결판)"
+            },
+            {
+                question: "\"일을 망쳐서 선배에게 쿠사리(くさり)를 먹었다.\"에서 '쿠사리'를 올바르게 순화한 단어는 무엇일까요?",
+                options: ["면박 (핀잔)", "칭찬", "위로", "조언"],
+                answer: "면박 (핀잔)"
+            },
+            {
+                question: "\"셔츠의 가라(から)를 단정하게 세우다.\" 등 옷의 형태를 말할 때 쓰는 '가라'의 순화어는 무엇일까요?",
+                options: ["옷깃", "소매", "단추", "주머니"],
+                answer: "옷깃"
+            },
+            {
+                question: "흔히 반찬이나 식재료로 쓰이는 일본어 '다쿠안'과 '다마네기'를 순서대로 올바르게 짝지어 순화한 것은 무엇일까요?",
+                options: ["단무지 / 양파", "김치 / 마늘", "피클 / 파", "깍두기 / 감자"],
+                answer: "단무지 / 양파"
+            },
+            {
+                question: "\"컵에 물을 입빠이(いっぱい) 채워라.\"에서 쓰인 '입빠이'를 바르게 대체한 우리말은 무엇일까요?",
+                options: ["가득", "조금", "절반", "억지로"],
+                answer: "가득"
+            },
+            {
+                question: "중국집에서 자장면과 함께 가장 자주 먹는 음식 중 하나인 '짬뽕(ちゃんぽん)'을 순화한 공식 명칭은 무엇일까요?",
+                options: ["초마면", "기스면", "우동", "짜장면"],
+                answer: "초마면"
+            },
+            {
+                question: "\"거짓말을 한 것이 결국 뽀록 나다.\"라는 표현에서 '뽀록 나다'를 대체할 수 있는 우리말은 무엇일까요?",
+                options: ["들통나다", "화나다", "성공하다", "실패하다"],
+                answer: "들통나다"
+            },
+            {
+                question: "\"아싸리(あっさり) 포기하는 게 낫다.\"에서 쓰인 '아싸리'를 대신할 수 있는 우리말로 가장 적절한 것은 무엇일까요?",
+                options: ["차라리 (산뜻하게)", "마침내", "억지로", "기필코"],
+                answer: "차라리 (산뜻하게)"
+            },
+            {
+                question: "\"불안한 마음에 문 앞을 왔다리 갔다리 하다.\"에서 쓰인 일본어 투 표현을 바르게 고친 것은 무엇일까요?",
+                options: ["왔다 갔다", "이리저리", "우왕좌왕", "갈팡질팡"],
+                answer: "왔다 갔다"
+            },
+            {
+                question: "\"새로 산 삐까뻔쩍한 구두\"에서 '삐까뻔쩍'을 대체할 올바른 우리말은 무엇일까요?",
+                options: ["번쩍번쩍", "반짝반짝", "휘황찬란", "알록달록"],
+                answer: "번쩍번쩍"
+            },
+            {
+                question: "\"땡땡이 무늬 넥타이를 맸다.\"에서 일본어 잔재인 '땡땡이 무늬'를 우리말로 가장 바르게 고쳐 쓴 것은 무엇일까요?",
+                options: ["물방울 무늬", "줄무늬", "체크 무늬", "꽃무늬"],
+                answer: "물방울 무늬"
+            },
+            {
+                question: "옷이나 물건의 색상을 표현할 때 종종 쓰이는 '곤색'을 우리말로 바르게 고쳐 쓴 것은 무엇일까요?",
+                options: ["감색 (짙은 남색)", "검정색", "보라색", "초록색"],
+                answer: "감색 (짙은 남색)"
+            }
+        ];
+
+        // 게임 상태 변수
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAnswering = false;
+
+        // DOM 요소들
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const questionProgress = document.getElementById('question-progress');
+        const scoreDisplay = document.getElementById('score-display');
+        const progressBar = document.getElementById('progress-bar');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const resultComment = document.getElementById('result-comment');
+        const resultEmoji = document.getElementById('result-emoji');
+
+        // 배열 섞기 함수 (보기 위치를 랜덤하게)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // 게임 시작
+        function startGame() {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            quizScreen.classList.add('flex');
+            
+            // 퀴즈 순서도 섞고 싶다면 아래 주석을 해제하세요.
+            shuffleArray(quizData); 
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            updateScoreDisplay();
+            loadQuestion();
+        }
+
+        // 문제 불러오기
+        function loadQuestion() {
+            isAnswering = false;
+            feedbackMessage.classList.add('hidden');
+            optionsContainer.innerHTML = '';
+            
+            const currentQuiz = quizData[currentQuestionIndex];
+            questionText.innerText = currentQuiz.question;
+            
+            // 진행률 업데이트
+            const currentNum = currentQuestionIndex + 1;
+            const totalNum = quizData.length;
+            questionProgress.innerText = `문제 ${currentNum} / ${totalNum}`;
+            progressBar.style.width = `${(currentNum / totalNum) * 100}%`;
+
+            // 보기 섞기
+            const shuffledOptions = shuffleArray([...currentQuiz.options]);
+
+            // 보기 버튼 생성
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.className = "option-btn w-full bg-white border-2 border-gray-200 text-gray-700 font-bold py-4 px-6 rounded-xl text-lg hover:border-green-500 hover:text-green-600 focus:outline-none";
+                
+                button.onclick = () => checkAnswer(button, option, currentQuiz.answer);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // 정답 확인
+        function checkAnswer(selectedButton, selectedOption, correctAnswer) {
+            if (isAnswering) return; // 중복 클릭 방지
+            isAnswering = true;
+
+            const allButtons = optionsContainer.querySelectorAll('button');
+            
+            if (selectedOption === correctAnswer) {
+                // 정답일 경우
+                score++;
+                updateScoreDisplay();
+                selectedButton.classList.remove('border-gray-200', 'text-gray-700');
+                selectedButton.classList.add('border-green-500', 'bg-green-100', 'text-green-700');
+                showFeedback(true);
+            } else {
+                // 오답일 경우
+                selectedButton.classList.remove('border-gray-200', 'text-gray-700');
+                selectedButton.classList.add('border-red-500', 'bg-red-100', 'text-red-700');
+                
+                // 진짜 정답 표시
+                allButtons.forEach(btn => {
+                    if (btn.innerText === correctAnswer) {
+                        btn.classList.remove('border-gray-200');
+                        btn.classList.add('border-green-500', 'bg-green-50', 'text-green-600');
+                    }
+                });
+                showFeedback(false);
+            }
+
+            // 모든 버튼 비활성화 (시각적 처리)
+            allButtons.forEach(btn => btn.style.pointerEvents = 'none');
+
+            // 1.5초 후 다음 문제로
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    loadQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1500);
+        }
+
+        // 피드백 메시지 표시
+        function showFeedback(isCorrect) {
+            feedbackMessage.classList.remove('hidden');
+            if (isCorrect) {
+                feedbackMessage.innerText = "⭕ 정답입니다!";
+                feedbackMessage.className = "mt-6 text-center font-bold text-lg p-4 rounded-xl bg-green-100 text-green-700 fade-in";
+            } else {
+                feedbackMessage.innerText = "❌ 아쉽네요! 오답입니다.";
+                feedbackMessage.className = "mt-6 text-center font-bold text-lg p-4 rounded-xl bg-red-100 text-red-700 fade-in";
+            }
+        }
+
+        // 점수 업데이트
+        function updateScoreDisplay() {
+            scoreDisplay.innerText = score;
+        }
+
+        // 결과 화면 표시
+        function showResult() {
+            window.VillageBridge?.report(score, quizData.length, currentQuestionIndex);
+            quizScreen.classList.add('hidden');
+            quizScreen.classList.remove('flex');
+            resultScreen.classList.remove('hidden');
+
+            finalScoreDisplay.innerText = score;
+
+            // 점수에 따른 코멘트
+            if (score === quizData.length) {
+                resultEmoji.innerText = "👑";
+                resultComment.innerText = "완벽합니다! 선생님께 폭풍 칭찬받을 우리말 달인!";
+                resultComment.className = "text-xl font-bold text-green-600 mb-10";
+            } else if (score >= 20) {
+                resultEmoji.innerText = "👏";
+                resultComment.innerText = "대단해요! 올바른 우리말을 아주 잘 알고 계시네요.";
+                resultComment.className = "text-xl font-bold text-blue-600 mb-10";
+            } else if (score >= 10) {
+                resultEmoji.innerText = "👍";
+                resultComment.innerText = "좋습니다! 이번 기회에 헷갈렸던 단어들을 잘 복습했어요.";
+                resultComment.className = "text-xl font-bold text-yellow-600 mb-10";
+            } else {
+                resultEmoji.innerText = "💪";
+                resultComment.innerText = "괜찮아요! 게임을 다시 하며 우리말을 배워보아요.";
+                resultComment.className = "text-xl font-bold text-gray-600 mb-10";
+            }
+        }
+
+        // 게임 초기화
+        function resetGame() {
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+    </script>
+<script src="../mission-bridge.js"></script>
+</body>
+</html>

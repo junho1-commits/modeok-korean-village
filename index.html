@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#244b43">
+  <meta name="description" content="모덕초 친구들과 떠나는 우리말 한옥마을 모험. 무작위 미션을 풀고 정답률 90% 이상으로 여행 도장을 모아 보세요.">
+  <meta property="og:title" content="모덕 우리말 유람 · 한옥마을 모험">
+  <meta property="og:description" content="여섯 가지 우리말 미션, 라이프 3개! 관문을 통과하며 우리말 여행 도장을 모아요.">
+  <title>모덕 우리말 유람 · 한옥마을 모험</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="game-core.js" defer></script>
+  <script src="game.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="모덕 우리말 유람 처음 화면"><span class="brand-symbol">ㅁ</span><span>모덕 <strong>우리말 유람</strong><small>여섯 빛깔 배움이 피어나는 마을</small></span></a>
+    <nav class="top-actions" aria-label="여행 메뉴"><button id="help-btn" class="quiet">여행 안내</button><button id="new-btn" class="quiet">새 여행</button><span class="school-name">모덕초등학교</span></nav>
+  </header>
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">국어 6학년 2학기 · 4단원</p><h1>한 걸음마다,<br class="mobile-break"> 우리말이 꽃피다.</h1><p class="intro-copy">꽃 친구, 산 친구와 함께 떠나는 한옥마을 여행.<br>배움의 관문을 지나 나만의 우리말 도장을 모아 보세요.</p></div>
+      <div class="travel-ticket"><span class="ticket-label">오늘의 여행 수첩</span><strong id="traveler-name">우리말 여행자</strong><div class="ticket-stats"><span id="progress-label">0 / 6 관문</span><span id="hearts" aria-label="남은 라이프 3개">♥ ♥ ♥</span></div><div class="meter"><span id="progress-bar"></span></div><small id="save-state" role="status">여행을 시작하면 자동으로 기록해요</small></div>
+    </section>
+    <section class="journey-layout" aria-label="우리말 여행 지도">
+      <div class="map-card">
+        <div class="map-heading"><span><i></i> 우리말 한옥마을</span><span class="map-guide">길을 따라 하나씩, 정답률 90% 이상</span></div>
+        <div class="map-scroll"><div class="map-world" id="map-world">
+          <svg class="landscape" viewBox="0 0 1100 720" role="img" aria-label="산과 시냇물, 한옥 여섯 채가 있는 우리말 마을 지도">
+            <defs>
+              <linearGradient id="paper" x2="0" y2="1"><stop stop-color="#f0f5e9"/><stop offset="1" stop-color="#e2eccc"/></linearGradient>
+              <pattern id="texture" width="19" height="19" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r=".7" fill="#527253" opacity=".08"/><circle cx="12" cy="15" r=".6" fill="#527253" opacity=".07"/></pattern>
+              <symbol id="pine" viewBox="0 0 70 92"><path d="M34 87V35" stroke="#766844" stroke-width="6"/><path d="M35 0 12 35h13L4 60h22L9 76h53L47 60h20L45 35h12Z" fill="#587c5c"/><path d="M35 9 25 36h10L20 61h15V76" fill="#6e946d"/></symbol>
+              <symbol id="house" viewBox="0 0 150 125"><ellipse cx="77" cy="115" rx="68" ry="9" fill="#405940" opacity=".12"/><path d="M25 60h101v49H25Z" fill="#fcf4de" stroke="#a68b69" stroke-width="2"/><path d="M34 61v47m28-47v47m32-47v47m24-47v47" stroke="#8b6549" stroke-width="5"/><path d="M18 111h116v6H18Z" fill="#acb4a1"/><path d="M45 75h12v22H45Zm27 0h14v33H72Zm29 0h12v22h-12Z" fill="#c7d6c0" stroke="#987657" stroke-width="2"/><path d="M3 65Q17 58 29 24h91q13 32 28 41Q78 54 3 65Z" fill="#435b5a" stroke="#334744" stroke-width="3"/><path d="M24 48h105M31 33h91M16 58h120" stroke="#71837a" stroke-width="2"/><path d="m42 25-5 34m23-34-3 34m22-34v34m18-34 3 34m16-34 6 34" stroke="#334744" stroke-width="2"/><path d="M28 23h93" stroke="#334744" stroke-width="5" stroke-linecap="round"/></symbol>
+              <symbol id="flower" viewBox="0 0 30 30"><g fill="#e9a2a2"><circle cx="15" cy="7" r="6"/><circle cx="23" cy="13" r="6"/><circle cx="20" cy="23" r="6"/><circle cx="9" cy="23" r="6"/><circle cx="6" cy="13" r="6"/></g><circle cx="15" cy="15" r="4" fill="#f7d77c"/></symbol>
+            </defs>
+            <rect width="1100" height="720" fill="url(#paper)"/>
+            <path d="M-30 166 76 44q20-21 41 2l49 63 80-92q22-25 45 1l100 125 69-68q20-24 39 1l81 105Z" fill="#c9dbc8"/><path d="m52 168 90-93q18-20 40 2l116 134 72-75q22-21 45 2l46 69Z" fill="#b5cfb6"/>
+            <path d="m691 116 88-101q19-18 37 3l120 131 51-58q18-16 32 3l88 91Z" fill="#c6d9c8"/>
+            <path d="M-60 570Q120 592 220 495t220-21q99 50 177-14t151-8q119 73 163-28t232-85" fill="none" stroke="#c1d9d2" stroke-width="70"/><path d="M-60 570Q120 592 220 495t220-21q99 50 177-14t151-8q119 73 163-28t232-85" fill="none" stroke="#e6f4e8" stroke-width="3" stroke-dasharray="19 18"/>
+            <path d="M95 602C121 550 102 458 170 431S351 437 359 352S225 229 278 190S493 123 529 214S495 415 643 373S700 210 839 200S1003 231 947 326S905 443 840 533S971 605 1010 566" fill="none" stroke="#c1bda0" stroke-width="43" stroke-linecap="round"/>
+            <path id="travel-path" d="M95 602C121 550 102 458 170 431S351 437 359 352S225 229 278 190S493 123 529 214S495 415 643 373S700 210 839 200S1003 231 947 326S905 443 840 533S971 605 1010 566" fill="none" stroke="#faf1d9" stroke-width="34" stroke-linecap="round"/>
+            <path d="m153 456 41 31m-49-19 41 31m-32-46 42 31m-35-41 41 31" stroke="#a88962" stroke-width="7"/><path d="m137 451 64 48m-40-70 64 47" stroke="#856d4f" stroke-width="4"/>
+            <g opacity=".9"><use href="#pine" x="49" y="244" width="55" height="76"/><use href="#pine" x="78" y="211" width="62" height="86"/><use href="#pine" x="24" y="193" width="58" height="80"/><use href="#pine" x="411" y="75" width="56" height="80"/><use href="#pine" x="442" y="53" width="58" height="80"/><use href="#pine" x="638" y="142" width="56" height="78"/><use href="#pine" x="670" y="123" width="65" height="90"/><use href="#pine" x="997" y="270" width="62" height="86"/><use href="#pine" x="1035" y="245" width="56" height="78"/><use href="#pine" x="454" y="557" width="58" height="80"/><use href="#pine" x="495" y="584" width="52" height="72"/><use href="#pine" x="543" y="535" width="56" height="80"/></g>
+            <g id="village-houses"></g>
+            <g fill="#8ca780" opacity=".5"><ellipse cx="315" cy="587" rx="60" ry="27"/><ellipse cx="709" cy="592" rx="70" ry="30"/><ellipse cx="102" cy="132" rx="52" ry="14"/></g>
+            <g><use href="#flower" x="207" y="558" width="18" height="18"/><use href="#flower" x="230" y="572" width="14" height="14"/><use href="#flower" x="463" y="248" width="20" height="20"/><use href="#flower" x="481" y="273" width="13" height="13"/><use href="#flower" x="711" y="498" width="18" height="18"/><use href="#flower" x="737" y="513" width="14" height="14"/><use href="#flower" x="970" y="110" width="19" height="19"/><use href="#flower" x="945" y="125" width="14" height="14"/></g>
+            <g transform="translate(55 567)"><path d="M0 48V9m79 39V9" stroke="#94684b" stroke-width="7"/><path d="M-10 11Q40 3 89 11L77 0H2Z" fill="#405f59"/><rect x="13" y="12" width="52" height="23" rx="3" fill="#fff7de" stroke="#ad9671"/><text x="39" y="28" text-anchor="middle" fill="#526251" font-size="12" font-weight="bold">마을 입구</text></g>
+            <g transform="translate(976 500)"><path d="M15 60V2" stroke="#957750" stroke-width="4"/><path d="M17 2h43l-9 15 9 15H17Z" fill="#b95440"/><path d="M32 10h10m-5 0v12m-5-6h10" stroke="#fff1c9" stroke-width="2"/></g>
+            <text x="544" y="671" text-anchor="middle" fill="#60765b" font-size="17" font-family="serif" letter-spacing="5">말을 아끼는 마음이 자라는 곳</text>
+            <rect width="1100" height="720" fill="url(#texture)" pointer-events="none"/>
+          </svg>
+          <div id="map-stops"></div><div class="travelers" id="travelers"><img src="assets/travelers.png" alt="꽃 모자와 산 모자를 쓴 모덕초 여행 친구들"><span>함께 가자!</span></div>
+          <div class="map-compass" aria-hidden="true">✧<small>우리말 따라</small></div>
+        </div></div>
+        <div class="map-legend"><span><i class="legend-dot current"></i>지금 도전</span><span><i class="legend-dot cleared"></i>통과한 관문</span><span><i class="legend-dot locked"></i>아직 잠긴 관문</span><span class="legend-note">미션 순서는 새 여행마다 달라져요</span></div>
+      </div>
+      <aside class="sidebar">
+        <div class="next-card"><p class="eyebrow" id="next-kicker">첫 번째 발걸음</p><div class="place-icon" aria-hidden="true">🏮</div><h2 id="next-title">우리말 마을로<br>떠나 볼까요?</h2><p id="next-desc">여섯 관문에서 우리말의 보물을 찾아요.</p><div class="rule-chips"><span>통과 90%</span><span>라이프 3개</span></div><button class="primary" id="continue-btn">여행 시작하기</button><p class="checkpoint-note" id="checkpoint-note">여행 기록은 자동으로 저장돼요.</p></div>
+        <div class="stamps-card"><div class="section-heading"><h2>나의 여행 도장</h2><span id="stamp-count">0 / 6</span></div><div class="stamps" id="stamps"></div><p>관문을 통과할 때마다<br>도장 하나가 수첩에 새겨져요.</p></div>
+      </aside>
+    </section>
+    <footer class="page-footer"><span>작은 낱말 하나에도, 우리만의 빛깔이 있어요.</span><span>모덕초 · 우리말 여행 수첩</span></footer>
+  </main>
+  <dialog id="welcome-dialog" aria-labelledby="welcome-title"><form id="welcome-form"><button class="dialog-close" type="button" data-close="welcome-dialog" aria-label="닫기">×</button><img class="welcome-mascots" src="assets/travelers.png" alt="모덕초 여행 친구들"><p class="eyebrow">우리말 보물을 찾아 떠나요</p><h2 id="welcome-title">반가워요, 여행자!</h2><p>미션은 무작위 순서로 만나요.<br>각 관문에서 <strong>정답률 90% 이상</strong>이면 다음 길이 열려요.</p><label class="name-label" for="nickname">여행자 이름 <small>별명도 좋아요</small></label><input id="nickname" maxlength="16" placeholder="예: 우리말 지킴이" autocomplete="nickname"><details class="mission-choice"><summary>여행에 담을 HTML 미션 선택 <span>기본 6개</span></summary><div id="mission-options"></div></details><p class="small-note">라이프는 미션 통과 실패 시 1개 줄어요.<br>모두 소진하면 복습을 90% 이상 마쳐 3개를 회복해요.</p><button type="submit" class="primary">여행 출발!</button><p id="welcome-error" role="alert"></p></form></dialog>
+  <dialog id="help-dialog" aria-labelledby="help-title"><button class="dialog-close" data-close="help-dialog" aria-label="닫기">×</button><p class="eyebrow">우리말 여행 길잡이</p><h2 id="help-title">천천히 배워도 괜찮아요.</h2><ol class="help-list"><li>원하는 HTML 자료를 골라 여행을 시작해요. 선택한 미션 순서는 무작위로 정해져요.</li><li>현재 관문을 눌러 자료 안의 퀴즈를 끝까지 풀어요. 최소 10문제이며, 엽전 등 보너스 점수는 통과 판정에 쓰지 않아요.</li><li>정답률이 <strong>90% 이상</strong>이면 도장을 받고 다음 길이 열려요. 25문제는 23개 이상 맞혀야 해요.</li><li>90% 미만이면 라이프가 하나 줄어요. 0개일 때는 현재 관문을 복습하여 90% 이상을 얻으면 라이프 3개가 회복돼요. 이후 정식 도전으로 통과해요.</li><li>지도 버튼으로 돌아와도 기록은 남아요. 같은 기기·크롬 프로필·사이트 주소에서 이어 할 수 있어요. 시크릿 모드나 브라우저 기록 삭제 시에는 기록이 지워질 수 있어요.</li></ol><button class="primary" data-close="help-dialog">알겠어요</button></dialog>
+  <dialog id="reset-dialog" aria-labelledby="reset-title"><p class="eyebrow">새로운 여행 준비</p><h2 id="reset-title">처음부터 새로 떠날까요?</h2><p>현재 여행의 도장, 라이프, 풀이 기록이 초기화돼요.<br>미션을 다시 선택하고 순서를 새로 섞어요.</p><div class="button-row"><button class="secondary" data-close="reset-dialog">계속 이어 하기</button><button class="primary" id="confirm-reset">새 여행 준비</button></div></dialog>
+  <dialog id="mission-dialog" aria-labelledby="mission-title"><div class="mission-toolbar"><div><span id="mission-mode">우리말 관문</span><h2 id="mission-title"></h2></div><span id="mission-target">통과 기준 90%</span><button id="map-return" class="secondary">지도에 저장하고 돌아가기</button></div><div class="mission-loading" id="mission-loading" role="status">미션을 준비하고 있어요…</div><iframe id="mission-frame" title="우리말 HTML 미션" src="about:blank" allow="autoplay" sandbox="allow-scripts allow-same-origin allow-modals allow-forms allow-pointer-lock"></iframe><div id="result-panel" class="result-panel" hidden><div class="result-inner"><p class="eyebrow" id="result-kicker"></p><div class="result-emblem" id="result-emblem">✿</div><h2 id="result-title"></h2><p id="result-detail"></p><p class="result-number" id="result-number"></p><p id="result-message"></p><div class="result-actions"><button id="result-next" class="primary"></button><button id="review-answers" class="secondary">풀이 살펴보기</button><button id="result-map" class="quiet">지도로 돌아가기</button></div></div></div><div class="mission-bottom"><span>미션을 끝까지 풀면 결과가 자동으로 지도에 기록돼요.</span><button id="show-result" class="quiet" hidden>기록된 결과 보기</button></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

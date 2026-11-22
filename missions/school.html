@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>우리말 한옥 서당 퀴즈 🏮</title>
+  <script src="../vendor/tailwind.js"></script>
+  <script src="../vendor/confetti.js"></script>
+  <script src="../vendor/tone.js"></script>
+  <style>
+    /* 궁궐 비단 + 산수화 일월오봉도 몽환적 배경 */
+    body {
+      font-family: 'Gowun Batang', serif;
+      background-color: #1A1412;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(229, 184, 75, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(29, 78, 95, 0.35) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(184, 55, 42, 0.14) 0%, transparent 65%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23E5B84B' stroke-opacity='0.08' stroke-width='1'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z'/%3E%3Ccircle cx='30' cy='30' r='12'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #261E18;
+    }
+
+    /* 전통 판본체/붓글씨 느낌 타이틀 폰트 */
+    .font-myung {
+      font-family: 'Song Myung', serif;
+    }
+
+    /* 영롱한 나전칠기(자개) 무지갯빛 광택 효과 */
+    @keyframes najeonShimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .najeon-border {
+      background: linear-gradient(
+        125deg,
+        #1A1412 0%,
+        #1D4E5F 20%,
+        #52B788 35%,
+        #E5B84B 50%,
+        #E07A5F 65%,
+        #9B5DE5 80%,
+        #1A1412 100%
+      );
+      background-size: 300% 300%;
+      animation: najeonShimmer 6s ease infinite;
+    }
+
+    /* 궁궐 단청 문양 띠 (금박 라인 추가) */
+    .dancheong-border {
+      height: 12px;
+      background: repeating-linear-gradient(
+        90deg,
+        #1D4E5F 0px, #1D4E5F 16px,
+        #FFD166 16px, #FFD166 20px,
+        #B8372A 20px, #B8372A 36px,
+        #FCF9F2 36px, #FCF9F2 40px,
+        #2E6F40 40px, #2E6F40 56px,
+        #261E18 56px, #261E18 60px
+      );
+      border-top: 2px solid #E5B84B;
+      border-bottom: 2px solid #E5B84B;
+      box-shadow: 0 2px 10px rgba(229, 184, 75, 0.35);
+    }
+
+    /* 최고급 금박 나전칠기 한옥 전각 카드 */
+    .hanok-card {
+      background: linear-gradient(180deg, #FFFDF9 0%, #F7EFE1 100%);
+      border: 4px solid #E5B84B;
+      box-shadow: 
+        0 0 0 4px #2B1B12,
+        0 0 0 7px #B8860B,
+        0 30px 65px -10px rgba(0, 0, 0, 0.75),
+        0 0 40px rgba(229, 184, 75, 0.25);
+      position: relative;
+    }
+
+    /* 모서리 전통 금박 귀장식 */
+    .corner-ornament {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 3px solid #B8860B;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .corner-tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+    .corner-tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+    .corner-bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+    .corner-br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+    /* 전통 완자살/격자 창살 무늬 + 은은한 금가루 한지 배경 */
+    .changsal-bg {
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(229, 184, 75, 0.14) 0%, transparent 60%),
+        linear-gradient(to right, rgba(139, 101, 78, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(139, 101, 78, 0.08) 1px, transparent 1px),
+        radial-gradient(rgba(218, 165, 32, 0.18) 1.2px, transparent 1.2px);
+      background-size: 100% 100%, 36px 36px, 36px 36px, 24px 24px;
+    }
+
+    /* 전통 붉은 낙관(인장) 스타일 */
+    .nakgwan {
+      border: 2px solid #B8372A;
+      color: #B8372A;
+      background: linear-gradient(135deg, rgba(184, 55, 42, 0.12), rgba(229, 184, 75, 0.12));
+      box-shadow: inset 0 0 0 1px rgba(184, 55, 42, 0.35), 0 2px 6px rgba(184, 55, 42, 0.15);
+      font-family: 'Song Myung', serif;
+    }
+
+    /* 웅장한 궁궐 기와지붕 처마 장식 */
+    .giwa-roof {
+      background: linear-gradient(180deg, #1E242B 0%, #111418 100%);
+      position: relative;
+    }
+    .giwa-roof::after {
+      content: "";
+      position: absolute;
+      bottom: -9px;
+      left: 0;
+      right: 0;
+      height: 9px;
+      background-image: radial-gradient(circle at 12px 0, #111418 10px, #E5B84B 10.5px, transparent 11.5px);
+      background-size: 24px 12px;
+      z-index: 5;
+    }
+
+    /* 청사초롱 흔들림 + 은은한 불빛 발광 */
+    @keyframes lanternSway {
+      0%, 100% { transform: rotate(-5deg); filter: drop-shadow(0 4px 12px rgba(255, 190, 85, 0.6)); }
+      50% { transform: rotate(5deg); filter: drop-shadow(0 6px 18px rgba(255, 120, 70, 0.8)); }
+    }
+    .lantern-sway {
+      transform-origin: top center;
+      animation: lanternSway 3.5s ease-in-out infinite;
+    }
+
+    /* 흩날리는 훈민정음 & 금빛 매화 꽃잎 */
+    @keyframes driftDown {
+      0% { transform: translateY(-10vh) rotate(0deg) scale(0.9); opacity: 0; }
+      15% { opacity: 0.55; }
+      85% { opacity: 0.55; }
+      100% { transform: translateY(110vh) rotate(360deg) scale(1.1); opacity: 0; }
+    }
+    .hangul-petal {
+      position: fixed;
+      top: -10vh;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+      text-shadow: 0 0 10px rgba(229, 184, 75, 0.6);
+      animation: driftDown linear infinite;
+    }
+
+    /* 선택지 고급 자개·나무 호패 버튼 */
+    .option-btn {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F7EFE0 100%);
+      border: 2px solid #C6A972;
+      box-shadow: 0 4px 0 #8B654E, 0 6px 12px rgba(38, 30, 24, 0.08);
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .option-btn::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(229, 184, 75, 0.28), transparent);
+      transition: left 0.5s ease;
+    }
+    .option-btn:hover:not(:disabled)::before {
+      left: 140%;
+    }
+    .option-btn:hover:not(:disabled) {
+      transform: translateY(-3px) scale(1.01);
+      border-color: #E5B84B;
+      background: linear-gradient(180deg, #FFFDF7 0%, #F2E6CE 100%);
+      box-shadow: 0 6px 0 #1D4E5F, 0 10px 20px rgba(229, 184, 75, 0.25);
+    }
+    .option-btn:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #8B654E;
+    }
+
+    /* 황금빛 광채 버튼 */
+    .royal-gold-btn {
+      background: linear-gradient(135deg, #B8372A 0%, #8E2318 50%, #B8372A 100%);
+      border: 2px solid #FFD166;
+      box-shadow: 0 4px 15px rgba(184, 55, 42, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+    .royal-blue-btn {
+      background: linear-gradient(135deg, #1D4E5F 0%, #12333F 50%, #1D4E5F 100%);
+      border: 2px solid #E5B84B;
+      box-shadow: 0 4px 15px rgba(29, 78, 95, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    /* 전통 판본체/붓글씨 느낌 타이틀 폰트 */
+    .font-myung {
+      font-family: 'Song Myung', serif;
+    }
+
+    /* 궁궐 단청 문양 띠 (오방색: 청·적·황·백·흑) */
+    .dancheong-border {
+      height: 10px;
+      background: repeating-linear-gradient(
+        90deg,
+        #1D4E5F 0px, #1D4E5F 16px,
+        #E5B84B 16px, #E5B84B 20px,
+        #B8372A 20px, #B8372A 36px,
+        #FCF9F2 36px, #FCF9F2 40px,
+        #2E6F40 40px, #2E6F40 56px,
+        #261E18 56px, #261E18 60px
+      );
+      border-top: 2px solid #261E18;
+      border-bottom: 2px solid #261E18;
+    }
+
+    /* 한옥 대청마루 & 창호지 카드 */
+    .hanok-card {
+      background: #FCF8F0;
+      border: 5px solid #4A3222;
+      box-shadow: 
+        0 0 0 3px #D8C7AE,
+        0 0 0 7px #3A2518,
+        0 25px 50px -12px rgba(38, 30, 24, 0.35);
+      position: relative;
+    }
+
+    /* 전통 완자살/격자 창살 무늬 배경 */
+    .changsal-bg {
+      background-image: 
+        linear-gradient(to right, rgba(110, 78, 55, 0.09) 1.5px, transparent 1.5px),
+        linear-gradient(to bottom, rgba(110, 78, 55, 0.09) 1.5px, transparent 1.5px),
+        radial-gradient(rgba(110, 78, 55, 0.05) 1px, transparent 1px);
+      background-size: 32px 32px, 32px 32px, 16px 16px;
+    }
+
+    /* 전통 붉은 낙관(인장) 스타일 */
+    .nakgwan {
+      border: 2.5px solid #B8372A;
+      color: #B8372A;
+      background: rgba(184, 55, 42, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(184, 55, 42, 0.35);
+      font-family: 'Song Myung', serif;
+    }
+
+    /* 웅장한 기와지붕 처마 장식 */
+    .giwa-roof {
+      background: linear-gradient(180deg, #252A34 0%, #161920 100%);
+      position: relative;
+    }
+    .giwa-roof::after {
+      content: "";
+      position: absolute;
+      bottom: -9px;
+      left: 0;
+      right: 0;
+      height: 9px;
+      background-image: radial-gradient(circle at 12px 0, #161920 10px, transparent 11px);
+      background-size: 24px 12px;
+      z-index: 5;
+    }
+
+    /* 청사초롱 흔들림 애니메이션 */
+    @keyframes lanternSway {
+      0%, 100% { transform: rotate(-4deg); }
+      50% { transform: rotate(4deg); }
+    }
+    .lantern-sway {
+      transform-origin: top center;
+      animation: lanternSway 3.5s ease-in-out infinite;
+    }
+
+    /* 흩날리는 훈민정음 & 매화 꽃잎 */
+    @keyframes driftDown {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+      15% { opacity: 0.25; }
+      85% { opacity: 0.25; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+    .hangul-petal {
+      position: fixed;
+      top: -10vh;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+      animation: driftDown linear infinite;
+    }
+
+    /* 선택지 나무 패찰(호패) 버튼 */
+    .option-btn {
+      background: linear-gradient(180deg, #FFFDF8 0%, #F6EFE2 100%);
+      border: 2px solid #B89F7D;
+      box-shadow: 0 3px 0 #8B654E;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .option-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      border-color: #1D4E5F;
+      background: #F0F6F8;
+      box-shadow: 0 6px 0 #1D4E5F;
+    }
+    .option-btn:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #8B654E;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-7px); }
+    }
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .pop-in {
+      animation: popIn 0.4s ease-out forwards;
+    }
+
+    /* 5단위 황금 용 승천 & 빛무리 맥동 애니메이션 */
+    @keyframes royalAuraPulse {
+      0%, 100% { box-shadow: 0 0 25px rgba(255, 209, 102, 0.65), inset 0 0 25px rgba(229, 184, 75, 0.35); }
+      50% { box-shadow: 0 0 55px rgba(255, 209, 102, 0.95), inset 0 0 40px rgba(255, 243, 176, 0.65); }
+    }
+    .royal-milestone-glow {
+      animation: royalAuraPulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes dragonSoar {
+      0%, 100% { transform: translateY(0px) rotate(-6deg) scale(1); }
+      50% { transform: translateY(-12px) rotate(6deg) scale(1.12); }
+    }
+    .dragon-soar {
+      animation: dragonSoar 1.2s ease-in-out infinite;
+    }
+
+    @keyframes beamSpin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .sunburst-rays {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 240%; height: 240%;
+      background: repeating-conic-gradient(
+        from 0deg,
+        rgba(255, 215, 0, 0.16) 0deg 10deg,
+        transparent 10deg 20deg
+      );
+      animation: beamSpin 14s linear infinite;
+      pointer-events: none;
+    }
+
+    /* 쥐불놀이 불꽃 궤적 회전 애니메이션 */
+    @keyframes jwibulSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .jwibul-spin {
+      animation: jwibulSpin 0.85s linear infinite;
+    }
+
+    /* 풍물놀이 덩실덩실 어깨춤 애니메이션 */
+    @keyframes pungmulBounce {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-6px) rotate(3deg); }
+    }
+    .pungmul-bounce {
+      animation: pungmulBounce 0.6s ease-in-out infinite;
+    }
+
+    /* 상모 리본 휘날림 애니메이션 */
+    @keyframes sangmoWave {
+      0%, 100% { transform: rotate(-18deg) scaleX(1); }
+      50% { transform: rotate(18deg) scaleX(-1); }
+    }
+    .sangmo-wave {
+      transform-origin: 40px 16px;
+      animation: sangmoWave 0.7s ease-in-out infinite;
+    }
+
+    /* 널뛰기 도약 애니메이션 */
+    @keyframes neolJump {
+      0%, 100% { transform: translateY(0px); }
+      45% { transform: translateY(-16px) rotate(-4deg); }
+      55% { transform: translateY(-16px) rotate(4deg); }
+    }
+    .neol-jump {
+      animation: neolJump 0.9s cubic-bezier(0.28, 0.84, 0.42, 1) infinite;
+    }
+
+    /* 강강술래 둥글게 돌기 애니메이션 */
+    @keyframes ganggangSway {
+      0%, 100% { transform: translateX(-4px) scale(0.98); }
+      50% { transform: translateX(4px) scale(1.03); }
+    }
+    .ganggang-sway {
+      animation: ganggangSway 0.8s ease-in-out infinite;
+    }
+
+    /* 스크롤바 커스텀 */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #EAE0CC;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #6E4E37;
+      border-radius: 4px;
+    }
+  </style>
+<style>.hidden{display:none!important}button:focus-visible{outline:3px solid #b77142;outline-offset:3px}</style>
+</head>
+<body class="flex items-center justify-center p-4 sm:p-6 relative">
+
+  <!-- 흩날리는 훈민정음 자음·모음 & 매화꽃 배경 -->
+  <div id="hangul-bg-layer" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+  <!-- 메인 컨테이너 -->
+  <div class="w-full max-w-2xl relative z-10">
+    
+    <!-- 상단 나전칠기 한옥 현판 & 청사초롱 바 -->
+    <div class="flex justify-between items-center mb-4 px-1">
+      <div class="najeon-border p-[2px] rounded-xl shadow-lg">
+        <div class="flex items-center gap-2.5 bg-[#1E1611] text-[#FCF8F0] px-4 py-2 rounded-[10px]">
+          <span class="nakgwan bg-[#FCF8F0] text-xs px-1.5 py-0.5 font-bold tracking-widest">어명</span>
+          <span class="font-myung text-xl sm:text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#FFF3B0] via-[#E5B84B] to-[#FFF3B0]">
+            경복궁 우리말 서당
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- 가야금 효과음 토글 버튼 -->
+        <button id="sound-toggle-btn" onclick="toggleSound()" class="bg-[#2B1E17] hover:bg-[#3D2B21] text-[#FFF3B0] font-bold py-2 px-3 rounded-xl shadow-md border-2 border-[#E5B84B] text-sm flex items-center gap-1 transition hover:scale-105 cursor-pointer" title="가야금 소리 켜기/끄기">
+          <span id="sound-icon">🎵</span> <span class="hidden sm:inline">풍류 소리</span>
+        </button>
+        <!-- 순화어 족보 버튼 -->
+        <button onclick="playPluck('G4'); toggleModal(true)" class="bg-[#2B1E17] hover:bg-[#3D2B21] text-[#FFF3B0] font-bold py-2 px-3.5 rounded-xl shadow-md border-2 border-[#E5B84B] text-sm flex items-center gap-1.5 transition hover:scale-105 cursor-pointer">
+          <span>📜</span> 순화어 족보 (31선)
+        </button>
+      </div>
+    </div>
+
+    <!-- 화면 1: 시작 화면 (경복궁 근정전 왕실 에디션) -->
+    <div id="start-screen" class="hanok-card rounded-2xl overflow-hidden pop-in">
+      <!-- 기와 지붕 + 단청 띠 -->
+      <div class="giwa-roof py-3.5 px-6 text-center">
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FFF3B0] via-[#E5B84B] to-[#FFF3B0] text-xs sm:text-sm tracking-[0.35em] font-bold">
+          ✦ 세종대왕 어전(御殿) 우리말 과거시험 ✦
+        </span>
+      </div>
+      <div class="dancheong-border"></div>
+
+      <!-- 좌우 대롱대롱 빛나는 청사초롱 SVG 장식 -->
+      <div class="hidden sm:block absolute top-14 left-5 lantern-sway pointer-events-none z-20">
+        <svg width="40" height="76" viewBox="0 0 40 76">
+          <line x1="20" y1="0" x2="20" y2="12" stroke="#E5B84B" stroke-width="2"/>
+          <circle cx="20" cy="34" r="16" fill="rgba(255, 200, 90, 0.25)"/>
+          <rect x="9" y="12" width="22" height="22" rx="4" fill="#1D4E5F" stroke="#E5B84B" stroke-width="1.5"/>
+          <rect x="9" y="34" width="22" height="22" rx="4" fill="#B8372A" stroke="#E5B84B" stroke-width="1.5"/>
+          <line x1="20" y1="56" x2="20" y2="72" stroke="#FFD166" stroke-width="2.5"/>
+        </svg>
+      </div>
+      <div class="hidden sm:block absolute top-14 right-5 lantern-sway pointer-events-none z-20" style="animation-delay: -1.7s;">
+        <svg width="40" height="76" viewBox="0 0 40 76">
+          <line x1="20" y1="0" x2="20" y2="12" stroke="#E5B84B" stroke-width="2"/>
+          <circle cx="20" cy="34" r="16" fill="rgba(255, 200, 90, 0.25)"/>
+          <rect x="9" y="12" width="22" height="22" rx="4" fill="#1D4E5F" stroke="#E5B84B" stroke-width="1.5"/>
+          <rect x="9" y="34" width="22" height="22" rx="4" fill="#B8372A" stroke="#E5B84B" stroke-width="1.5"/>
+          <line x1="20" y1="56" x2="20" y2="72" stroke="#FFD166" stroke-width="2.5"/>
+        </svg>
+      </div>
+
+      <div class="p-8 sm:p-10 text-center changsal-bg relative">
+        <div class="corner-ornament corner-tl"></div>
+        <div class="corner-ornament corner-tr"></div>
+        <div class="corner-ornament corner-bl"></div>
+        <div class="corner-ornament corner-br"></div>
+
+        <!-- 일월오봉도 & 붉은 태양·은빛 달 상징 엠블럼 -->
+        <div class="inline-flex flex-col items-center mb-4 floating">
+          <div class="najeon-border p-1 rounded-full shadow-xl">
+            <div class="w-24 h-24 rounded-full bg-gradient-to-b from-[#1D4E5F] to-[#122E38] flex items-center justify-center relative overflow-hidden">
+              <!-- 일월오봉도 해와 달 -->
+              <circle cx="24" cy="24" r="7" fill="#FCF8F0" opacity="0.9"/>
+              <circle cx="72" cy="24" r="7" fill="#E05A47" opacity="0.95"/>
+              <span class="text-5xl relative z-10 drop-shadow-md">🏯</span>
+              <span class="nakgwan absolute bottom-1 bg-[#FCF8F0] text-[10px] px-1.5 py-0.2 font-bold">장원급제</span>
+            </div>
+          </div>
+        </div>
+        
+        <h1 class="font-myung text-4xl sm:text-5xl text-[#261E18] mb-3 leading-snug tracking-tight">
+          우리말 순화어<br/>
+          <span class="text-[#B8372A] underline decoration-[#E5B84B] decoration-4 underline-offset-8">장원급제</span> 과거시험
+        </h1>
+
+        <div class="flex items-center justify-center gap-3 my-5">
+          <span class="w-16 h-0.5 bg-gradient-to-r from-transparent to-[#B8860B]"></span>
+          <span class="text-[#B8372A] text-base">🌸 ✦ 🌸</span>
+          <span class="w-16 h-0.5 bg-gradient-to-l from-transparent to-[#B8860B]"></span>
+        </div>
+        
+        <p class="text-[#3E3024] text-base sm:text-lg mb-8 max-w-md mx-auto leading-relaxed">
+          무심코 쓰던 외래어 서른한 가지를<br/>
+          곱고 정겨운 우리말로 다듬어 황금빛 <b class="text-[#B8372A]">어사화</b>를 꽂으시오!
+        </p>
+
+        <!-- 난이도 선택 (일반 모드 vs 빈칸 심화 모드) -->
+        <div class="max-w-md mx-auto mb-5">
+          <div class="inline-flex bg-[#EAE0CC] p-1.5 rounded-xl border-2 border-[#B8860B] shadow-inner gap-1.5 w-full">
+            <button id="diff-normal-btn" onclick="setDifficulty('normal')" class="flex-1 py-2.5 px-3 rounded-lg font-myung text-base font-bold bg-[#1D4E5F] text-[#FCF8F0] shadow-xs transition cursor-pointer">
+              📜 일반 시험 (온전한 낱말)
+            </button>
+            <button id="diff-hard-btn" onclick="setDifficulty('hard')" class="flex-1 py-2.5 px-3 rounded-lg font-myung text-base font-bold text-[#4A3222] hover:bg-[#DFD2BA] transition cursor-pointer">
+              🔥 어려운 시험 (어◯로 빈칸)
+            </button>
+          </div>
+          <p id="difficulty-desc" class="text-xs text-[#5C4838] mt-2 font-bold">
+            ※ 제시된 온전한 외래어를 보고 알맞은 우리말 순화어를 고르시오.
+          </p>
+        </div>
+
+        <!-- 문제 수 선택 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto mb-8">
+          <button onclick="startGame(10)" class="royal-blue-btn text-[#FCF8F0] font-myung text-xl py-4 px-6 rounded-xl hover:scale-[1.04] transition cursor-pointer flex items-center justify-center gap-2">
+            <span>🍵</span> 10문제 초시(初試)
+          </button>
+          <button onclick="startGame(31)" class="royal-gold-btn text-[#FCF8F0] font-myung text-xl py-4 px-6 rounded-xl hover:scale-[1.04] transition cursor-pointer flex items-center justify-center gap-2">
+            <span>👑</span> 31문제 전시(殿試)!
+          </button>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-4 text-xs sm:text-sm text-[#4A3222] font-bold bg-[#F3EAD8]/90 py-3 px-4 rounded-xl border-2 border-[#D4B475] max-w-md mx-auto shadow-xs">
+          <span class="flex items-center gap-1">🕯️ 호롱불 힌트</span>
+          <span class="flex items-center gap-1">🎆 5종 민속놀이 축하</span>
+          <span class="flex items-center gap-1">📜 어명 교지</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 화면 2: 퀴즈 진행 화면 -->
+    <div id="quiz-screen" class="hidden hanok-card rounded-2xl overflow-hidden pop-in">
+      <!-- 기와 상단 바 + 단청 띠 -->
+      <div class="giwa-roof py-3 px-6 flex items-center justify-between text-[#FCF8F0]">
+        <div class="flex items-center gap-2.5">
+          <span id="question-counter" class="font-myung text-base bg-[#3A2518] px-3 py-0.5 rounded-lg border border-[#E5B84B] text-[#FFF3B0]">
+            제 1문 / 10문
+          </span>
+          <span id="combo-badge" class="hidden font-bold text-xs text-[#261E18] bg-gradient-to-r from-[#FFF3B0] to-[#E5B84B] px-2.5 py-1 rounded-lg shadow-sm animate-bounce">
+            🔥 2연속 정답!
+          </span>
+        </div>
+        <div class="font-myung text-lg text-[#FFD166] drop-shadow-xs">
+          황금 엽전: <span id="score-display">0</span>냥
+        </div>
+      </div>
+      <div class="dancheong-border"></div>
+
+      <div class="p-6 sm:p-8 changsal-bg relative">
+        <div class="corner-ornament corner-tl"></div>
+        <div class="corner-ornament corner-tr"></div>
+        <div class="corner-ornament corner-bl"></div>
+        <div class="corner-ornament corner-br"></div>
+
+        <!-- 오방색 나전칠기 진행도 막대 -->
+        <div class="w-full h-4 bg-[#E6DCC8] rounded-full overflow-hidden mb-6 p-0.5 border-2 border-[#B8860B] shadow-inner">
+          <div id="progress-bar" class="h-full najeon-border rounded-full transition-all duration-500" style="width: 10%"></div>
+        </div>
+
+        <!-- 문제 황금 두루마리 족자 카드 -->
+        <div class="bg-gradient-to-b from-[#FFFDF8] to-[#F3E9D4] rounded-2xl p-6 mb-6 border-2 border-[#B8860B] text-center relative shadow-md">
+          <!-- 족자 양끝 금장 나무 축 장식 -->
+          <div class="h-2.5 bg-gradient-to-r from-[#B8860B] via-[#4A3222] to-[#B8860B] rounded-full mb-4 shadow-xs"></div>
+
+          <span id="question-type-badge" class="nakgwan inline-block text-xs font-bold px-3.5 py-1 mb-3 rounded-md">
+            ✦ 이 외래어를 다듬은 고운 우리말은 무엇이오? ✦
+          </span>
+          <h2 id="question-word" class="font-myung text-3xl sm:text-4xl text-[#261E18] mb-3 tracking-wide drop-shadow-2xs">
+            스쿨존
+          </h2>
+          <p id="question-context" class="text-[#3E3228] text-sm sm:text-base bg-[#FFFDF9] border border-[#D4B475] rounded-xl py-2.5 px-4 inline-block leading-relaxed shadow-xs">
+            "학교 앞 <span class="text-[#B8372A] font-bold underline decoration-dotted">스쿨존</span>에서는 시속 30km 이하로 서행해야 해요."
+          </p>
+
+          <!-- 초성 힌트 버튼 -->
+          <div class="mt-4">
+            <button id="hint-btn" onclick="showHint()" class="text-xs font-bold text-[#4A3222] bg-gradient-to-r from-[#F3E5C8] to-[#E6D0A7] hover:brightness-95 border border-[#B8860B] px-4 py-1.5 rounded-lg shadow-2xs transition cursor-pointer">
+              🕯️ 황금 호롱불 켜고 초성 힌트 보기
+            </button>
+            <p id="hint-text" class="hidden text-sm font-bold text-[#1D4E5F] mt-2 bg-[#E3EFF3] border border-[#7FAAC0] inline-block px-4 py-1 rounded-lg shadow-2xs">
+              초성 힌트: ㅇㄹㅇ ㅂㅎ ㄱㅇ
+            </p>
+          </div>
+
+          <div class="h-2.5 bg-gradient-to-r from-[#B8860B] via-[#4A3222] to-[#B8860B] rounded-full mt-4 shadow-xs"></div>
+        </div>
+
+        <!-- 4지선다 나무 호패 보기 -->
+        <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-6">
+          <!-- JS로 버튼 생성 -->
+        </div>
+
+        <!-- 쥐불놀이 축하 / 따뜻한 응원 특별 연출 무대 -->
+        <div id="streak-stage" class="hidden mb-4 rounded-xl p-4 relative overflow-hidden transition-all shadow-md">
+          <!-- JS로 쥐불놀이 풍물패 또는 서당 응원단 렌더링 -->
+        </div>
+
+        <!-- 정답/오답 훈장님 말씀 배너 -->
+        <div id="feedback-area" class="hidden rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all">
+          <div class="flex items-center gap-3 text-center sm:text-left">
+            <span id="feedback-emoji" class="text-3xl">🎉</span>
+            <div>
+              <p id="feedback-title" class="font-myung text-lg"></p>
+              <p id="feedback-desc" class="text-sm opacity-95"></p>
+            </div>
+          </div>
+          <button id="next-btn" onclick="nextQuestion()" class="w-full sm:w-auto font-myung text-lg bg-[#3A2518] hover:bg-[#24160E] text-[#FCF8F0] border-2 border-[#E5B84B] px-6 py-2.5 rounded-lg shadow-md transition hover:scale-105 cursor-pointer shrink-0">
+            다음 문제 ➔
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 화면 3: 결과 화면 (어사화 & 교지 스타일) -->
+    <div id="result-screen" class="hidden hanok-card rounded-xl overflow-hidden pop-in">
+      <div class="giwa-roof py-3 px-6 text-center">
+        <span class="text-[#E5B84B] text-xs tracking-[0.35em] font-bold">과 거 시 험 방 (榜) 발 표</span>
+      </div>
+      <div class="dancheong-border"></div>
+
+      <div class="p-8 sm:p-10 text-center changsal-bg">
+        <div id="result-badge-icon" class="text-6xl mb-3 floating">👑</div>
+        <div class="nakgwan inline-block font-bold px-5 py-1 text-base mb-3 tracking-widest">
+          어 명 교 지 (敎 旨)
+        </div>
+        <h2 id="result-rank" class="font-myung text-3xl sm:text-4xl text-[#261E18] mb-2">
+          세종대왕님도 감탄할 장원급제!
+        </h2>
+        <p id="result-subtitle" class="text-[#4A3B2C] mb-6">
+          실로 놀라운 우리말 실력이오! 순화어를 완벽히 깨우쳤구려.
+        </p>
+
+        <!-- 성적 요약표 -->
+        <div class="bg-[#F3EAD8] rounded-xl p-5 mb-6 border-2 border-[#6E4E37] grid grid-cols-3 gap-4 max-w-md mx-auto shadow-inner">
+          <div>
+            <p class="text-xs text-[#5C4838] font-bold mb-1">하사받은 엽전</p>
+            <p id="final-score" class="font-myung text-2xl sm:text-3xl text-[#B8372A]">100냥</p>
+          </div>
+          <div class="border-x border-[#B89F7D]">
+            <p class="text-xs text-[#5C4838] font-bold mb-1">맞힌 문항</p>
+            <p id="final-correct" class="font-myung text-2xl sm:text-3xl text-[#1D4E5F]">10 / 10</p>
+          </div>
+          <div>
+            <p class="text-xs text-[#5C4838] font-bold mb-1">최고 기세</p>
+            <p id="final-combo" class="font-myung text-2xl sm:text-3xl text-[#2E6F40]">10연속</p>
+          </div>
+        </div>
+
+        <!-- 오답 노트 (틀린 문제가 있을 때만 표시) -->
+        <div id="review-section" class="hidden text-left bg-[#FDF3F2] rounded-xl p-5 mb-6 border-2 border-[#D49B95] max-h-48 overflow-y-auto">
+          <p class="font-myung text-[#B8372A] text-base mb-2.5 flex items-center gap-1.5">
+            <span>🖌️</span> 붓으로 다시 써보아야 할 순화어 (오답 기록)
+          </p>
+          <ul id="wrong-list" class="space-y-2 text-sm text-[#261E18]">
+            <!-- JS로 오답 목록 생성 -->
+          </ul>
+        </div>
+
+        <!-- 하단 버튼 -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <button onclick="resetToStart()" class="font-myung text-lg bg-[#1D4E5F] hover:bg-[#153B48] text-[#FCF8F0] border-2 border-[#0F2A34] py-3.5 px-8 rounded-xl shadow-md hover:scale-105 transition cursor-pointer">
+            🔄 다시 과거 응시하기
+          </button>
+          <button onclick="playPluck('G4'); toggleModal(true)" class="font-myung text-lg bg-[#FCF8F0] text-[#4A3222] border-2 border-[#6E4E37] py-3.5 px-6 rounded-xl hover:bg-[#F2E8D5] transition cursor-pointer">
+            📜 순화어 족보 열람
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 모달: 우리말 순화어 31선 족보 -->
+  <div id="dictionary-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1410]/65 backdrop-blur-xs">
+    <div class="bg-[#FCF8F0] rounded-xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl border-4 border-[#4A3222] pop-in overflow-hidden">
+      <div class="giwa-roof p-5 flex justify-between items-center">
+        <div>
+          <h3 class="font-myung text-2xl text-[#FCF8F0]">📜 우리말 순화어 31선 족보</h3>
+          <p class="text-xs text-[#E5B84B] mt-0.5">외래어 대신 곱고 정겨운 우리말을 사용해 보시오!</p>
+        </div>
+        <button onclick="playPluck('C4'); toggleModal(false)" class="w-9 h-9 rounded-lg bg-[#6E4E37] text-[#FCF8F0] hover:bg-[#B8372A] flex items-center justify-center font-bold text-lg cursor-pointer transition">
+          ✕
+        </button>
+      </div>
+      <div class="dancheong-border"></div>
+      
+      <div class="p-4 border-b border-[#D5C7B2] bg-[#F3EAD8]">
+        <input type="text" id="search-input" onkeyup="filterDictionary()" placeholder="🔍 찾고 싶은 외래어나 순화어를 적어보시오..." class="w-full px-4 py-2.5 rounded-lg bg-[#FCF8F0] border-2 border-[#9E8264] focus:outline-none focus:border-[#1D4E5F] text-sm text-[#261E18]">
+      </div>
+
+      <div id="dictionary-list" class="p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3 changsal-bg">
+        <!-- JS로 단어장 목록 생성 -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. 배경에 훈민정음 자음·모음 및 금빛 매화꽃 흩날리게 만들기
+    function initKoreanParticles() {
+      const container = document.getElementById('hangul-bg-layer');
+      const chars = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅎ', 'ㅏ', 'ㅓ', 'ㅗ', 'ㅜ', '🌸', '✨', '✿'];
+      for (let i = 0; i < 24; i++) {
+        const span = document.createElement('span');
+        const isFlower = i % 3 === 0;
+        span.className = `hangul-petal font-myung ${isFlower ? 'text-[#FFD166]' : 'text-[#E5B84B]'}`;
+        span.textContent = chars[Math.floor(Math.random() * chars.length)];
+        span.style.left = `${Math.random() * 100}vw`;
+        span.style.fontSize = `${16 + Math.random() * 22}px`;
+        span.style.animationDuration = `${11 + Math.random() * 15}s`;
+        span.style.animationDelay = `-${Math.random() * 20}s`;
+        container.appendChild(span);
+      }
+    }
+    initKoreanParticles();
+
+    // 2. Tone.js 한국 전통 5음계(평조/계면조) 가야금 효과음
+    let soundEnabled = true;
+    let gayageumSynth = null;
+
+    function initAudio() {
+      if (!gayageumSynth && typeof Tone !== 'undefined') {
+        gayageumSynth = new Tone.PluckSynth({
+          attackNoise: 1.2,
+          dampening: 3200,
+          resonance: 0.92
+        }).toDestination();
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('sound-icon');
+      icon.textContent = soundEnabled ? '🎵' : '🔇';
+      if (soundEnabled) playPluck('G4');
+    }
+
+    async function playPluck(note) {
+      if (!soundEnabled || typeof Tone === 'undefined') return;
+      try {
+        await Tone.start();
+        initAudio();
+        gayageumSynth.triggerAttack(note);
+      } catch (e) {}
+    }
+
+    async function playKoreanMelody(type) {
+      if (!soundEnabled || typeof Tone === 'undefined') return;
+      try {
+        await Tone.start();
+        initAudio();
+        const now = Tone.now();
+        if (type === 'correct') {
+          // 한국 전통 5음계 상행 (황-태-중-임-남: C4-D4-F4-G4-A4)
+          gayageumSynth.triggerAttack('C4', now);
+          gayageumSynth.triggerAttack('F4', now + 0.11);
+          gayageumSynth.triggerAttack('G4', now + 0.22);
+          gayageumSynth.triggerAttack('C5', now + 0.34);
+        } else if (type === 'milestone') {
+          // 5단위 대축제! 웅장한 궁중 대취타 & 가야금 쌍가락 팡파르
+          const notes = ['C4', 'G4', 'A4', 'C5', 'D5', 'F5', 'G5', 'C6'];
+          notes.forEach((n, idx) => {
+            gayageumSynth.triggerAttack(n, now + idx * 0.08);
+          });
+        } else if (type === 'wrong') {
+          // 묵직한 거문고 저음 튕김
+          gayageumSynth.triggerAttack('D3', now);
+          gayageumSynth.triggerAttack('C3', now + 0.18);
+        } else if (type === 'fanfare') {
+          // 장원급제 경쾌한 풍류 가락
+          const notes = ['C4', 'D4', 'F4', 'G4', 'A4', 'C5'];
+          notes.forEach((n, idx) => {
+            gayageumSynth.triggerAttack(n, now + idx * 0.1);
+          });
+        }
+      } catch (e) {}
+    }
+
+    // 이미지 속 31개 순화어 전체 데이터
+    const wordData = [
+      { id: 1, foreign: "스쿨존", korean: "어린이 보호 구역", example: "학교 앞 [스쿨존]에서는 시속 30km 이하로 천천히 운전해요." },
+      { id: 2, foreign: "메세지(메시지)", korean: "문자", example: "친구에게 반가운 안부 [메세지]를 보냈어요." },
+      { id: 3, foreign: "라커룸 / 라커", korean: "물품 보관함", example: "수영장에 들어가기 전에 [라커]에 가방을 넣어 두었어요." },
+      { id: 4, foreign: "리필", korean: "더 채우기, 다시 채우기", example: "다 마신 음료수를 무료로 [리필] 받았어요." },
+      { id: 5, foreign: "혈당 스파이크", korean: "혈당 급상승", example: "식후 가벼운 산책은 [혈당 스파이크]를 막아 줍니다." },
+      { id: 6, foreign: "무빙 워크", korean: "자동길", example: "공항에서 짐이 무거울 때 [무빙 워크]를 이용하면 편해요." },
+      { id: 7, foreign: "리워드", korean: "보상 혜택", example: "목표를 달성하면 특별한 [리워드]를 드립니다." },
+      { id: 8, foreign: "네티즌", korean: "누리꾼", example: "많은 [네티즌]들이 응원 댓글을 남겼어요." },
+      { id: 9, foreign: "원플러스원(1+1)", korean: "하나 더 주기", example: "편의점에서 과자를 [원플러스원] 행사로 샀어요." },
+      { id: 10, foreign: "이모티콘", korean: "그림말", example: "대화창에 귀여운 [이모티콘]을 보내 기분을 표현했어요." },
+      { id: 11, foreign: "워터파크", korean: "물놀이 공원", example: "여름방학을 맞아 가족들과 [워터파크]에 놀러 갔어요." },
+      { id: 12, foreign: "가드레일", korean: "보호난간", example: "도로 가장자리의 [가드레일]이 차가 벗어나는 것을 막아줘요." },
+      { id: 13, foreign: "네비게이션", korean: "길 도우미", example: "처음 가는 길이라 [네비게이션]의 안내를 따라갔어요." },
+      { id: 14, foreign: "네일 아트", korean: "손톱 꾸미기", example: "기분 전환을 위해 예쁘게 [네일 아트]를 받았어요." },
+      { id: 15, foreign: "스트레스", korean: "긴장, 압박감", example: "시험 기간이라 [스트레스]가 많이 쌓였어요." },
+      { id: 16, foreign: "필라테스", korean: "균형 운동", example: "자세를 바르게 교정하기 위해 [필라테스]를 배워요." },
+      { id: 17, foreign: "노트", korean: "공책", example: "선생님께서 말씀하신 중요한 내용을 [노트]에 적었어요." },
+      { id: 18, foreign: "블로그", korean: "사랑 누리방", example: "매일 일상과 독서 기록을 내 [블로그]에 올려요." },
+      { id: 19, foreign: "리모델링", korean: "새단장", example: "오래된 도서관이 깔끔하게 [리모델링] 되었어요." },
+      { id: 20, foreign: "베란다", korean: "내민 공간", example: "따뜻한 햇살이 들어오는 [베란다]에 화분을 두었어요." },
+      { id: 21, foreign: "포토존", korean: "사진 촬영 구역", example: "꽃밭 앞에 마련된 [포토존]에서 기념사진을 찍었어요." },
+      { id: 22, foreign: "댓글(리플)", korean: "달림글", example: "내가 올린 게시글에 친구들의 [리플]이 달렸어요." },
+      { id: 23, foreign: "어그로", korean: "억지 주목", example: "관심을 끌려고 일부러 [어그로]를 끄는 행동은 좋지 않아요." },
+      { id: 24, foreign: "오마카세", korean: "주방 특선", example: "오늘 저녁은 요리사가 알아서 내어주는 [오마카세]로 정했어요." },
+      { id: 25, foreign: "벌크 업", korean: "근육 키우기", example: "건강한 체격을 만들기 위해 운동과 식단으로 [벌크 업] 중이에요." },
+      { id: 26, foreign: "버츄얼 휴먼", korean: "가상인간", example: "요즘은 광고 모델로 활약하는 [버츄얼 휴먼]도 많아요." },
+      { id: 27, foreign: "퍼스널 컬러", korean: "맞춤 색깔", example: "나에게 가장 잘 어울리는 [퍼스널 컬러]를 진단받았어요." },
+      { id: 28, foreign: "플러팅", korean: "호감 표시", example: "상대방에게 은근슬쩍 [플러팅]을 건네며 마음을 표현했어요." },
+      { id: 29, foreign: "시터", korean: "돌보미", example: "맞벌이 부모님을 대신해 아이를 돌봐주는 [시터] 선생님이 오셨어요." },
+      { id: 30, foreign: "굿즈", korean: "기획 상품", example: "좋아하는 캐릭터의 한정판 [굿즈]를 구매했어요." },
+      { id: 31, foreign: "언박싱", korean: "개봉", example: "새로 산 태블릿 상자를 뜯으며 [언박싱] 영상을 찍었어요." }
+    ];
+
+    // 게임 상태 변수
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let combo = 0;
+    let wrongStreak = 0;
+    let maxCombo = 0;
+    let correctCount = 0;
+    let wrongAnswers = [];
+    let totalQuestionsCount = 10;
+    let isAnswered = false;
+    let difficultyMode = 'normal'; // 'normal' 또는 'hard'
+
+    // 난이도 선택 토글 함수
+    function setDifficulty(mode) {
+      playPluck(mode === 'hard' ? 'A4' : 'G4');
+      difficultyMode = mode;
+      const normalBtn = document.getElementById('diff-normal-btn');
+      const hardBtn = document.getElementById('diff-hard-btn');
+      const descEl = document.getElementById('difficulty-desc');
+
+      if (mode === 'normal') {
+        normalBtn.className = 'flex-1 py-2.5 px-3 rounded-lg font-myung text-base font-bold bg-[#1D4E5F] text-[#FCF8F0] shadow-xs transition cursor-pointer';
+        hardBtn.className = 'flex-1 py-2.5 px-3 rounded-lg font-myung text-base font-bold text-[#4A3222] hover:bg-[#DFD2BA] transition cursor-pointer';
+        descEl.innerHTML = '※ 제시된 온전한 외래어를 보고 알맞은 우리말 순화어를 고르시오.';
+      } else {
+        hardBtn.className = 'flex-1 py-2.5 px-3 rounded-lg font-myung text-base font-bold bg-[#B8372A] text-[#FFF3B0] shadow-xs transition cursor-pointer';
+        normalBtn.className = 'flex-1 py-2.5 px-3 rounded-lg font-myung text-base font-bold text-[#4A3222] hover:bg-[#DFD2BA] transition cursor-pointer';
+        descEl.innerHTML = '🔥 <span class="text-[#B8372A]">어◯로</span>처럼 외래어 낱말 중 한 글자가 가려진 채 출제되오!';
+      }
+    }
+
+    // 어려운 모드용: 낱말 중 한 글자를 '◯'로 가리는 함수
+    function maskOneChar(word) {
+      // 괄호 부가 설명이 있으면 핵심 앞단어만 추출 (예: "메세지(메시지)" -> "메세지")
+      const cleanWord = word.split('(')[0].split('/')[0].trim();
+      const validIndices = [];
+      for (let i = 0; i < cleanWord.length; i++) {
+        // 공백이나 기호가 아닌 한글/숫자 글자 위치 수집
+        if (/[가-힣a-zA-Z0-9]/.test(cleanWord[i])) {
+          validIndices.push(i);
+        }
+      }
+      if (validIndices.length === 0) return cleanWord;
+
+      // 3글자 이상일 때는 가운데 글자를 우선 가려 '어◯로'처럼 직관적으로 보이게 처리
+      let targetIdx;
+      if (validIndices.length >= 3) {
+        const middlePool = validIndices.slice(1, -1);
+        targetIdx = middlePool[Math.floor(Math.random() * middlePool.length)];
+      } else {
+        targetIdx = validIndices[Math.floor(Math.random() * validIndices.length)];
+      }
+
+      return cleanWord.substring(0, targetIdx) + '◯' + cleanWord.substring(targetIdx + 1);
+    }
+
+    // 한글 초성 추출 함수
+    function getChoseong(str) {
+      const cho = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+      let result = "";
+      for (let i = 0; i < str.length; i++) {
+        const code = str.charCodeAt(i) - 44032;
+        if (code > -1 && code < 11172) {
+          result += cho[Math.floor(code / 588)];
+        } else {
+          result += str.charAt(i);
+        }
+      }
+      return result;
+    }
+
+    // 배열 섞기 함수
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // 게임 시작
+    function startGame(numQuestions) {
+      playPluck('C5');
+      totalQuestionsCount = numQuestions;
+      currentQuestions = shuffle(wordData).slice(0, numQuestions);
+      currentIndex = 0;
+      score = 0;
+      combo = 0;
+      wrongStreak = 0;
+      maxCombo = 0;
+      correctCount = 0;
+      wrongAnswers = [];
+
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('quiz-screen').classList.remove('hidden');
+
+      renderQuestion();
+    }
+
+    // 문제 화면 렌더링
+    function renderQuestion() {
+      isAnswered = false;
+      const q = currentQuestions[currentIndex];
+      
+      // 상단 진행도 및 점수 갱신
+      document.getElementById('question-counter').textContent = `제 ${currentIndex + 1}문 / ${totalQuestionsCount}문`;
+      document.getElementById('score-display').textContent = score;
+      const progressPercent = ((currentIndex) / totalQuestionsCount) * 100;
+      document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+      // 연속 정답 배지
+      const comboBadge = document.getElementById('combo-badge');
+      if (combo >= 2) {
+        comboBadge.textContent = `🔥 ${combo}연속 정답!`;
+        comboBadge.classList.remove('hidden');
+      } else {
+        comboBadge.classList.add('hidden');
+      }
+
+      // 힌트 및 피드백 초기화
+      document.getElementById('hint-btn').classList.remove('hidden');
+      document.getElementById('hint-text').classList.add('hidden');
+      document.getElementById('hint-text').textContent = `초성 힌트: ${getChoseong(q.korean)}`;
+      document.getElementById('feedback-area').classList.add('hidden');
+      document.getElementById('streak-stage').classList.add('hidden');
+
+      // 난이도에 따른 문제 배지 및 낱말 표시
+      const typeBadge = document.getElementById('question-type-badge');
+      const wordEl = document.getElementById('question-word');
+      const contextEl = document.getElementById('question-context');
+
+      if (difficultyMode === 'hard') {
+        const maskedWord = maskOneChar(q.foreign);
+        typeBadge.innerHTML = '🔥 [어려운 시험] 가려진 낱말(<span class="text-[#B8372A]">◯</span>)을 유추하여 순화어를 고르시오! 🔥';
+        wordEl.innerHTML = maskedWord.replace('◯', '<span class="text-[#B8372A] mx-0.5">◯</span>');
+        const maskedExample = q.example.replace(/\[(.*?)\]/g, `<span class="text-[#B8372A] font-bold underline decoration-dotted">${maskedWord}</span>`);
+        contextEl.innerHTML = `"${maskedExample}"`;
+      } else {
+        typeBadge.textContent = '✦ 이 외래어를 다듬은 고운 우리말은 무엇이오? ✦';
+        wordEl.textContent = q.foreign;
+        const formattedExample = q.example.replace(/\[(.*?)\]/g, '<span class="text-[#B8372A] font-bold underline decoration-dotted">$1</span>');
+        contextEl.innerHTML = `"${formattedExample}"`;
+      }
+
+      // 4지선다 보기 생성 (정답 1개 + 오답 3개)
+      const distractors = shuffle(wordData.filter(item => item.id !== q.id)).slice(0, 3);
+      const options = shuffle([q, ...distractors]);
+
+      const optionsGrid = document.getElementById('options-grid');
+      optionsGrid.innerHTML = '';
+
+      const numLabels = ['一', '二', '三', '四'];
+
+      options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `option-btn w-full text-left p-4 rounded-xl font-bold text-[#2C241E] text-base sm:text-lg flex items-center gap-3 shadow-xs cursor-pointer`;
+        btn.innerHTML = `
+          <span class="w-8 h-8 rounded-lg bg-[#EFE6D5] border border-[#8B654E] text-[#5C4033] font-myung flex items-center justify-center shrink-0 text-sm">
+            ${numLabels[idx]}
+          </span>
+          <span>${opt.korean}</span>
+        `;
+        btn.onclick = () => handleAnswer(opt, btn, q);
+        optionsGrid.appendChild(btn);
+      });
+    }
+
+    // 초성 힌트 보기
+    function showHint() {
+      playPluck('A4');
+      document.getElementById('hint-btn').classList.add('hidden');
+      document.getElementById('hint-text').classList.remove('hidden');
+    }
+
+    // 정답 확인 처리
+    function handleAnswer(selectedOpt, selectedBtn, correctQ) {
+      if (isAnswered) return;
+      isAnswered = true;
+
+      const allBtns = document.getElementById('options-grid').querySelectorAll('button');
+      allBtns.forEach(b => b.disabled = true);
+
+      const isCorrect = selectedOpt.id === correctQ.id;
+      const feedbackArea = document.getElementById('feedback-area');
+      const feedbackEmoji = document.getElementById('feedback-emoji');
+      const feedbackTitle = document.getElementById('feedback-title');
+      const feedbackDesc = document.getElementById('feedback-desc');
+
+      feedbackArea.classList.remove('hidden', 'bg-[#EBF3EE]', 'text-[#244A34]', 'border-[#7BA38B]', 'bg-[#FDF3F2]', 'text-[#8C271E]', 'border-[#D49B95]');
+
+      if (isCorrect) {
+        // 정답 버튼 스타일 (전통 청록/쪽빛 느낌)
+        selectedBtn.style.background = '#1D4E5F';
+        selectedBtn.style.borderColor = '#0F2A34';
+        selectedBtn.style.color = '#FCF8F0';
+
+        combo++;
+        wrongStreak = 0;
+        if (combo > maxCombo) maxCombo = combo;
+        correctCount++;
+
+        const isMilestone = (combo >= 5 && combo % 5 === 0);
+        const hardBonus = (difficultyMode === 'hard') ? 30 : 0;
+        const bonus = (isMilestone ? (combo * 20) : (combo >= 2 ? 20 : 0)) + hardBonus;
+        score += (100 + bonus);
+        document.getElementById('score-display').textContent = score;
+
+        if (isMilestone) {
+          playKoreanMelody('milestone');
+          feedbackArea.classList.add('bg-gradient-to-r', 'from-[#FFF8E1]', 'via-[#FFECB3]', 'to-[#FFF8E1]', 'text-[#4A1D12]', 'border-2', 'border-[#E5B84B]');
+          feedbackEmoji.textContent = '🐉';
+          feedbackTitle.textContent = `천하제일 경사로다! ${combo}연속 대위업 달성! (특별 하사금 +${bonus}냥)`;
+          feedbackDesc.textContent = `'${correctQ.foreign}' → '${correctQ.korean}'! 임금님께서 어전 풍악을 울리라 명하셨소!`;
+          renderRoyalMilestoneCelebration(combo);
+          triggerRoyalFireworks(combo);
+        } else {
+          playKoreanMelody('correct');
+          feedbackArea.classList.add('bg-[#EBF3EE]', 'text-[#244A34]', 'border-2', 'border-[#7BA38B]');
+          feedbackEmoji.textContent = combo >= 3 ? '🔥' : '🏮';
+          feedbackTitle.textContent = combo >= 2 ? `얼씨구! 정답이오! (${combo}연속 기세 +${bonus}냥)` : '좋구나! 정답이오!';
+          feedbackDesc.textContent = `'${correctQ.foreign}'의 바른 우리말 순화어는 '${correctQ.korean}'이오.`;
+
+          // 일반 연속 정답 시 전통 민속놀이 축하 연출 발동
+          if (combo >= 2) {
+            renderJwibulCelebration(combo);
+            if (typeof confetti === 'function') {
+              confetti({
+                particleCount: 45 + combo * 10,
+                spread: 65,
+                origin: { y: 0.7 },
+                colors: ['#FF6B00', '#FFD166', '#B8372A', '#E5B84B']
+              });
+            }
+          }
+        }
+      } else {
+        playKoreanMelody('wrong');
+        selectedBtn.classList.add('shake');
+        selectedBtn.style.background = '#B8372A';
+        selectedBtn.style.borderColor = '#7A1E15';
+        selectedBtn.style.color = '#FCF8F0';
+
+        // 실제 정답 버튼 강조 표시
+        allBtns.forEach((btn, idx) => {
+          const optText = btn.querySelector('span:last-child').textContent;
+          if (optText === correctQ.korean) {
+            btn.style.background = '#1D4E5F';
+            btn.style.borderColor = '#0F2A34';
+            btn.style.color = '#FCF8F0';
+          }
+        });
+
+        combo = 0;
+        wrongStreak++;
+        wrongAnswers.push(correctQ);
+
+        feedbackArea.classList.add('bg-[#FDF3F2]', 'text-[#8C271E]', 'border-2', 'border-[#D49B95]');
+        feedbackEmoji.textContent = '📜';
+        feedbackTitle.textContent = '아쉽구려! 다시 한번 새겨보시오.';
+        feedbackDesc.textContent = `'${correctQ.foreign}'의 바른 순화어는 '${correctQ.korean}'이오.`;
+
+        // 2연속 이상 오답 시 서당 식구들의 따뜻한 응원 무대 발동
+        if (wrongStreak >= 2) {
+          renderEncouragementStage(wrongStreak);
+        }
+      }
+
+      // 마지막 문제일 경우 다음 버튼 문구 변경
+      const nextBtn = document.getElementById('next-btn');
+      if (currentIndex === totalQuestionsCount - 1) {
+        nextBtn.textContent = '최종 결과 보기 👑';
+      } else {
+        nextBtn.textContent = '다음 문제 ➔';
+      }
+    }
+
+    // 🐉 5연속, 10연속, 15연속 등 5단위 달성 시 경복궁 근정전 어전 대축제 & 황금 용 승천 특별 무대!
+    function renderRoyalMilestoneCelebration(streak) {
+      const stage = document.getElementById('streak-stage');
+      const milestoneTitles = {
+        5: {
+          rank: '어사화(御賜花) 하사 · 5연속 경사!',
+          quote: '오색 구름을 뚫고 황금 용이 승천하옵니다! 어사화를 꽂고 궁궐을 행차하시오!',
+          sub: '꽹과리·태평소·용고(龍鼓) 대취타가 경복궁 근정전 앞마당에 울려 퍼집니다!'
+        },
+        10: {
+          rank: '일월오봉도(日月五峯圖)의 축복 · 10연속 신화!',
+          quote: '해와 달이 나란히 빛나며 10연속 완벽 행진을 경하드리옵니다!',
+          sub: '집현전 학사들도 기립박수를 보내는 전설의 우리말 대학자 탄생이오!'
+        },
+        15: {
+          rank: '세종대왕 어전 대제학 · 15연속 기적!',
+          quote: '하늘이 내린 우리말의 수호자! 15연속 무결점 기록이 실록에 새겨지옵니다!',
+          sub: '밤하늘을 가득 수놓는 오방색 황실 불꽃놀이를 만끽하시옵소서!'
+        }
+      };
+
+      const info = milestoneTitles[streak] || {
+        rank: `전설의 우리말 성군 · ${streak}연속 위업!`,
+        quote: `${streak}연속 정답이라는 전무후무한 대기록이 천하에 선포되었소!`,
+        sub: '황금 용과 봉황이 함께 춤추는 영광의 대축제 한마당이옵니다!'
+      };
+
+      stage.className = 'mb-5 rounded-2xl p-5 sm:p-6 relative overflow-hidden transition-all najeon-border p-[3px] royal-milestone-glow pop-in';
+      stage.innerHTML = `
+        <div class="bg-gradient-to-br from-[#1C0D0A] via-[#3B1510] to-[#122630] rounded-[13px] p-4 sm:p-5 relative overflow-hidden text-[#FCF8F0]">
+          <!-- 회전하는 황금 후광 햇살 -->
+          <div class="sunburst-rays"></div>
+
+          <!-- 상단 왕실 어명 배지 -->
+          <div class="relative z-10 text-center mb-3">
+            <span class="inline-flex items-center gap-2 bg-gradient-to-r from-[#FFD166] via-[#FFF3B0] to-[#E5B84B] text-[#261E18] font-myung font-bold text-xs sm:text-sm px-4 py-1 rounded-full shadow-lg border border-[#B8372A]">
+              <span>👑</span> ${info.rank} <span>👑</span>
+            </span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+            <!-- 승천하는 황금 여의주 용 SVG -->
+            <div class="shrink-0 dragon-soar">
+              <svg width="96" height="92" viewBox="0 0 100 96" class="overflow-visible">
+                <!-- 황금 후광 -->
+                <circle cx="50" cy="48" r="38" fill="rgba(255, 209, 102, 0.16)" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="5 3"/>
+                <!-- 여의주 불꽃 -->
+                <circle cx="76" cy="24" r="9" fill="rgba(255, 107, 0, 0.45)"/>
+                <circle cx="76" cy="24" r="5.5" fill="#FFF3B0" stroke="#FF6B00" stroke-width="1.5"/>
+                <!-- 황금 용 몸통 곡선 -->
+                <path d="M22 72 C14 54, 34 48, 28 32 C24 20, 44 16, 52 28 C60 40, 44 54, 58 64 C70 72, 82 58, 76 46" fill="none" stroke="#E5B84B" stroke-width="9" stroke-linecap="round"/>
+                <path d="M22 72 C14 54, 34 48, 28 32 C24 20, 44 16, 52 28 C60 40, 44 54, 58 64 C70 72, 82 58, 76 46" fill="none" stroke="#FFF3B0" stroke-width="3" stroke-dasharray="4 4" stroke-linecap="round"/>
+                <!-- 용 머리 & 뿔 -->
+                <circle cx="54" cy="26" r="10" fill="#D99B26" stroke="#FFF3B0" stroke-width="1.5"/>
+                <path d="M48 18 L42 8 M56 17 L60 7" stroke="#FFF3B0" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="57" cy="24" r="2.2" fill="#B8372A"/>
+                <!-- 전통 구름 -->
+                <path d="M16 78 Q24 70 34 76 Q44 70 52 78 Z" fill="#FCF8F0" opacity="0.85"/>
+              </svg>
+            </div>
+
+            <!-- 왕실 축하 어명 문구 -->
+            <div class="text-center flex-1">
+              <p class="font-myung text-lg sm:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#FFF3B0] via-[#FFD166] to-[#FFF3B0] leading-snug drop-shadow-sm">
+                "${info.quote}"
+              </p>
+              <p class="text-xs sm:text-sm text-[#F3E5C8] mt-2 font-bold">
+                🎺 ${info.sub}
+              </p>
+            </div>
+
+            <!-- 좌우 대취타 나팔 & 북 아이콘 -->
+            <div class="flex sm:flex-col items-center gap-2 text-3xl sm:text-4xl pungmul-bounce select-none">
+              <span>🎆</span>
+              <span>🏮</span>
+            </div>
+          </div>
+        </div>
+      `;
+      stage.classList.remove('hidden');
+    }
+
+    // 🎆 5단위 달성 시 화면 양쪽과 중앙에서 3연속 황실 오방색 불꽃놀이 폭죽 발사!
+    function triggerRoyalFireworks(streak) {
+      if (typeof confetti !== 'function') return;
+      const royalColors = ['#FFD166', '#FFF3B0', '#B8372A', '#1D4E5F', '#2E6F40', '#FF7B00'];
+      const waves = Math.min(4, 2 + Math.floor(streak / 5));
+
+      for (let i = 0; i < waves; i++) {
+        setTimeout(() => {
+          // 왼쪽 대포
+          confetti({
+            particleCount: 65,
+            angle: 60,
+            spread: 75,
+            origin: { x: 0.1, y: 0.65 },
+            colors: royalColors,
+            scalar: 1.2
+          });
+          // 오른쪽 대포
+          confetti({
+            particleCount: 65,
+            angle: 120,
+            spread: 75,
+            origin: { x: 0.9, y: 0.65 },
+            colors: royalColors,
+            scalar: 1.2
+          });
+        }, i * 320);
+      }
+    }
+
+    // 🔥 연속 정답 시 매번 다른 한국 전통 놀이 축하 무대 렌더링 (쥐불놀이, 강강술래, 상모돌리기, 북청사자놀음, 널뛰기)
+    let lastCelebrateIdx = -1;
+    function renderJwibulCelebration(streak) {
+      const stage = document.getElementById('streak-stage');
+      const speed = Math.max(0.35, 0.9 - streak * 0.1);
+
+      const celebrations = [
+        // 1. 정월대보름 쥐불놀이
+        {
+          bg: 'from-[#1A1325] via-[#2B1B3D] to-[#1A1325]',
+          border: 'border-[#E5B84B]',
+          badge: `🔥 정월대보름 쥐불놀이 · ${streak}연속!`,
+          titleColor: 'text-[#FFD166]',
+          quote: `정월대보름 쥐불놀이 불꽃이 밤하늘을 수놓았소! ${streak}연속 장원 행진이오!`,
+          sub: '덩기덕 쿵더러러~ 🎇 불꽃이 밝을수록 복이 쏟아진다오!',
+          leftSvg: `
+            <svg width="76" height="76" viewBox="0 0 80 80" class="overflow-visible">
+              <circle cx="40" cy="36" r="28" fill="none" stroke="rgba(255, 166, 43, 0.35)" stroke-width="3" stroke-dasharray="6 4"/>
+              <g style="transform-origin: 40px 36px; animation: jwibulSpin ${speed}s linear infinite;">
+                <circle cx="40" cy="36" r="28" fill="none" stroke="#FF7B00" stroke-width="2.5" stroke-dasharray="28 148" stroke-linecap="round"/>
+                <circle cx="40" cy="8" r="4.5" fill="#FFF3B0"/>
+                <circle cx="40" cy="8" r="8" fill="rgba(255, 107, 0, 0.45)"/>
+              </g>
+              <g class="pungmul-bounce">
+                <ellipse cx="40" cy="24" rx="10" ry="3" fill="#261E18" stroke="#E5B84B" stroke-width="1"/>
+                <rect x="35" y="18" width="10" height="6" rx="2" fill="#261E18"/>
+                <circle cx="40" cy="29" r="5.5" fill="#F7D5B4"/>
+                <path d="M31 48 L34 35 L46 35 L49 48 Z" fill="#1D4E5F" stroke="#FCF8F0" stroke-width="1"/>
+                <rect x="33" y="48" width="6" height="12" rx="2" fill="#FCF8F0"/>
+                <rect x="41" y="48" width="6" height="12" rx="2" fill="#FCF8F0"/>
+              </g>
+            </svg>`,
+          rightIcon: '🎇'
+        },
+        // 2. 한가위 강강술래
+        {
+          bg: 'from-[#172A3A] via-[#1D4E5F] to-[#172A3A]',
+          border: 'border-[#F4D35E]',
+          badge: `🌕 한가위 강강술래 · ${streak}연속!`,
+          titleColor: 'text-[#FFF3B0]',
+          quote: `보름달 아래 손에 손잡고 강강술래~ ${streak}연속 정답에 달님도 춤을 추오!`,
+          sub: '강강술래~ 강강술래~ 🎶 고운 우리말 실력이 보름달처럼 둥글고 밝구려!',
+          leftSvg: `
+            <svg width="82" height="76" viewBox="0 0 84 76" class="overflow-visible">
+              <circle cx="42" cy="18" r="13" fill="#FFF3B0" opacity="0.9"/>
+              <g class="ganggang-sway">
+                <!-- 왼쪽 여인 (분홍 치마) -->
+                <circle cx="24" cy="34" r="4.5" fill="#F7D5B4"/>
+                <path d="M16 56 L20 40 L28 40 L32 56 Z" fill="#E07A5F" stroke="#FCF8F0" stroke-width="1"/>
+                <!-- 오른쪽 여인 (연두 치마) -->
+                <circle cx="60" cy="34" r="4.5" fill="#F7D5B4"/>
+                <path d="M52 56 L56 40 L64 40 L68 56 Z" fill="#81B29A" stroke="#FCF8F0" stroke-width="1"/>
+                <!-- 맞잡은 두 손 -->
+                <path d="M27 42 Q42 47 57 42" stroke="#F7D5B4" stroke-width="3" fill="none" stroke-linecap="round"/>
+              </g>
+            </svg>`,
+          rightIcon: '🌕'
+        },
+        // 3. 신명 나는 풍물패 상모돌리기
+        {
+          bg: 'from-[#2D1A12] via-[#4A2518] to-[#2D1A12]',
+          border: 'border-[#E5B84B]',
+          badge: `🥁 풍물패 상모돌리기 · ${streak}연속!`,
+          titleColor: 'text-[#FFD166]',
+          quote: `얼씨구 절씨구! 풍물패가 상모 리본을 빙글빙글 돌리며 장원 행차를 알리오!`,
+          sub: '꽹과리 징 장구 북소리가 온 궁궐에 울려 퍼지옵니다! (${streak}연속 달성)',
+          leftSvg: `
+            <svg width="78" height="76" viewBox="0 0 80 76" class="overflow-visible">
+              <!-- 상모 리본 궤적 -->
+              <path d="M40 16 C12 2, 10 34, 40 22 C70 10, 68 38, 40 16" fill="none" stroke="#FCF8F0" stroke-width="2.5" class="sangmo-wave"/>
+              <g class="pungmul-bounce">
+                <ellipse cx="40" cy="24" rx="9" ry="3.5" fill="#FCF8F0" stroke="#B8372A" stroke-width="1.5"/>
+                <circle cx="40" cy="30" r="5.5" fill="#F7D5B4"/>
+                <!-- 쾌자 조끼 -->
+                <path d="M30 52 L34 36 L46 36 L50 52 Z" fill="#B8372A" stroke="#E5B84B" stroke-width="1.2"/>
+                <!-- 소고 북 -->
+                <circle cx="52" cy="43" r="6" fill="#E5B84B" stroke="#4A3222" stroke-width="1.5"/>
+              </g>
+            </svg>`,
+          rightIcon: '🪘'
+        },
+        // 4. 북청사자놀음 흥겨운 사자춤
+        {
+          bg: 'from-[#1E2B1D] via-[#2E4A2C] to-[#1E2B1D]',
+          border: 'border-[#E5B84B]',
+          badge: `🦁 북청사자놀음 · ${streak}연속!`,
+          titleColor: 'text-[#FFF3B0]',
+          quote: `어흥~ 나쁜 외래어 잡귀는 물렀거라! 사자탈이 방울을 흔들며 덩실덩실 춤추오!`,
+          sub: '우리말 지킴이의 기세에 사자도 신이 나서 어깨춤을 추는구려!',
+          leftSvg: `
+            <svg width="80" height="76" viewBox="0 0 80 76" class="overflow-visible">
+              <g class="pungmul-bounce">
+                <!-- 사자 갈기 -->
+                <circle cx="40" cy="34" r="17" fill="#B8372A" stroke="#E5B84B" stroke-width="2" stroke-dasharray="4 2"/>
+                <!-- 사자 얼굴 -->
+                <circle cx="40" cy="34" r="12" fill="#E5B84B"/>
+                <!-- 눈과 입 -->
+                <circle cx="35.5" cy="31" r="2.2" fill="#261E18"/>
+                <circle cx="44.5" cy="31" r="2.2" fill="#261E18"/>
+                <path d="M34 38 Q40 43 46 38" stroke="#B8372A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <!-- 금방울 -->
+                <circle cx="40" cy="51" r="4" fill="#FFD166" stroke="#261E18" stroke-width="1"/>
+              </g>
+            </svg>`,
+          rightIcon: '🦁'
+        },
+        // 5. 단오절 하늘 높이 널뛰기
+        {
+          bg: 'from-[#2A1B38] via-[#42275A] to-[#2A1B38]',
+          border: 'border-[#F4D35E]',
+          badge: `🎎 단오절 널뛰기 · ${streak}연속!`,
+          titleColor: 'text-[#FFD166]',
+          quote: `구름 위까지 솟구치는 널뛰기 기세! ${streak}연속 정답에 담장 너머까지 소문이 났소!`,
+          sub: '이얍! 솟아라 우리말! 높은 기세로 장원급제까지 직진하시오!',
+          leftSvg: `
+            <svg width="80" height="76" viewBox="0 0 80 76" class="overflow-visible">
+              <!-- 널판지 -->
+              <line x1="16" y1="60" x2="64" y2="54" stroke="#8B654E" stroke-width="4" stroke-linecap="round"/>
+              <polygon points="36,62 44,62 40,57" fill="#4A3222"/>
+              <!-- 높이 솟구친 선비/낭자 -->
+              <g class="neol-jump">
+                <circle cx="26" cy="24" r="5" fill="#F7D5B4"/>
+                <path d="M18 44 L22 30 L30 30 L34 44 Z" fill="#1D4E5F" stroke="#FCF8F0" stroke-width="1"/>
+                <path d="M16 32 L10 26 M36 32 L42 26" stroke="#1D4E5F" stroke-width="2.5" stroke-linecap="round"/>
+              </g>
+            </svg>`,
+          rightIcon: '🎏'
+        }
+      ];
+
+      // 직전과 다른 연출이 나오도록 선택
+      let idx = Math.floor(Math.random() * celebrations.length);
+      if (idx === lastCelebrateIdx) {
+        idx = (idx + 1) % celebrations.length;
+      }
+      lastCelebrateIdx = idx;
+      const item = celebrations[idx];
+
+      stage.className = `mb-4 rounded-xl p-4 relative overflow-hidden transition-all shadow-lg bg-gradient-to-r ${item.bg} border-2 ${item.border} text-[#FCF8F0] pop-in`;
+      stage.innerHTML = `
+        <div class="flex items-center justify-between gap-2 relative z-10">
+          <div class="shrink-0">${item.leftSvg}</div>
+          <div class="text-center flex-1 px-2">
+            <div class="inline-flex items-center gap-1.5 bg-[#B8372A] text-[#FFF3B0] text-xs font-bold px-3 py-0.5 rounded-full border border-[#E5B84B] mb-1.5">
+              ${item.badge}
+            </div>
+            <p class="font-myung text-base sm:text-lg ${item.titleColor} leading-snug">
+              "${item.quote}"
+            </p>
+            <p class="text-xs text-[#E8DBC5] mt-1">${item.sub}</p>
+          </div>
+          <div class="text-3xl sm:text-4xl pungmul-bounce pr-2 select-none">${item.rightIcon}</div>
+        </div>
+      `;
+      stage.classList.remove('hidden');
+    }
+
+    // 🍵 연속 오답 시 매번 다른 따뜻한 전통 서당 응원 무대 렌더링
+    let lastEncourageIdx = -1;
+    function renderEncouragementStage(missCount) {
+      const stage = document.getElementById('streak-stage');
+      const encouragements = [
+        {
+          bg: 'from-[#F9F1E2] via-[#FDF8EE] to-[#F9F1E2]',
+          border: 'border-[#8B654E]',
+          tagBg: 'bg-[#E3EFE7] text-[#2E6F40] border-[#96BFA3]',
+          tag: `🌿 훈장님의 숭늉 한 사발 · ${missCount}연속 아쉼`,
+          title: '훈장님께서 따뜻한 숭늉 한 사발을 내어주셨소',
+          desc: '허허, 천 리 길도 한 걸음부터라네! 급할 것 없으니 숭늉 한 모금 마시고 다시 보게나.',
+          svg: `
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="28" fill="#EFE2CA" stroke="#8B654E" stroke-width="2"/>
+              <!-- 훈장님 갓과 수염 -->
+              <ellipse cx="32" cy="18" rx="14" ry="3.5" fill="#261E18"/>
+              <rect x="25" y="11" width="14" height="7" rx="2" fill="#261E18"/>
+              <circle cx="32" cy="26" r="7" fill="#F7D5B4"/>
+              <path d="M27 31 Q32 45 37 31" fill="#FCF8F0" stroke="#D5C9B4" stroke-width="1"/>
+              <!-- 숭늉 사발 -->
+              <path d="M22 46 Q32 54 42 46 Z" fill="#8B654E"/>
+            </svg>`
+        },
+        {
+          bg: 'from-[#FDF2E9] via-[#FFF9F2] to-[#FDF2E9]',
+          border: 'border-[#C87D55]',
+          tagBg: 'bg-[#FCE8D8] text-[#9C4221] border-[#E6B08E]',
+          tag: `🍯 서당 벗들의 달콤한 약과 · ${missCount}연속 아쉼`,
+          title: '서당 벗들이 꿀약과와 수정과를 건네며 응원하오!',
+          desc: '우리말 순화어는 원래 헷갈리기 마련이지! 호롱불 초성 힌트를 켜보면 길이 보일 것이오!',
+          svg: `
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="28" fill="#FCE8D8" stroke="#C87D55" stroke-width="2"/>
+              <!-- 전통 꽃약과 모양 -->
+              <circle cx="32" cy="32" r="14" fill="#B86B35" stroke="#7A4119" stroke-width="2" stroke-dasharray="5 2"/>
+              <circle cx="32" cy="32" r="6" fill="#E5B84B"/>
+              <circle cx="32" cy="32" r="2" fill="#B8372A"/>
+            </svg>`
+        },
+        {
+          bg: 'from-[#EEF4F6] via-[#F7FAFB] to-[#EEF4F6]',
+          border: 'border-[#1D4E5F]',
+          tagBg: 'bg-[#DCEBF0] text-[#1D4E5F] border-[#9EC0CC]',
+          tag: `👑 세종대왕님의 인자한 격려 · ${missCount}연속 아쉼`,
+          title: '세종대왕님께서 인자한 미소로 격려하시옵니다',
+          desc: '실수는 배움의 어머니라 하였느니라. 틀린 낱말을 붓으로 새겼으니 이제 진짜 내 것이 되었도다!',
+          svg: `
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="28" fill="#DCEBF0" stroke="#1D4E5F" stroke-width="2"/>
+              <!-- 익선관 & 곤룡포 -->
+              <rect x="24" y="13" width="16" height="9" rx="3" fill="#261E18"/>
+              <circle cx="32" cy="27" r="7" fill="#F7D5B4"/>
+              <path d="M20 48 L24 35 L40 35 L44 48 Z" fill="#B8372A" stroke="#E5B84B" stroke-width="1.5"/>
+              <circle cx="32" cy="42" r="3.5" fill="#E5B84B"/>
+            </svg>`
+        },
+        {
+          bg: 'from-[#F4F0F8] via-[#FAF8FC] to-[#F4F0F8]',
+          border: 'border-[#6B5B95]',
+          tagBg: 'bg-[#E6E0F0] text-[#4A3B6E] border-[#B8AED1]',
+          tag: `🥁 동네 학동의 응원 북소리 · ${missCount}연속 아쉼`,
+          title: '서당 막내 학동이 힘찬 응원 북을 울려주오!',
+          desc: '둥둥둥! 기죽지 마시옵소서! 다음 문제에서 바로 기세를 되찾아 장원급제하실 것이옵니다!',
+          svg: `
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="28" fill="#E6E0F0" stroke="#6B5B95" stroke-width="2"/>
+              <!-- 전통 북과 북채 -->
+              <ellipse cx="32" cy="34" rx="13" ry="11" fill="#B8372A" stroke="#261E18" stroke-width="1.5"/>
+              <ellipse cx="32" cy="34" rx="8" ry="8" fill="#FCF8F0" stroke="#8B654E" stroke-width="1.5"/>
+              <line x1="18" y1="20" x2="29" y2="31" stroke="#E5B84B" stroke-width="3" stroke-linecap="round"/>
+              <line x1="46" y1="20" x2="35" y2="31" stroke="#E5B84B" stroke-width="3" stroke-linecap="round"/>
+            </svg>`
+        },
+        {
+          bg: 'from-[#F1F6EE] via-[#F9FCF7] to-[#F1F6EE]',
+          border: 'border-[#2E6F40]',
+          tagBg: 'bg-[#DFECE2] text-[#2E6F40] border-[#96BFA3]',
+          tag: `🎋 대나무 숲의 맑은 바람 · ${missCount}연속 아쉼`,
+          title: '대청마루에 불어오는 맑은 솔바람이 땀을 식혀주오',
+          desc: '비 온 뒤에 대나무가 더 꿋꿋이 자라듯, 한 번 헷갈린 순화어는 평생 잊지 않게 된다오!',
+          svg: `
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="28" fill="#DFECE2" stroke="#2E6F40" stroke-width="2"/>
+              <!-- 푸른 대나무 마디 -->
+              <rect x="29" y="14" width="6" height="36" rx="2" fill="#2E6F40"/>
+              <line x1="27" y1="26" x2="37" y2="26" stroke="#1B4326" stroke-width="2"/>
+              <line x1="27" y1="38" x2="37" y2="38" stroke="#1B4326" stroke-width="2"/>
+              <path d="M35 24 Q45 19 43 26 Q38 27 35 24" fill="#4C9A63"/>
+              <path d="M29 34 Q19 29 21 36 Q26 37 29 34" fill="#4C9A63"/>
+            </svg>`
+        }
+      ];
+
+      // 직전과 다른 응원 연출이 나오도록 선택
+      let idx = Math.floor(Math.random() * encouragements.length);
+      if (idx === lastEncourageIdx) {
+        idx = (idx + 1) % encouragements.length;
+      }
+      lastEncourageIdx = idx;
+      const item = encouragements[idx];
+
+      stage.className = `mb-4 rounded-xl p-4 relative overflow-hidden transition-all shadow-sm bg-gradient-to-r ${item.bg} border-2 ${item.border} text-[#261E18] pop-in`;
+      stage.innerHTML = `
+        <div class="flex items-center gap-3.5">
+          <div class="shrink-0 pungmul-bounce">${item.svg}</div>
+          <div class="text-left flex-1">
+            <span class="inline-block text-xs font-bold ${item.tagBg} border px-2.5 py-0.5 rounded-md mb-1">
+              ${item.tag}
+            </span>
+            <p class="font-myung text-base sm:text-lg text-[#4A3222]">${item.title}</p>
+            <p class="text-xs sm:text-sm text-[#5C4838] mt-0.5 leading-relaxed">${item.desc}</p>
+          </div>
+        </div>
+      `;
+      stage.classList.remove('hidden');
+    }
+
+    // 다음 문제로 이동
+    function nextQuestion() {
+      playPluck('F4');
+      currentIndex++;
+      if (currentIndex < totalQuestionsCount) {
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    // 최종 결과 화면 표시
+    function showResults() {
+      window.VillageBridge?.report(correctCount, totalQuestionsCount, correctCount + wrongAnswers.length);
+      playKoreanMelody('fanfare');
+      document.getElementById('quiz-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.remove('hidden');
+
+      const accuracy = Math.round((correctCount / totalQuestionsCount) * 100);
+      document.getElementById('final-score').textContent = `${score}냥`;
+      document.getElementById('final-correct').textContent = `${correctCount} / ${totalQuestionsCount}`;
+      document.getElementById('final-combo').textContent = `${maxCombo}연속`;
+
+      const rankEl = document.getElementById('result-rank');
+      const subEl = document.getElementById('result-subtitle');
+      const iconEl = document.getElementById('result-badge-icon');
+
+      if (accuracy === 100) {
+        iconEl.textContent = '👑';
+        rankEl.textContent = '세종대왕님도 감탄할 장원급제!';
+        subEl.textContent = '어사화를 꽂으시오! 모든 순화어를 막힘없이 깨우쳤구려.';
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 140,
+            spread: 85,
+            origin: { y: 0.6 },
+            colors: ['#B8372A', '#1D4E5F', '#E5B84B', '#2E6F40']
+          });
+        }
+      } else if (accuracy >= 70) {
+        iconEl.textContent = '🎖️';
+        rankEl.textContent = '우리말 사랑 진사 급제!';
+        subEl.textContent = '훌륭한 실력이오! 조금만 더 정진하면 장원급제라오!';
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 70,
+            spread: 65,
+            origin: { y: 0.6 },
+            colors: ['#B8372A', '#1D4E5F', '#E5B84B', '#2E6F40']
+          });
+        }
+      } else {
+        iconEl.textContent = '🌱';
+        rankEl.textContent = '서당의 새싹 학동!';
+        subEl.textContent = '오늘 익힌 순화어들을 일상에서 하나씩 써보시게나!';
+      }
+
+      // 오답 기록 렌더링
+      const reviewSection = document.getElementById('review-section');
+      const wrongList = document.getElementById('wrong-list');
+      if (wrongAnswers.length > 0) {
+        reviewSection.classList.remove('hidden');
+        wrongList.innerHTML = wrongAnswers.map(item => `
+          <li class="flex items-center justify-between bg-[#FCF9F2] px-3.5 py-2 rounded-lg border border-[#D49B95]">
+            <span class="font-bold text-[#4A3E35]">${item.foreign}</span>
+            <span class="text-[#B8372A] font-bold">➔ ${item.korean}</span>
+          </li>
+        `).join('');
+      } else {
+        reviewSection.classList.add('hidden');
+      }
+    }
+
+    // 처음 화면으로 돌아가기
+    function resetToStart() {
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('quiz-screen').classList.add('hidden');
+      document.getElementById('start-screen').classList.remove('hidden');
+    }
+
+    // 순화어 족보(단어장) 모달 열기/닫기
+    function toggleModal(show) {
+      const modal = document.getElementById('dictionary-modal');
+      if (show) {
+        renderDictionary(wordData);
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    // 단어장 목록 렌더링
+    function renderDictionary(list) {
+      const container = document.getElementById('dictionary-list');
+      container.innerHTML = list.map(item => `
+        <div class="p-3 rounded-lg bg-[#FCF9F2] border border-[#C8B69E] flex items-center justify-between hover:border-[#2B5B6C] transition shadow-2xs">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-[#8B654E] w-5">${item.id}.</span>
+            <span class="font-bold text-[#2C241E] text-sm">${item.foreign}</span>
+          </div>
+          <span class="text-xs font-bold text-[#2B5B6C] bg-[#E6EFF2] px-2.5 py-1 rounded-md border border-[#B4CCD4]">
+            ${item.korean}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    // 단어장 검색 필터
+    function filterDictionary() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const filtered = wordData.filter(item => 
+        item.foreign.toLowerCase().includes(query) || 
+        item.korean.toLowerCase().includes(query)
+      );
+      renderDictionary(filtered);
+    }
+  </script>
+<script src="../mission-bridge.js"></script>
+</body>
+</html>

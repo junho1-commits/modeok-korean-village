@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>외래어 우리말 순화어 과거시험</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="../vendor/tailwind.js"></script>
+  <!-- Google Fonts: 한국 전통 감성 명조 및 손글씨 폰트 -->
+  <style>
+    :root {
+      --hanji-bg: #f8f4ea;
+      --ink-black: #221f1c;
+      --dancheong-red: #c83e3b;
+      --dancheong-blue: #234d70;
+      --dancheong-green: #2c6e58;
+      --dancheong-yellow: #d99b26;
+    }
+
+    body {
+      font-family: 'Noto Serif KR', 'Gowun Batang', serif;
+      background-color: var(--hanji-bg);
+      color: var(--ink-black);
+      min-height: 100vh;
+      overflow-x: hidden;
+      /* 한지 질감 + 은은한 창호지 격자 패턴 */
+      background-image: 
+        linear-gradient(rgba(176, 154, 120, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(176, 154, 120, 0.08) 1px, transparent 1px),
+        radial-gradient(rgba(200, 62, 59, 0.045) 1px, transparent 0),
+        linear-gradient(180deg, #fcf9f2 0%, #efe6d5 100%);
+      background-size: 44px 44px, 44px 44px, 22px 22px, 100% 100%;
+    }
+
+    .font-batang {
+      font-family: 'Gowun Batang', 'Noto Serif KR', serif;
+    }
+
+    .font-pen {
+      font-family: 'Nanum Pen Script', cursive;
+    }
+
+    /* 한지 두루마리 및 창호 카드 */
+    .hanji-card {
+      background: rgba(255, 253, 248, 0.96);
+      border: 2px solid #dcccb0;
+      box-shadow: 
+        0 20px 50px -12px rgba(42, 32, 18, 0.16),
+        inset 0 0 36px rgba(235, 223, 200, 0.5);
+      position: relative;
+    }
+
+    /* 한옥 세살문 창살 패턴 */
+    .changsal-grid {
+      background-image: 
+        linear-gradient(to right, rgba(168, 145, 112, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(168, 145, 112, 0.12) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* 단청 오방색 띠 */
+    .dancheong-ribbon {
+      height: 7px;
+      background: linear-gradient(90deg, 
+        #234d70 0%, #234d70 20%, 
+        #c83e3b 20%, #c83e3b 40%, 
+        #d99b26 40%, #d99b26 60%, 
+        #fcf9f2 60%, #fcf9f2 80%, 
+        #2c6e58 80%, #2c6e58 100%
+      );
+    }
+
+    /* 전통 네 귀퉁이 문양 */
+    .corner-frame {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-color: #c83e3b;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .c-tl { top: 10px; left: 10px; border-top: 2px solid; border-left: 2px solid; }
+    .c-tr { top: 10px; right: 10px; border-top: 2px solid; border-right: 2px solid; }
+    .c-bl { bottom: 10px; left: 10px; border-bottom: 2px solid; border-left: 2px solid; }
+    .c-br { bottom: 10px; right: 10px; border-bottom: 2px solid; border-right: 2px solid; }
+
+    /* 전통 낙관(붉은 도장) */
+    .red-stamp {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #c83e3b;
+      color: #c83e3b;
+      background: rgba(200, 62, 59, 0.06);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    /* 애니메이션 */
+    @keyframes popIn {
+      0% { opacity: 0; transform: translateY(12px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .animate-pop {
+      animation: popIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    .animate-shake {
+      animation: shake 0.32s ease-in-out;
+    }
+
+    /* 떠다니는 배경 매화 꽃잎 */
+    @keyframes floatPetal {
+      0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
+      15% { opacity: 0.7; }
+      85% { opacity: 0.6; }
+      100% { transform: translateY(105vh) translateX(45px) rotate(360deg); opacity: 0; }
+    }
+    .ambient-petal {
+      position: fixed;
+      top: -5vh;
+      pointer-events: none;
+      z-index: 1;
+      animation: floatPetal linear infinite;
+    }
+
+    .option-card {
+      transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .option-card:hover:not(:disabled) {
+      transform: translateY(-2px);
+      border-color: #234d70;
+      background-color: #fbf7ef;
+      box-shadow: 0 6px 16px rgba(35, 77, 112, 0.12);
+    }
+  </style>
+<style>.hidden{display:none!important}button:focus-visible{outline:3px solid #b77142;outline-offset:3px}</style>
+</head>
+<body class="flex flex-col items-center justify-center p-4 sm:p-6 relative selection:bg-[#d99b26]/30">
+
+  <!-- 폭죽/꽃잎 캔버스 -->
+  <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+  <!-- 은은한 배경 매화 꽃잎 컨테이너 -->
+  <div id="ambient-petals" aria-hidden="true"></div>
+
+  <!-- 하단 수묵 산수화 실루엣 배경 -->
+  <svg class="fixed bottom-0 left-0 w-full h-56 sm:h-72 text-[#2b251e] opacity-[0.07] pointer-events-none z-0" viewBox="0 0 1440 320" preserveAspectRatio="none" fill="currentColor">
+    <path d="M0,224L80,197.3C160,171,320,117,480,122.7C640,128,800,192,960,197.3C1120,203,1280,149,1360,122.7L1440,96L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+    <path fill-opacity="0.55" d="M0,256L120,234.7C240,213,480,171,720,176C960,181,1200,235,1320,261.3L1440,288L1440,320L1320,320C1200,320,960,320,720,320C480,320,240,320,120,320L0,320Z"></path>
+  </svg>
+
+  <!-- 좌측 상단 수묵 매화 가지 일러스트 -->
+  <svg class="fixed top-0 left-0 w-60 h-60 opacity-20 pointer-events-none z-0" viewBox="0 0 260 260" fill="none">
+    <path d="M-10,20 Q70,40 120,110 T210,160" stroke="#4a3b2c" stroke-width="5" stroke-linecap="round"/>
+    <path d="M85,68 Q130,45 175,55" stroke="#4a3b2c" stroke-width="3" stroke-linecap="round"/>
+    <path d="M135,122 Q155,165 185,195" stroke="#4a3b2c" stroke-width="2.5" stroke-linecap="round"/>
+    <g fill="#c83e3b">
+      <circle cx="175" cy="55" r="7"/><circle cx="184" cy="49" r="5"/><circle cx="183" cy="61" r="5"/><circle cx="168" cy="48" r="5"/><circle cx="168" cy="61" r="5"/>
+      <circle cx="210" cy="160" r="8"/><circle cx="220" cy="153" r="5.5"/><circle cx="219" cy="167" r="5.5"/><circle cx="202" cy="152" r="5.5"/><circle cx="202" cy="167" r="5.5"/>
+      <circle cx="122" cy="112" r="6"/><circle cx="130" cy="106" r="4.5"/><circle cx="129" cy="118" r="4.5"/>
+      <circle cx="185" cy="195" r="6"/><circle cx="193" cy="190" r="4.5"/><circle cx="192" cy="201" r="4.5"/>
+    </g>
+    <circle cx="175" cy="55" r="2.5" fill="#d99b26"/>
+    <circle cx="210" cy="160" r="3" fill="#d99b26"/>
+  </svg>
+
+  <!-- 우측 상단 전통 창살 원형 문양 -->
+  <svg class="fixed top-6 right-6 w-48 h-48 text-[#234d70] opacity-[0.11] pointer-events-none z-0" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.5">
+    <circle cx="100" cy="100" r="88"/>
+    <circle cx="100" cy="100" r="72" stroke-dasharray="6 4"/>
+    <circle cx="100" cy="100" r="45"/>
+    <path d="M100,12 L100,188 M12,100 L188,100 M38,38 L162,162 M162,38 L38,162" stroke-opacity="0.5"/>
+  </svg>
+
+  <!-- 상단 고정 헤더 바 -->
+  <header class="w-full max-w-2xl flex items-center justify-between mb-3 relative z-10 px-1">
+    <div class="flex items-center gap-2 text-xs sm:text-sm text-[#5c5346] font-semibold">
+      <span class="red-stamp px-2 py-0.5 rounded text-xs">전수검수</span>
+      <span>원본 31선 · 25문항 완비</span>
+    </div>
+    <button onclick="toggleGlossary(true)" class="px-3.5 py-1.5 rounded-lg bg-[#234d70] text-[#fdfbf7] text-xs sm:text-sm font-bold shadow hover:bg-[#1a3a54] transition cursor-pointer flex items-center gap-1.5 border border-[#d99b26]/60">
+      <span>📜</span>
+      <span>31개 순화어 족보</span>
+    </button>
+  </header>
+
+  <!-- 메인 게임 화면 컨테이너 -->
+  <main id="app" class="w-full max-w-2xl relative z-10"></main>
+
+  <!-- 31개 순화어 족보 모달 -->
+  <div id="glossary-modal" class="fixed inset-0 bg-black/55 backdrop-blur-xs z-40 hidden items-center justify-center p-4">
+    <div class="hanji-card rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-pop">
+      <div class="dancheong-ribbon shrink-0"></div>
+      <div class="p-5 border-b border-[#e2d6c1] bg-[#f7f2e7] shrink-0">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="red-stamp px-2 py-0.5 rounded text-xs">우리말 족보</span>
+            <h3 class="font-batang font-bold text-lg sm:text-xl text-[#221f1c]">자료 속 외래어 순화어 31선</h3>
+          </div>
+          <button onclick="toggleGlossary(false)" class="w-8 h-8 rounded-full bg-[#e8decb] text-[#4a4238] font-bold hover:bg-[#c83e3b] hover:text-white transition cursor-pointer">✕</button>
+        </div>
+        <input 
+          id="glossary-search" 
+          type="text" 
+          oninput="filterGlossary(this.value)" 
+          placeholder="찾고 싶은 외래어나 순화어를 검색하세요 (예: 오마카세, 자동길, 15)..." 
+          class="w-full px-4 py-2.5 rounded-xl bg-white border border-[#d6c7ad] text-sm text-[#221f1c] focus:outline-none focus:border-[#234d70]"
+        />
+      </div>
+      <div class="p-5 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-sm" id="glossary-list"></div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. 이미지 속 31개 외래어 우리말 순화어 원본 데이터 (100% 정확 대조 완료)
+    // =========================================================================
+    const fullGlossary = [
+      { no: 1, foreign: "스쿨존", korean: "어린이 보호 구역" },
+      { no: 2, foreign: "메세지", korean: "문자" },
+      { no: 3, foreign: "라커룸 / 라커", korean: "물품 보관함" },
+      { no: 4, foreign: "리필", korean: "더 채우기, 다시 채우기" },
+      { no: 5, foreign: "혈당 스파이크", korean: "혈당 급상승" },
+      { no: 6, foreign: "무빙 워크", korean: "자동길" },
+      { no: 7, foreign: "리워드", korean: "보상 혜택" },
+      { no: 8, foreign: "네티즌", korean: "누리꾼" },
+      { no: 9, foreign: "원플러스원(1+1)", korean: "하나 더 주기" },
+      { no: 10, foreign: "이모티콘", korean: "그림말" },
+      { no: 11, foreign: "워터파크", korean: "물놀이 공원" },
+      { no: 12, foreign: "가드레일", korean: "보호난간" },
+      { no: 13, foreign: "네비게이션", korean: "길 도우미" },
+      { no: 14, foreign: "네일 아트", korean: "손톱 꾸미기" },
+      { no: 15, foreign: "스트레스", korean: "긴장, 압박감" },
+      { no: 16, foreign: "필라테스", korean: "균형 운동" },
+      { no: 17, foreign: "노트", korean: "공책" },
+      { no: 18, foreign: "블로그", korean: "사랑 누리방" },
+      { no: 19, foreign: "리모델링", korean: "새단장" },
+      { no: 20, foreign: "베란다", korean: "내민 공간" },
+      { no: 21, foreign: "포토존", korean: "사진 촬영 구역" },
+      { no: 22, foreign: "댓글(리플)", korean: "달림글" },
+      { no: 23, foreign: "어그로", korean: "억지 주목" },
+      { no: 24, foreign: "오마카세", korean: "주방 특선" },
+      { no: 25, foreign: "벌크 업", korean: "근육 키우기" },
+      { no: 26, foreign: "버츄얼 휴먼", korean: "가상인간" },
+      { no: 27, foreign: "퍼스널 컬러", korean: "맞춤 색깔" },
+      { no: 28, foreign: "플러팅", korean: "호감 표시" },
+      { no: 29, foreign: "시터", korean: "돌보미" },
+      { no: 30, foreign: "굿즈", korean: "기획 상품" },
+      { no: 31, foreign: "언박싱", korean: "개봉" }
+    ];
+
+    // =========================================================================
+    // 2. 전수 검수 완료된 25문항 문제 은행 (31개 순화어 전체 반영)
+    // =========================================================================
+    const initialQuizData = [
+      {
+        id: 1,
+        question: "다음 문장의 밑줄 친 '어그로'를 자료에 제시된 우리말 순화어로 가장 알맞게 바꾼 것은 무엇인가요?",
+        context: "“인터넷 방송에서 시청자들의 관심을 끌기 위해 일부러 <u>어그로</u>를 끄는 행동은 자제해야 합니다.”",
+        options: ["긴장, 압박감", "억지 주목", "호감 표시", "돌보미"],
+        correctIndex: 1,
+        rationale: "자료 23번에 따라 '어그로'는 '억지 주목'으로 순화합니다. (참고: 15번 스트레스→긴장, 압박감 / 28번 플러팅→호감 표시 / 29번 시터→돌보미)"
+      },
+      {
+        id: 2,
+        question: "자료에 제시된 외래어와 그에 대응하는 우리말 순화어가 올바르게 짝지어진 것은 무엇인가요?",
+        context: "",
+        options: ["블로그 - 누리꾼", "시터 - 가상인간", "베란다 - 내민 공간", "굿즈 - 주방 특선"],
+        correctIndex: 2,
+        rationale: "자료 20번에 따라 '베란다'는 '내민 공간'이 맞습니다. (18번 블로그→사랑 누리방, 29번 시터→돌보미, 30번 굿즈→기획 상품)"
+      },
+      {
+        id: 3,
+        question: "음식을 주문할 때 메뉴를 정하지 않고 요리사에게 일임하는 방식인 '오마카세'의 우리말 순화어는 무엇인가요?",
+        context: "",
+        options: ["하나 더 주기", "더 채우기, 다시 채우기", "주방 특선", "기획 상품"],
+        correctIndex: 2,
+        rationale: "자료 24번에 따라 '오마카세'의 우리말 순화어는 '주방 특선'입니다. (9번 원플러스원→하나 더 주기, 4번 리필→더 채우기, 다시 채우기)"
+      },
+      {
+        id: 4,
+        question: "다음 설명에 해당하는 외래어와 우리말 순화어가 순서대로 바르게 연결된 것은 무엇인가요?",
+        context: "“컴퓨터 그래픽이나 인공지능 기술 등을 이용해 만들어 낸 가상의 인물”",
+        options: ["버츄얼 휴먼 - 가상인간", "시터 - 돌보미", "네티즌 - 누리꾼", "리워드 - 보상 혜택"],
+        correctIndex: 0,
+        rationale: "자료 26번에 따라 '버츄얼 휴먼'의 순화어는 '가상인간'입니다."
+      },
+      {
+        id: 5,
+        question: "자료에 제시된 외래어와 우리말 순화어의 짝이 잘못 연결된(틀린) 것은 무엇인가요?",
+        context: "",
+        options: ["무빙 워크 - 자동길", "네비게이션 - 자동길", "가드레일 - 보호난간", "워터파크 - 물놀이 공원"],
+        correctIndex: 1,
+        rationale: "자료 13번에 따라 '네비게이션'의 순화어는 '길 도우미'입니다. '자동길'은 6번 '무빙 워크'의 순화어이므로 ②번이 틀린 짝입니다."
+      },
+      {
+        id: 6,
+        question: "다음 빈칸 (가)와 (나)에 들어갈 우리말 순화어로 알맞은 것은 무엇인가요?",
+        context: "“운동을 통해 ( 가 )를 실천하고, 고탄수화물 식단을 피하여 식후 ( 나 )를 예방하는 것이 건강 관리에 좋습니다.”",
+        options: [
+          "(가) 균형 운동, (나) 긴장, 압박감",
+          "(가) 근육 키우기, (나) 혈당 급상승",
+          "(가) 새단장, (나) 보상 혜택",
+          "(가) 손톱 꾸미기, (나) 하나 더 주기"
+        ],
+        correctIndex: 1,
+        rationale: "자료 25번 '벌크 업 → 근육 키우기'와 5번 '혈당 스파이크 → 혈당 급상승'이 문맥에 정확히 들어맞습니다."
+      },
+      {
+        id: 7,
+        question: "장소나 구역을 나타내는 외래어와 우리말 순화어의 연결이 옳지 않은 것은 무엇인가요?",
+        context: "",
+        options: ["스쿨존 - 어린이 보호 구역", "포토존 - 사진 촬영 구역", "라커룸 - 사랑 누리방", "워터파크 - 물놀이 공원"],
+        correctIndex: 2,
+        rationale: "자료 3번에 따라 '라커룸 / 라커'는 '물품 보관함'입니다. '사랑 누리방'은 18번 '블로그'의 순화어입니다."
+      },
+      {
+        id: 8,
+        question: "다음 대화에서 밑줄 친 부분을 자료의 우리말 순화어로 모두 바르게 바꾼 것은 무엇인가요?",
+        context: "갑: “어제 보낸 <u>메세지</u> 확인했어?”\n을: “응! 행사장에서 받은 <u>굿즈</u> 사진도 같이 보냈더라.”",
+        options: ["그림말, 개봉", "문자, 기획 상품", "달림글, 새단장", "공책, 보상 혜택"],
+        correctIndex: 1,
+        rationale: "자료 2번 '메세지 → 문자', 30번 '굿즈 → 기획 상품'이 올바른 순화어입니다."
+      },
+      {
+        id: 9,
+        question: "'퍼스널 컬러'와 '플러팅'의 우리말 순화어가 순서대로 올바르게 짝지어진 것은 무엇인가요?",
+        context: "",
+        options: ["맞춤 색깔 - 호감 표시", "손톱 꾸미기 - 억지 주목", "사진 촬영 구역 - 그림말", "균형 운동 - 돌보미"],
+        correctIndex: 0,
+        rationale: "자료 27번 '퍼스널 컬러 → 맞춤 색깔', 28번 '플러팅 → 호감 표시'입니다."
+      },
+      {
+        id: 10,
+        question: "자료에 제시된 외래어 중, 우리말 순화어가 정확히 3글자로 이루어진 것끼리만 묶인 것은 무엇인가요?",
+        context: "",
+        options: [
+          "시터, 댓글(리플), 리모델링",
+          "노트, 언박싱, 네티즌",
+          "이모티콘, 블로그, 라커룸",
+          "리필, 스쿨존, 가드레일"
+        ],
+        correctIndex: 0,
+        rationale: "29번 시터(돌보미, 3글자), 22번 댓글(달림글, 3글자), 19번 리모델링(새단장, 3글자)으로 모두 3글자입니다!"
+      },
+      {
+        id: 11,
+        question: "초등학교 등 어린이 보호를 위해 지정한 구역인 '스쿨존'의 우리말 순화어는 무엇인가요?",
+        context: "",
+        options: ["어린이 보호 구역", "사진 촬영 구역", "물놀이 공원", "보호난간"],
+        correctIndex: 0,
+        rationale: "자료 1번에 따라 '스쿨존'의 우리말 순화어는 '어린이 보호 구역'입니다."
+      },
+      {
+        id: 12,
+        question: "공항이나 지하철역 등에서 걸어가는 사람을 자동으로 이동시켜 주는 장치인 '무빙 워크'의 우리말 순화어는 무엇인가요?",
+        context: "",
+        options: ["길 도우미", "자동길", "내민 공간", "물품 보관함"],
+        correctIndex: 1,
+        rationale: "자료 6번에 따라 '무빙 워크'는 '자동길'로 순화합니다. (참고: 13번 네비게이션→길 도우미)"
+      },
+      {
+        id: 13,
+        question: "대화창에서 감정이나 표정을 그림으로 전달하는 '이모티콘'의 우리말 순화어는 무엇인가요?",
+        context: "",
+        options: ["달림글", "그림말", "문자", "공책"],
+        correctIndex: 1,
+        rationale: "자료 10번에 따라 '이모티콘'은 '그림말'로 순화합니다."
+      },
+      {
+        id: 14,
+        question: "새로 산 물건의 상자를 열어 내용물을 살펴보는 '언박싱'의 우리말 순화어는 무엇인가요?",
+        context: "",
+        options: ["새단장", "개봉", "기획 상품", "보상 혜택"],
+        correctIndex: 1,
+        rationale: "자료 31번에 따라 '언박싱'의 우리말 순화어는 '개봉'입니다."
+      },
+      {
+        id: 15,
+        question: "다음 설명에 해당하는 외래어 '리필'의 우리말 순화어는 무엇인가요?",
+        context: "“음료나 샴푸 등을 다 쓴 뒤 다시 채워 넣는 것”",
+        options: ["하나 더 주기", "더 채우기, 다시 채우기", "보상 혜택", "주방 특선"],
+        correctIndex: 1,
+        rationale: "자료 4번에 따라 '리필'의 우리말 순화어는 '더 채우기, 다시 채우기'입니다."
+      },
+      {
+        id: 16,
+        question: "'리워드'와 '원플러스원(1+1)'의 우리말 순화어가 순서대로 바르게 짝지어진 것은 무엇인가요?",
+        context: "",
+        options: [
+          "보상 혜택 - 하나 더 주기",
+          "하나 더 주기 - 보상 혜택",
+          "더 채우기, 다시 채우기 - 기획 상품",
+          "주방 특선 - 호감 표시"
+        ],
+        correctIndex: 0,
+        rationale: "자료 7번 '리워드 → 보상 혜택', 9번 '원플러스원(1+1) → 하나 더 주기'가 순서대로 올바른 짝입니다."
+      },
+      {
+        id: 17,
+        question: "인터넷 공간에서 활동하는 사람들을 일컫는 '네티즌'의 우리말 순화어는 무엇인가요?",
+        context: "",
+        options: ["사랑 누리방", "가상인간", "누리꾼", "돌보미"],
+        correctIndex: 2,
+        rationale: "자료 8번에 따라 '네티즌'은 '누리꾼'으로 순화합니다. (18번 블로그→사랑 누리방)"
+      },
+      {
+        id: 18,
+        question: "도로 옆 추락이나 충돌을 막기 위해 설치하는 '가드레일'의 우리말 순화어는 무엇인가요?",
+        context: "",
+        options: ["보호난간", "어린이 보호 구역", "자동길", "내민 공간"],
+        correctIndex: 0,
+        rationale: "자료 12번에 따라 '가드레일'의 우리말 순화어는 '보호난간'입니다."
+      },
+      {
+        id: 19,
+        question: "'네일 아트'와 '필라테스'의 우리말 순화어가 순서대로 바르게 짝지어진 것은 무엇인가요?",
+        context: "",
+        options: [
+          "손톱 꾸미기 - 균형 운동",
+          "맞춤 색깔 - 근육 키우기",
+          "손톱 꾸미기 - 근육 키우기",
+          "균형 운동 - 호감 표시"
+        ],
+        correctIndex: 0,
+        rationale: "자료 14번 '네일 아트 → 손톱 꾸미기', 16번 '필라테스 → 균형 운동'이 바른 짝입니다."
+      },
+      {
+        id: 20,
+        question: "다음 중 자료에 제시된 우리말 순화어가 '2글자'인 외래어끼리만 바르게 묶인 것은 무엇인가요?",
+        context: "",
+        options: [
+          "메세지, 노트, 언박싱",
+          "이모티콘, 네티즌, 시터",
+          "리모델링, 댓글(리플), 베란다",
+          "무빙 워크, 스쿨존, 오마카세"
+        ],
+        correctIndex: 0,
+        rationale: "2번 메세지(문자, 2글자), 17번 노트(공책, 2글자), 31번 언박싱(개봉, 2글자)으로 모두 2글자입니다!"
+      },
+      {
+        id: 21,
+        question: "정신적·육체적 부담으로 느끼는 '스트레스'의 우리말 순화어는 무엇인가요?",
+        context: "",
+        options: ["긴장, 압박감", "혈당 급상승", "억지 주목", "호감 표시"],
+        correctIndex: 0,
+        rationale: "자료 15번에 따라 '스트레스'의 우리말 순화어는 '긴장, 압박감'입니다."
+      },
+      {
+        id: 22,
+        question: "개인이 인터넷에 자신의 관심사에 따라 글을 올리는 공간인 '블로그'의 우리말 순화어는 무엇인가요?",
+        context: "",
+        options: ["누리꾼", "사랑 누리방", "달림글", "물품 보관함"],
+        correctIndex: 1,
+        rationale: "자료 18번에 따라 '블로그'는 '사랑 누리방'으로 순화합니다."
+      },
+      {
+        id: 23,
+        question: "학교나 수영장 등에서 개인 소지품을 넣어 두는 '라커룸 / 라커'의 우리말 순화어는 무엇인가요?",
+        context: "",
+        options: ["내민 공간", "물품 보관함", "사진 촬영 구역", "보호난간"],
+        correctIndex: 1,
+        rationale: "자료 3번에 따라 '라커룸 / 라커'의 우리말 순화어는 '물품 보관함'입니다."
+      },
+      {
+        id: 24,
+        question: "다음 대화의 밑줄 친 '네비게이션'과 '포토존'을 자료의 우리말 순화어로 순서대로 바르게 고친 것은 무엇인가요?",
+        context: "“<u>네비게이션</u> 안내를 따라 도착한 수목원 입구 <u>포토존</u>에서 가족사진을 찍었어요.”",
+        options: [
+          "길 도우미, 사진 촬영 구역",
+          "자동길, 물놀이 공원",
+          "길 도우미, 어린이 보호 구역",
+          "보호난간, 내민 공간"
+        ],
+        correctIndex: 0,
+        rationale: "자료 13번 '네비게이션 → 길 도우미', 21번 '포토존 → 사진 촬영 구역'이 올바릅니다."
+      },
+      {
+        id: 25,
+        question: "'댓글(리플)'과 '리모델링'의 우리말 순화어가 순서대로 바르게 짝지어진 것은 무엇인가요?",
+        context: "",
+        options: [
+          "달림글 - 새단장",
+          "그림말 - 개봉",
+          "문자 - 내민 공간",
+          "달림글 - 기획 상품"
+        ],
+        correctIndex: 0,
+        rationale: "자료 22번 '댓글(리플) → 달림글', 19번 '리모델링 → 새단장'이 순서대로 올바르게 짝지어졌습니다."
+      }
+    ];
+
+    // =========================================================================
+    // 3. 상태 관리 및 헬퍼 함수
+    // =========================================================================
+    let state = {
+      screen: 'start', // 'start' | 'quiz' | 'result'
+      selectedCount: 15,
+      activeQuestions: [],
+      isRetryMode: false,
+      currentIdx: 0,
+      selectedOption: null,
+      isAnswered: false,
+      userAnswers: [],
+      reviewOnlyWrong: true
+    };
+
+    const app = document.getElementById('app');
+
+    // 선택지를 무작위로 섞으면서 정답 인덱스를 정확히 유지하는 함수
+    function prepareShuffledQuestion(q) {
+      const paired = q.options.map((text, idx) => ({
+        text,
+        isCorrect: idx === q.correctIndex
+      }));
+      for (let i = paired.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [paired[i], paired[j]] = [paired[j], paired[i]];
+      }
+      return {
+        ...q,
+        options: paired.map(p => p.text),
+        correctIndex: paired.findIndex(p => p.isCorrect)
+      };
+    }
+
+    // 배경에 떠다니는 은은한 매화 꽃잎 생성
+    function spawnAmbientPetals() {
+      const container = document.getElementById('ambient-petals');
+      if (!container) return;
+      const petalColors = ['#f4b6bc', '#e88d96', '#f7cfd3', '#e5b869'];
+      for (let i = 0; i < 14; i++) {
+        const el = document.createElement('div');
+        el.className = 'ambient-petal';
+        const left = Math.random() * 100;
+        const duration = 12 + Math.random() * 14;
+        const delay = Math.random() * 12;
+        const size = 10 + Math.random() * 8;
+        const color = petalColors[i % petalColors.length];
+        el.style.left = `${left}vw`;
+        el.style.animationDuration = `${duration}s`;
+        el.style.animationDelay = `-${delay}s`;
+        el.innerHTML = `
+          <svg width="${size}" height="${size}" viewBox="0 0 20 20" fill="${color}">
+            <path d="M10 1 C14 5, 19 10, 10 19 C1 10, 6 5, 10 1 Z" />
+          </svg>
+        `;
+        container.appendChild(el);
+      }
+    }
+
+    // 족보 모달 초기화 및 검색
+    function initGlossary(filterText = '') {
+      const listEl = document.getElementById('glossary-list');
+      const keyword = filterText.trim().toLowerCase();
+      const filtered = fullGlossary.filter(item => 
+        item.foreign.toLowerCase().includes(keyword) || 
+        item.korean.toLowerCase().includes(keyword) ||
+        String(item.no) === keyword
+      );
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="col-span-full text-center py-8 text-[#7a6f60]">검색 결과와 일치하는 단어가 없습니다.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(item => `
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-[#e6dcc8] hover:border-[#234d70] transition">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-[#f3ede0] text-[#5c5346] text-xs font-bold flex items-center justify-center shrink-0">${item.no}</span>
+            <span class="text-[#5c5346] font-medium">${item.foreign}</span>
+          </div>
+          <span class="font-bold text-[#234d70] text-right">➔ ${item.korean}</span>
+        </div>
+      `).join('');
+    }
+
+    function filterGlossary(val) {
+      initGlossary(val);
+    }
+
+    function toggleGlossary(show) {
+      const modal = document.getElementById('glossary-modal');
+      if (show) {
+        const searchInput = document.getElementById('glossary-search');
+        if (searchInput) searchInput.value = '';
+        initGlossary('');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function setQuestionCount(count) {
+      state.selectedCount = count;
+      renderStart();
+    }
+
+    // =========================================================================
+    // 4. 화면 렌더링 (시작 화면 / 퀴즈 진행 화면 / 최종 결과 및 오답 노트)
+    // =========================================================================
+    function render() {
+      if (state.screen === 'start') {
+        renderStart();
+      } else if (state.screen === 'quiz') {
+        renderQuiz();
+      } else if (state.screen === 'result') {
+        renderResult();
+      }
+    }
+
+    // [화면 1] 한국 전통미 시작 화면
+    function renderStart() {
+      const tiers = [
+        {
+          count: 10,
+          rank: "초시 (初試)",
+          subtitle: "맛보기 시험",
+          desc: "핵심 10문제로 가볍게 실력 점검",
+          accent: "#2c6e58"
+        },
+        {
+          count: 15,
+          rank: "복시 (覆試)",
+          subtitle: "실력 다지기",
+          desc: "다채로운 15문제 실전 겨루기",
+          accent: "#234d70"
+        },
+        {
+          count: 25,
+          rank: "전시 (殿試)",
+          subtitle: "장원급제 도전",
+          desc: "31개 단어 총망라 25문제 완주",
+          accent: "#c83e3b"
+        }
+      ];
+
+      const tierCardsHtml = tiers.map(t => {
+        const isSelected = state.selectedCount === t.count;
+        return `
+          <button 
+            onclick="setQuestionCount(${t.count})" 
+            class="text-left p-4 rounded-xl border-2 relative overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-0.5 ${
+              isSelected 
+                ? 'bg-[#fffdf8] border-[#c83e3b] shadow-md ring-2 ring-[#c83e3b]/20' 
+                : 'bg-[#f7f2e7]/90 border-[#dfd3bc] hover:border-[#234d70]'
+            }">
+            ${isSelected ? `<span class="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-[#c83e3b] text-white text-xs flex items-center justify-center font-bold">✓</span>` : ''}
+            <div class="text-xs font-bold mb-1" style="color: ${t.accent}">${t.rank}</div>
+            <div class="font-batang font-bold text-xl text-[#221f1c] mb-0.5">${t.count}문제</div>
+            <div class="text-xs font-bold text-[#4a4238] mb-1">${t.subtitle}</div>
+            <div class="text-[11px] text-[#7a6f60]">${t.desc}</div>
+          </button>
+        `;
+      }).join('');
+
+      app.innerHTML = `
+        <div class="hanji-card changsal-grid rounded-2xl overflow-hidden animate-pop">
+          <div class="dancheong-ribbon"></div>
+          <div class="corner-frame c-tl"></div>
+          <div class="corner-frame c-tr"></div>
+          <div class="corner-frame c-bl"></div>
+          <div class="corner-frame c-br"></div>
+
+          <div class="p-7 sm:p-10 text-center relative">
+            <!-- 상단 전통 매듭 & 훈민정음 원형 엠블럼 -->
+            <div class="flex flex-col items-center justify-center mb-4">
+              <svg class="w-12 h-9 mb-1" viewBox="0 0 60 44" fill="none">
+                <path d="M30,4 L30,14" stroke="#c83e3b" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="30" cy="20" r="7" stroke="#c83e3b" stroke-width="3" fill="#fdfbf7"/>
+                <circle cx="21" cy="20" r="4.5" stroke="#234d70" stroke-width="2.5"/>
+                <circle cx="39" cy="20" r="4.5" stroke="#2c6e58" stroke-width="2.5"/>
+                <path d="M26,27 L23,41 M30,27 L30,43 M34,27 L37,41" stroke="#d99b26" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+
+              <div class="relative inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-b from-[#234d70] to-[#17334b] text-[#fdfbf7] border-4 border-[#d99b26] shadow-lg">
+                <div class="inset-1.5 absolute rounded-full border border-[#fdfbf7]/30"></div>
+                <div class="text-center">
+                  <div class="font-batang text-xs text-[#f0c76e] tracking-widest mb-0.5">우리말</div>
+                  <div class="font-batang text-3xl font-bold tracking-widest leading-none">한글</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 붉은 전통 낙관 배지 -->
+            <div class="flex items-center justify-center gap-2 mb-3">
+              <span class="red-stamp px-3 py-1 rounded text-xs sm:text-sm">
+                우리말 겨루기 · 과거시험
+              </span>
+            </div>
+
+            <h1 class="font-batang font-bold text-3xl sm:text-4xl text-[#221f1c] mb-3 tracking-tight">
+              외래어 우리말 순화어 퀴즈
+            </h1>
+
+            <p class="text-[#4a4238] text-sm sm:text-base mb-7 leading-relaxed font-batang max-w-lg mx-auto">
+              무심코 쓰던 31가지 외래어를 곱고 정겨운 우리말로 갈고닦아 보시오.<br/>
+              한 문제마다 <strong class="text-[#234d70] underline decoration-[#d99b26] decoration-2 underline-offset-4">즉시 정답과 풀이를 밝혀주고</strong>, 
+              시험 후에는 <strong class="text-[#c83e3b] underline decoration-[#c83e3b]/40 decoration-2 underline-offset-4">틀린 문제만 골라 설욕전</strong>을 치를 수 있소!
+            </p>
+
+            <!-- 과거시험 응시 문항 수 선택 -->
+            <div class="mb-7 text-left max-w-xl mx-auto">
+              <div class="flex items-center justify-between mb-2.5 px-1">
+                <span class="font-batang font-bold text-sm text-[#221f1c]">📌 응시할 시험 규모를 선택하시오</span>
+                <span class="text-xs text-[#6e6456]">총 25문항 문제 은행 수록</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                ${tierCardsHtml}
+              </div>
+            </div>
+
+            <!-- 시작 버튼 -->
+            <button onclick="startFullQuiz()" class="w-full sm:w-auto px-10 py-4 rounded-xl bg-gradient-to-r from-[#234d70] via-[#1c3f5c] to-[#234d70] hover:from-[#17344d] hover:to-[#17344d] text-[#fdfbf7] font-batang font-bold text-xl border-2 border-[#d99b26] shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer">
+              🏮 ${state.selectedCount}문제 과거시험 시작하기
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // [화면 2] 퀴즈 진행 화면
+    function renderQuiz() {
+      const total = state.activeQuestions.length;
+      const currentQ = state.activeQuestions[state.currentIdx];
+      const progress = ((state.currentIdx + (state.isAnswered ? 1 : 0)) / total) * 100;
+      const labels = ['가', '나', '다', '라'];
+
+      const optionsHtml = currentQ.options.map((opt, idx) => {
+        let btnClass = "bg-white border-2 border-[#e2d6c1] text-[#221f1c]";
+        let badgeHtml = `<span class="w-8 h-8 rounded-lg bg-[#f3ede0] border border-[#d6c7ad] text-[#234d70] font-batang font-bold flex items-center justify-center mr-3.5 shrink-0">${labels[idx]}</span>`;
+        let statusIcon = "";
+
+        if (state.isAnswered) {
+          if (idx === currentQ.correctIndex) {
+            btnClass = "bg-[#eef7f4] border-2 border-[#2c6e58] text-[#174234] shadow-sm";
+            badgeHtml = `<span class="w-8 h-8 rounded-lg bg-[#2c6e58] text-white font-bold flex items-center justify-center mr-3.5 shrink-0">✓</span>`;
+            statusIcon = `<span class="ml-auto text-[#2c6e58] font-bold text-xs sm:text-sm bg-[#d5ede5] px-2.5 py-1 rounded-md border border-[#2c6e58]/30">정답</span>`;
+          } else if (idx === state.selectedOption) {
+            btnClass = "bg-[#fdf1f1] border-2 border-[#c83e3b] text-[#7a1e1c] animate-shake";
+            badgeHtml = `<span class="w-8 h-8 rounded-lg bg-[#c83e3b] text-white font-bold flex items-center justify-center mr-3.5 shrink-0">✕</span>`;
+            statusIcon = `<span class="ml-auto text-[#c83e3b] font-bold text-xs sm:text-sm bg-[#fadcd9] px-2.5 py-1 rounded-md border border-[#c83e3b]/30">내 선택</span>`;
+          } else {
+            btnClass = "bg-[#f9f6f0] border-2 border-[#ebe2d3] text-[#9e9486] opacity-65";
+          }
+        }
+
+        return `
+          <button 
+            onclick="selectAnswer(${idx})" 
+            ${state.isAnswered ? 'disabled' : ''}
+            class="option-card w-full text-left p-4 rounded-xl flex items-center font-medium text-base sm:text-lg ${btnClass} cursor-pointer disabled:cursor-default">
+            ${badgeHtml}
+            <span class="flex-1">${opt}</span>
+            ${statusIcon}
+          </button>
+        `;
+      }).join('');
+
+      let feedbackHtml = '';
+      if (state.isAnswered) {
+        const isCorrect = state.selectedOption === currentQ.correctIndex;
+        feedbackHtml = `
+          <div class="mt-6 p-5 rounded-xl animate-pop border-2 ${isCorrect ? 'bg-[#eef7f4] border-[#2c6e58]' : 'bg-[#fdf3f2] border-[#c83e3b]'}">
+            <div class="flex items-center gap-2.5 mb-2">
+              <span class="red-stamp px-2 py-0.5 rounded text-xs ${isCorrect ? '!border-[#2c6e58] !text-[#2c6e58] !bg-[#2c6e58]/10' : ''}">
+                ${isCorrect ? '정답이오' : '아쉽소'}
+              </span>
+              <h3 class="font-batang font-bold text-lg sm:text-xl ${isCorrect ? 'text-[#1c4d3d]' : 'text-[#8c2320]'}">
+                ${isCorrect ? '참 잘하셨습니다! 정확히 맞히셨어요.' : `정답은 [ ${currentQ.options[currentQ.correctIndex]} ] 입니다.`}
+              </h3>
+            </div>
+            <p class="text-[#3b352e] text-sm sm:text-base leading-relaxed pl-2 border-l-2 ${isCorrect ? 'border-[#2c6e58]/40' : 'border-[#c83e3b]/40'} ml-1">
+              ${currentQ.rationale}
+            </p>
+            <div class="mt-4 flex justify-end">
+              <button onclick="nextQuestion()" class="px-6 py-3 rounded-xl bg-[#234d70] hover:bg-[#193954] text-white font-batang font-bold shadow hover:shadow-md transition-all cursor-pointer flex items-center gap-2">
+                <span>${state.currentIdx < total - 1 ? '다음 문제 풀기' : '최종 성적표 및 오답 보기'}</span>
+                <span>➔</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      app.innerHTML = `
+        <div class="hanji-card rounded-2xl overflow-hidden animate-pop">
+          <div class="dancheong-ribbon"></div>
+          <div class="p-6 sm:p-8">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                ${state.isRetryMode ? `<span class="px-2.5 py-0.5 rounded bg-[#c83e3b] text-white text-xs font-bold">오답 설욕전</span>` : ''}
+                <span class="px-3 py-1 rounded-lg bg-[#234d70] text-white font-batang font-bold text-sm">
+                  제 ${state.currentIdx + 1}문 / 총 ${total}문
+                </span>
+              </div>
+              <span class="text-sm font-bold text-[#2c6e58]">
+                맞힌 문제: ${state.userAnswers.filter(a => a.isCorrect).length}개
+              </span>
+            </div>
+            
+            <div class="w-full h-2.5 bg-[#e8decb] rounded-full overflow-hidden mb-6 border border-[#d6c7ad]">
+              <div class="h-full bg-gradient-to-r from-[#234d70] via-[#2c6e58] to-[#d99b26] transition-all duration-500" style="width: ${progress}%"></div>
+            </div>
+
+            <h2 class="font-batang text-xl sm:text-2xl font-bold text-[#221f1c] leading-snug mb-4">
+              ${currentQ.question}
+            </h2>
+
+            ${currentQ.context ? `
+              <div class="bg-[#f5efe3] border-y-2 border-[#d6c7ad] p-4 mb-6 text-[#2e2923] font-batang text-base sm:text-lg whitespace-pre-line leading-relaxed">
+                ${currentQ.context}
+              </div>
+            ` : '<div class="mb-4"></div>'}
+
+            <div class="space-y-3">
+              ${optionsHtml}
+            </div>
+
+            ${feedbackHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    // [화면 3] 최종 결과 및 틀린 문제 모아보기 화면
+    function renderResult() {
+      const total = state.activeQuestions.length;
+      const correctCount = state.userAnswers.filter(a => a.isCorrect).length;
+      const wrongList = state.userAnswers.filter(a => !a.isCorrect);
+      const score = Math.round((correctCount / total) * 100);
+      window.VillageBridge?.report(correctCount, total, state.userAnswers.length, state.isRetryMode);
+
+      if (score >= 80) {
+        triggerPetalConfetti(85);
+      }
+
+      let rankTitle = "";
+      let message = "";
+      let wittyClosing = "";
+      if (score >= 90) {
+        rankTitle = "장원급제 · 우리말 대제학";
+        message = "한 문제도 놓치지 않으려는 기세가 대단합니다! 우리말 사랑이 하늘에 닿았군요.";
+        wittyClosing = "세종대왕님께서도 무릎을 탁 치고 흐뭇해하실 우리말 지킴이십니다! 무심코 쓰던 외래어 대신 곱고 정겨운 우리말을 골라 쓰는 그 마음이 바로 대한민국의 가장 빛나는 품격입니다.";
+      } else if (score >= 60) {
+        rankTitle = "우등 급제 · 우리말 지킴이";
+        message = "훌륭한 실력입니다! 아래 오답 노트로 헷갈린 부분만 가볍게 다듬어 보세요.";
+        wittyClosing = "우리말 사랑이 이미 수준급이십니다! 낯설던 순화어도 자꾸 부르다 보면 정이 드는 법, 오늘 익힌 다정한 우리말 한마디가 내일의 말씨를 더욱 아름답게 꽃피울 거예요.";
+      } else {
+        rankTitle = "정진 중 · 우리말 수련생";
+        message = "괜찮습니다! 아래 틀린 문제들을 차근차근 살펴보고 다시 도전해 보세요.";
+        wittyClosing = "괜찮습니다! 몰랐던 우리말을 새로 만나는 즐거움이 더 크니까요. 외래어에 내어주었던 자리를 따뜻하고 알기 쉬운 우리말로 하나씩 채워가는 멋쟁이가 되어보아요!";
+      }
+
+      const displayList = state.reviewOnlyWrong ? wrongList : state.userAnswers;
+
+      let reviewHtml = '';
+      if (wrongList.length === 0 && state.reviewOnlyWrong) {
+        reviewHtml = `
+          <div class="text-center py-8 bg-[#eef7f4] rounded-xl border-2 border-[#2c6e58]/40">
+            <div class="font-batang font-bold text-2xl text-[#2c6e58] mb-1">🎉 틀린 문제가 단 하나도 없습니다!</div>
+            <p class="text-sm text-[#3d5c52]">모든 문제를 완벽하게 맞히셨습니다.</p>
+          </div>
+        `;
+      } else {
+        reviewHtml = displayList.map((item) => {
+          const q = item.questionObj;
+          return `
+            <div class="p-5 rounded-xl border-2 ${item.isCorrect ? 'bg-white border-[#2c6e58]/40' : 'bg-[#fdf4f3] border-[#c83e3b]/60 shadow-xs'}">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-xs px-2.5 py-1 rounded ${item.isCorrect ? 'bg-[#2c6e58] text-white' : 'bg-[#c83e3b] text-white'}">
+                  ${item.isCorrect ? `문항 #${q.id} · 정답 ⭕` : `문항 #${q.id} · 오답 ❌`}
+                </span>
+              </div>
+              <p class="font-batang font-bold text-[#221f1c] text-base mb-3">${q.question}</p>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mb-3">
+                <div class="p-2.5 rounded-lg border ${item.isCorrect ? 'bg-[#eef7f4] border-[#2c6e58]/30 text-[#174234]' : 'bg-[#fae3e1] border-[#c83e3b]/30 text-[#7a1e1c]'}">
+                  <span class="font-bold">내가 고른 답:</span> ${q.options[item.selectedIdx]}
+                </div>
+                <div class="p-2.5 rounded-lg bg-[#eef7f4] border border-[#2c6e58]/30 text-[#174234]">
+                  <span class="font-bold">올바른 정답:</span> ${q.options[q.correctIndex]}
+                </div>
+              </div>
+              
+              <div class="text-xs sm:text-sm text-[#4a4238] bg-[#f9f6f0] p-3 rounded-lg border border-[#e2d6c1]">
+                📜 <strong>풀이:</strong> ${q.rationale}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      app.innerHTML = `
+        <div class="hanji-card rounded-2xl overflow-hidden animate-pop max-h-[88vh] flex flex-col">
+          <div class="dancheong-ribbon shrink-0"></div>
+          <div class="p-6 sm:p-8 overflow-y-auto">
+            <!-- 성적표 헤더 -->
+            <div class="text-center mb-7">
+              <span class="red-stamp px-3 py-1 rounded text-sm mb-3">우리말 성적표</span>
+              <h2 class="font-batang font-bold text-2xl sm:text-3xl text-[#221f1c] mb-1">${rankTitle}</h2>
+              <p class="text-[#5c5346] text-sm sm:text-base mb-5">${message}</p>
+
+              <div class="inline-flex items-center gap-6 bg-[#f7f2e7] px-8 py-4 rounded-xl border-2 border-[#d6c7ad]">
+                <div>
+                  <div class="text-xs text-[#6e6456] font-bold">총점</div>
+                  <div class="font-batang font-bold text-3xl sm:text-4xl text-[#234d70]">
+                    ${score}점
+                  </div>
+                </div>
+                <div class="h-10 w-px bg-[#d6c7ad]"></div>
+                <div>
+                  <div class="text-xs text-[#6e6456] font-bold">정답 / 오답</div>
+                  <div class="font-bold text-lg">
+                    <span class="text-[#2c6e58]">${correctCount}개</span> / <span class="text-[#c83e3b]">${wrongList.length}개</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 오답 / 전체 필터 탭 -->
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-[#e2d6c1] pb-3 mb-5">
+              <h3 class="font-batang font-bold text-lg sm:text-xl text-[#221f1c]">
+                ${state.reviewOnlyWrong ? `📌 틀린 문제 모아보기 (${wrongList.length}개)` : `📖 전체 문제 풀이 (${total}개)`}
+              </h3>
+              <div class="flex gap-2">
+                <button onclick="toggleFilter(true)" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer ${state.reviewOnlyWrong ? 'bg-[#c83e3b] text-white' : 'bg-[#ede4d3] text-[#5c5346] hover:bg-[#e0d3bc]'}">
+                  틀린 문제만 (${wrongList.length})
+                </button>
+                <button onclick="toggleFilter(false)" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer ${!state.reviewOnlyWrong ? 'bg-[#234d70] text-white' : 'bg-[#ede4d3] text-[#5c5346] hover:bg-[#e0d3bc]'}">
+                  전체 보기 (${total})
+                </button>
+              </div>
+            </div>
+
+            <!-- 복습 카드 목록 -->
+            <div class="space-y-4 mb-7">
+              ${reviewHtml}
+            </div>
+
+            <!-- 우리말 수호 현판 배너 -->
+            <div class="mb-8 rounded-2xl bg-gradient-to-b from-[#f7f1e3] to-[#efe5d1] border-2 border-[#c9b79c] p-6 relative overflow-hidden shadow-inner">
+              <div class="corner-frame c-tl"></div>
+              <div class="corner-frame c-tr"></div>
+              <div class="corner-frame c-bl"></div>
+              <div class="corner-frame c-br"></div>
+
+              <div class="text-center max-w-xl mx-auto">
+                <span class="red-stamp px-2.5 py-0.5 rounded text-xs mb-3">우리말 수호 현판</span>
+                <p class="font-batang text-sm sm:text-base text-[#3b332a] leading-relaxed mb-4">
+                  ${wittyClosing}
+                </p>
+                <div class="h-px w-24 bg-[#c83e3b]/40 mx-auto mb-4"></div>
+                <p class="font-batang font-bold text-base sm:text-lg text-[#234d70] leading-snug mb-4">
+                  “말이 살아야 얼이 삽니다 🌸 — 일상 속 작은 우리말 쓰기, 당신이 오늘 지킨 가장 아름다운 유산입니다.”
+                </p>
+                <button id="copy-pledge-btn" onclick="copyPledgeQuote(${score})" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/90 hover:bg-white border border-[#cbbba0] text-[#4a4238] text-xs sm:text-sm font-bold shadow-xs transition cursor-pointer">
+                  <span>📋</span>
+                  <span>우리말 수호 다짐 복사하기</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 하단 재도전 버튼 그룹 -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+              ${wrongList.length > 0 ? `
+                <button onclick="retryWrongQuestions()" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#c83e3b] hover:bg-[#a8302d] text-white font-batang font-bold text-lg shadow-md transition cursor-pointer">
+                  🔥 틀린 문제만 다시 풀기 (${wrongList.length}개)
+                </button>
+              ` : ''}
+              <button onclick="startFullQuiz()" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#234d70] hover:bg-[#193954] text-white font-batang font-bold text-lg shadow-md transition cursor-pointer">
+                🔄 같은 규모(${total}문제) 다시 풀기
+              </button>
+              <button onclick="goToStart()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#efe5d1] hover:bg-[#e3d4b7] text-[#3b332a] border border-[#cbbba0] font-batang font-bold text-lg transition cursor-pointer">
+                🏠 첫 화면으로
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 5. 인터랙션 핸들러
+    // =========================================================================
+    function goToStart() {
+      state.screen = 'start';
+      render();
+    }
+
+    function startFullQuiz() {
+      const selected = initialQuizData
+        .slice(0, state.selectedCount)
+        .map(q => prepareShuffledQuestion(q));
+
+      state = {
+        ...state,
+        screen: 'quiz',
+        activeQuestions: selected,
+        isRetryMode: false,
+        currentIdx: 0,
+        selectedOption: null,
+        isAnswered: false,
+        userAnswers: [],
+        reviewOnlyWrong: true
+      };
+      render();
+    }
+
+    function retryWrongQuestions() {
+      const wrongQuestions = state.userAnswers
+        .filter(a => !a.isCorrect)
+        .map(a => prepareShuffledQuestion(a.questionObj));
+      
+      if (wrongQuestions.length === 0) return;
+
+      state = {
+        ...state,
+        screen: 'quiz',
+        activeQuestions: wrongQuestions,
+        isRetryMode: true,
+        currentIdx: 0,
+        selectedOption: null,
+        isAnswered: false,
+        userAnswers: [],
+        reviewOnlyWrong: true
+      };
+      render();
+    }
+
+    function selectAnswer(idx) {
+      if (state.isAnswered) return;
+      const currentQ = state.activeQuestions[state.currentIdx];
+      const isCorrect = idx === currentQ.correctIndex;
+
+      state.selectedOption = idx;
+      state.isAnswered = true;
+      state.userAnswers.push({
+        questionObj: currentQ,
+        selectedIdx: idx,
+        isCorrect: isCorrect
+      });
+
+      if (isCorrect) {
+        triggerPetalConfetti(35);
+      }
+      render();
+    }
+
+    function nextQuestion() {
+      if (state.currentIdx < state.activeQuestions.length - 1) {
+        state.currentIdx++;
+        state.selectedOption = null;
+        state.isAnswered = false;
+        render();
+      } else {
+        state.screen = 'result';
+        render();
+      }
+    }
+
+    function toggleFilter(onlyWrong) {
+      state.reviewOnlyWrong = onlyWrong;
+      render();
+    }
+
+    function copyPledgeQuote(score) {
+      const textToCopy = `[우리말 순화어 과거시험 ${score}점 달성!]\n말이 살아야 얼이 삽니다 🌸 — 일상 속 작은 우리말 쓰기, 당신이 오늘 지킨 가장 아름다운 유산입니다.`;
+      const textarea = document.createElement('textarea');
+      textarea.value = textToCopy;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        const btn = document.getElementById('copy-pledge-btn');
+        if (btn) {
+          btn.innerHTML = '<span>✅</span><span>우리말 수호 다짐이 복사되었습니다!</span>';
+          btn.classList.add('border-[#2c6e58]', 'text-[#2c6e58]');
+          setTimeout(() => {
+            btn.innerHTML = '<span>📋</span><span>우리말 수호 다짐 복사하기</span>';
+            btn.classList.remove('border-[#2c6e58]', 'text-[#2c6e58]');
+          }, 2500);
+        }
+      } catch (e) {}
+      document.body.removeChild(textarea);
+    }
+
+    // 매화 꽃잎 & 오방색 축하 꽃가루 애니메이션
+    function triggerPetalConfetti(count) {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ['#c83e3b', '#234d70', '#d99b26', '#2c6e58', '#f2a2a8', '#e6b85c'];
+      const particles = Array.from({ length: count }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height * 0.4 - canvas.height * 0.4,
+        w: Math.random() * 10 + 6,
+        h: Math.random() * 6 + 4,
+        speedY: Math.random() * 2.5 + 2,
+        speedX: Math.random() * 2 - 1,
+        angle: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 0.12,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      }));
+
+      let frame = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p) => {
+          p.y += p.speedY;
+          p.x += p.speedX + Math.sin(frame * 0.05) * 0.5;
+          p.angle += p.spin;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, p.w / 2, p.h / 2, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+        frame++;
+        if (frame < 110) {
+          requestAnimationFrame(draw);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      draw();
+    }
+
+    // 초기 실행
+    spawnAmbientPetals();
+    initGlossary();
+    render();
+  </script>
+<script src="../mission-bridge.js"></script>
+</body>
+</html>

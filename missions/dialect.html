@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>재밌는 우리나라 사투리퀴즈 - 사막 오아시스 탐험</title>
+    <script src="../vendor/tailwind.js"></script>
+    <style>
+        @font-face {
+            font-family: 'DungGeunMo';
+            src: local("Malgun Gothic") format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'DungGeunMo', sans-serif;
+            background-color: #2c3e50;
+            user-select: none;
+        }
+        .font-pixel { font-family: 'DungGeunMo', sans-serif; }
+        
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a252c; 
+        }
+        
+        #gameCanvas {
+            display: block;
+            box-shadow: 0 0 0 4px #000, 0 0 20px rgba(0,0,0,0.8);
+            background-color: #f3dfb3; /* 사막 모래 배경 */
+            image-rendering: pixelated;
+        }
+
+        /* UI Overlays */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.7);
+            z-index: 100;
+        }
+        .hidden { display: none !important; }
+
+        .retro-box {
+            background-color: #fffbeb;
+            border: 6px solid #451a03;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.5);
+            padding: 2rem;
+            border-radius: 8px;
+        }
+
+        /* 캐릭터 선택 라디오 버튼 스타일 */
+        .char-radio { display: none; }
+        .char-label {
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 80px; height: 90px; 
+            font-size: 1.2rem;
+            background-color: #fef3c7;
+            border: 4px solid #b45309;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        .char-label:hover { background-color: #fde68a; }
+        .char-radio:checked + .char-label { 
+            border-color: #dc2626; 
+            background-color: #fecaca; 
+            transform: scale(1.05);
+        }
+        .char-icon { font-size: 2rem; margin-bottom: 5px; }
+
+        .retro-btn {
+            background-color: #16a34a;
+            color: white;
+            border: 4px solid #064e3b;
+            box-shadow: 6px 6px 0px #064e3b;
+            cursor: pointer;
+            transition: all 0.1s;
+            border-radius: 8px;
+        }
+        .retro-btn:active {
+            transform: translate(6px, 6px);
+            box-shadow: 0px 0px 0px #064e3b;
+        }
+
+        /* 캔버스 꽉 차게 설정 */
+        #gameCanvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            background-color: #f3dfb3;
+            image-rendering: pixelated;
+        }
+
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            margin: 20px auto 0;
+        }
+
+        .quiz-btn {
+            background-color: #fff;
+            border: 4px solid #451a03;
+            box-shadow: 4px 4px 0px #451a03;
+            padding: 15px 10px;
+            font-size: 1.3rem;
+            color: #451a03;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        
+        .quiz-btn:hover {
+            background-color: #f3f4f6;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #451a03;
+        }
+
+        .quiz-btn.active {
+            background-color: #fef08a;
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px #451a03;
+        }
+        
+        .correct-anim { background-color: #4ade80 !important; color: white !important; border-color: #14532d !important; }
+        .wrong-anim { background-color: #f87171 !important; color: white !important; border-color: #7f1d1d !important; }
+
+    </style>
+<style>.hidden{display:none!important}button:focus-visible{outline:3px solid #b77142;outline-offset:3px}</style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- HUD -->
+        <div id="hud" class="absolute top-4 left-4 text-white font-pixel text-2xl drop-shadow-[2px_2px_0_rgba(0,0,0,1)] hidden">
+            <div>남은 문제: <span id="hud-remain" class="text-yellow-400">0</span>개</div>
+            <div>맞춘 문제: <span id="hud-score" class="text-green-400">0</span>개</div>
+        </div>
+
+        <!-- 1. 시작 화면 -->
+        <div id="start-screen" class="overlay">
+            <div class="retro-box max-w-2xl w-full text-center flex flex-col gap-6">
+                <h1 class="font-pixel text-4xl text-amber-900 mb-2">🏜️ 사막 오아시스 사투리 탐험</h1>
+                
+                <div class="text-left">
+                    <label class="block text-amber-900 font-pixel text-xl mb-2">내 직업 선택</label>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <input type="radio" name="character" id="c-soldier" value="soldier" class="char-radio" checked>
+                        <label for="c-soldier" class="char-label"><canvas id="preview-soldier" width="60" height="70"></canvas>군인</label>
+                        
+                        <input type="radio" name="character" id="c-police" value="police" class="char-radio">
+                        <label for="c-police" class="char-label"><canvas id="preview-police" width="60" height="70"></canvas>경찰</label>
+                        
+                        <input type="radio" name="character" id="c-chef" value="chef" class="char-radio">
+                        <label for="c-chef" class="char-label"><canvas id="preview-chef" width="60" height="70"></canvas>요리사</label>
+                        
+                        <input type="radio" name="character" id="c-farmer" value="farmer" class="char-radio">
+                        <label for="c-farmer" class="char-label"><canvas id="preview-farmer" width="60" height="70"></canvas>농부</label>
+                        
+                        <input type="radio" name="character" id="c-monk" value="monk" class="char-radio">
+                        <label for="c-monk" class="char-label"><canvas id="preview-monk" width="60" height="70"></canvas>스님</label>
+                        
+                        <input type="radio" name="character" id="c-delivery" value="delivery" class="char-radio">
+                        <label for="c-delivery" class="char-label"><canvas id="preview-delivery" width="60" height="70"></canvas>택배원</label>
+
+                        <input type="radio" name="character" id="c-doctor" value="doctor" class="char-radio">
+                        <label for="c-doctor" class="char-label"><canvas id="preview-doctor" width="60" height="70"></canvas>의사</label>
+
+                        <input type="radio" name="character" id="c-firefighter" value="firefighter" class="char-radio">
+                        <label for="c-firefighter" class="char-label"><canvas id="preview-firefighter" width="60" height="70"></canvas>소방관</label>
+
+                        <input type="radio" name="character" id="c-student" value="student" class="char-radio">
+                        <label for="c-student" class="char-label"><canvas id="preview-student" width="60" height="70"></canvas>학생</label>
+
+                        <input type="radio" name="character" id="c-wizard" value="wizard" class="char-radio">
+                        <label for="c-wizard" class="char-label"><canvas id="preview-wizard" width="60" height="70"></canvas>마법사</label>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="text-left flex-1">
+                        <label class="block text-amber-900 font-pixel text-xl mb-2">이름 (닉네임)</label>
+                        <input type="text" id="nickname" class="w-full border-4 border-amber-900 p-3 outline-none font-pixel text-xl text-center rounded" placeholder="이름 입력" value="탐험가">
+                    </div>
+                    <div class="text-left flex-1">
+                        <label class="block text-amber-900 font-pixel text-xl mb-2">풀어볼 문제 개수</label>
+                        <div class="w-full bg-amber-100 border-4 border-amber-900 p-3 outline-none font-pixel text-xl text-center font-bold rounded text-amber-900">
+                            총 10개
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-start" class="w-full retro-btn font-pixel text-3xl py-4 mt-2">
+                    [ 탐험 시작하기 ]
+                </button>
+                <p class="text-base text-gray-700 font-pixel mt-2 text-center">조작법: W A S D 이동 / 물방울(?) 마크에 닿으면 퀴즈 시작!</p>
+            </div>
+        </div>
+
+        <!-- 2. 퀴즈 화면 -->
+        <div id="quiz-screen" class="overlay hidden">
+            <div class="retro-box w-full max-w-2xl text-center bg-amber-50">
+                <div class="bg-amber-900 text-white font-pixel text-3xl py-6 px-6 mb-6 border-4 border-amber-700 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]">
+                    "<span id="quiz-word" class="text-yellow-400 text-4xl mx-2"></span>" 은(는) 뭘까요?
+                </div>
+                
+                <div class="quiz-grid font-pixel">
+                    <div class="quiz-btn" id="ans-0" onclick="handleAnswer(0)"><span class="ans-text"></span></div>
+                    <div class="quiz-btn" id="ans-1" onclick="handleAnswer(1)"><span class="ans-text"></span></div>
+                    <div class="quiz-btn" id="ans-2" onclick="handleAnswer(2)"><span class="ans-text"></span></div>
+                    <div class="quiz-btn" id="ans-3" onclick="handleAnswer(3)"><span class="ans-text"></span></div>
+                </div>
+                <p class="mt-6 text-amber-900 font-pixel text-lg font-bold">▶ 마우스로 정답을 선택하세요!</p>
+            </div>
+        </div>
+
+        <!-- 3. 결과 화면 -->
+        <div id="end-screen" class="overlay hidden">
+            <div class="retro-box max-w-2xl w-full text-center flex flex-col items-center">
+                <h1 class="font-pixel text-4xl text-amber-900 mb-6 animate-bounce">🎉 다 깼어요!! 🎉</h1>
+                
+                <div class="flex flex-wrap md:flex-nowrap w-full gap-4 mb-6">
+                    <!-- 좌측: 캐릭터와 성적 -->
+                    <div class="flex-1 bg-amber-50 p-4 border-4 border-amber-200 rounded flex flex-col items-center justify-center shadow-[2px_2px_0_0_#d97706]">
+                        <canvas id="result-char-canvas" width="100" height="120" class="mb-2"></canvas>
+                        <p class="text-xl font-pixel mb-2 text-gray-800"><strong id="res-name" class="text-blue-600"></strong> 님의 기록</p>
+                        <div class="text-2xl font-pixel text-black mb-2">
+                            맞힌 문제: <span id="res-score" class="text-green-600 text-4xl"></span> / <span id="res-total"></span>
+                        </div>
+                        <div class="text-xl font-pixel text-gray-700">
+                            걸린 시간: <span id="res-time" class="text-red-500 text-3xl font-bold"></span> 초
+                        </div>
+                    </div>
+
+                    <!-- 우측: 오답 노트 -->
+                    <div class="flex-1 bg-amber-50 p-4 border-4 border-amber-200 rounded flex flex-col shadow-[2px_2px_0_0_#d97706]">
+                        <h2 class="font-pixel text-xl text-amber-900 mb-3 border-b-2 border-amber-200 pb-2">📝 오답 노트</h2>
+                        <div id="wrong-answers-list" class="overflow-y-auto max-h-56 font-pixel text-sm flex flex-col gap-2 w-full">
+                            <!-- JS로 오답 목록이 들어갑니다 -->
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-restart" class="w-full retro-btn bg-red-500 border-red-900 font-pixel text-3xl py-4 hover:bg-red-400">
+                    [ 다시 하기 ]
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. 사투리 데이터 ---
+        const allDialects = [
+            { word: "잠온다", meaning: "졸리다" }, { word: "땡초", meaning: "매운고추" },
+            { word: "쎄하다", meaning: "싸하다" }, { word: "기럭지", meaning: "길이" },
+            { word: "밀대", meaning: "대걸레" }, { word: "폭싹", meaning: "매우/완전히" },
+            { word: "문때다", meaning: "문지르다" }, { word: "아지매", meaning: "아주머니" },
+            { word: "모지라다", meaning: "모자라다" }, { word: "꼬부랑하다", meaning: "꼬불꼬불하다" },
+            { word: "천지빼까리", meaning: "엄청많다" }, { word: "정지", meaning: "부엌" },
+            { word: "정구지", meaning: "부추" }, { word: "찌짐", meaning: "부침개" },
+            { word: "봉다리", meaning: "봉지 / 비닐봉지" }, { word: "방구", meaning: "방귀" },
+            { word: "소꿉장난", meaning: "소꿉놀이" }, { word: "다라이", meaning: "대야" },
+            { word: "호치키스", meaning: "스테이플러" }, { word: "꼬시다", meaning: "꾀어내다" },
+            { word: "낑기다", meaning: "끼다" }, { word: "단디", meaning: "정확하게,꼼꼼하게" },
+            { word: "디다", meaning: "힘들다" }, { word: "새그럽다", meaning: "음식이 시다" },
+            { word: "데피다", meaning: "데우다" }, { word: "쪼매만", meaning: "조금만" },
+            { word: "단술", meaning: "식혜" }, { word: "추접다", meaning: "더럽다" },
+            { word: "강냉이", meaning: "옥수수" }, { word: "삐누", meaning: "비누" },
+            { word: "꼬추장", meaning: "고추장" }
+        ];
+
+        // --- 2. 게임 변수 설정 ---
+        const canvas = document.getElementById('gameCanvas');
+        let ctx = canvas.getContext('2d');
+        
+        let gameState = 'start'; 
+        let score = 0;
+        let totalQuestions = 10;
+        let selectedQuestions = [];
+        
+        // 맵 설정 (탁 트인 사막)
+        const tileSize = 60; 
+        let mazeCols = 40; 
+        let mazeRows = 30;
+        let maze = []; // 0: 모래, 1: 붉은바위, 2: 선인장, 3: 오아시스 풀, 4: 야자수, 6: 물(오아시스)
+        
+        // 카메라 (화면 스크롤용)
+        let camera = { x: 0, y: 0 };
+
+        // 맵 장식 (전갈, 뱀)
+        let animals = [];
+
+        // 플레이어 상태
+        let player = {
+            x: tileSize * 20, y: tileSize * 15,
+            w: 32, h: 48,
+            speed: 6.0, 
+            job: 'soldier',
+            name: '탐험가',
+            isMoving: false,
+            dir: 'down' // 바라보는 방향
+        };
+
+        let keys = { w: false, a: false, s: false, d: false };
+        let items = []; // 보물상자(퀴즈)
+        let currentQuiz = null;
+        let isAnswering = false;
+
+        let startTime = 0;
+        let wrongAnswers = [];
+
+        // 화면 크기에 맞게 캔버스 사이즈 조정
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // --- 3. UI 바인딩 ---
+        const uiStart = document.getElementById('start-screen');
+        const uiQuiz = document.getElementById('quiz-screen');
+        const uiEnd = document.getElementById('end-screen');
+        const uiHud = document.getElementById('hud');
+
+        // 캐릭터 썸네일(미리보기) 캔버스에 그리기
+        window.addEventListener('load', () => {
+            const jobs = ['soldier', 'police', 'chef', 'farmer', 'monk', 'delivery', 'doctor', 'firefighter', 'student', 'wizard'];
+            jobs.forEach(job => {
+                const pCanvas = document.getElementById('preview-' + job);
+                if(pCanvas) {
+                    const pCtx = pCanvas.getContext('2d');
+                    let tempCtx = ctx; 
+                    ctx = pCtx; // 임시로 ctx 변경
+                    drawCharacter(30, 50, job, false, "");
+                    ctx = tempCtx; // 원상 복구
+                }
+            });
+        });
+
+        document.getElementById('btn-start').addEventListener('click', startGame);
+        document.getElementById('btn-restart').addEventListener('click', () => location.reload());
+
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // --- 4. 오픈월드 사막 맵 생성 ---
+        function generateDesertMap() {
+            animals = [];
+            // 모두 모래(0)로 초기화
+            maze = Array(mazeRows).fill(null).map(() => Array(mazeCols).fill(0));
+            
+            // 중앙 상단 오아시스 만들기
+            let oasisX = Math.floor(mazeCols / 2);
+            let oasisY = 6;
+            
+            for(let r=0; r<mazeRows; r++) {
+                for(let c=0; c<mazeCols; c++) {
+                    let dist = Math.hypot(r - oasisY, c - oasisX);
+                    
+                    if (dist < 2.5) {
+                        maze[r][c] = 6; // 6: 일렁이는 물 (오아시스 중앙)
+                    } else if (dist < 4.5) {
+                        maze[r][c] = 3; // 3: 오아시스 주변 풀밭
+                    } else if (dist < 6) {
+                        maze[r][c] = 4; // 4: 풀밭 외곽의 야자수
+                    } else {
+                        // 맵 전체에 바위와 선인장 랜덤 흩뿌리기 (군락 형태)
+                        let noise = Math.sin(r * 0.5) + Math.cos(c * 0.5) + Math.random();
+                        if (noise > 1.8) {
+                            maze[r][c] = 1; // 층층이 붉은 바위
+                        } else if (Math.random() < 0.08) {
+                            maze[r][c] = 2; // 선인장
+                        } else if (Math.random() < 0.02) {
+                            maze[r][c] = 5; // 동물 뼈다귀 장식
+                        }
+
+                        // 전갈이나 뱀 랜덤 생성
+                        if (Math.random() < 0.03 && maze[r][c] !== 1) {
+                            animals.push({
+                                x: c * tileSize + Math.random() * tileSize,
+                                y: r * tileSize + Math.random() * tileSize,
+                                type: Math.random() > 0.5 ? 'scorpion' : 'snake',
+                                offset: Math.random() * 100
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // 맵 테두리는 바위로 막기
+            for(let i=0; i<mazeCols; i++) { maze[0][i] = 1; maze[mazeRows-1][i] = 1; }
+            for(let i=0; i<mazeRows; i++) { maze[i][0] = 1; maze[i][mazeCols-1] = 1; }
+        }
+
+        function placeItems() {
+            items = [];
+            let floorTiles = [];
+            for(let r=2; r<mazeRows-2; r++) {
+                for(let c=2; c<mazeCols-2; c++) {
+                    // 나무나 바위 안에 생성되지 않도록 반경 1칸 이내에 장애물이 없는 '안전한 타일'만 탐색
+                    let isSafe = true;
+                    for(let dr=-1; dr<=1; dr++) {
+                        for(let dc=-1; dc<=1; dc++) {
+                            let tr = r + dr;
+                            let tc = c + dc;
+                            if (maze[tr] && maze[tr][tc] !== 0 && maze[tr][tc] !== 3) {
+                                isSafe = false;
+                            }
+                        }
+                    }
+                    
+                    if(isSafe && (maze[r][c] === 0 || maze[r][c] === 3)) { 
+                        floorTiles.push({r, c});
+                    }
+                }
+            }
+            floorTiles = shuffle(floorTiles);
+
+            for(let i=0; i<totalQuestions; i++) {
+                let tile = floorTiles[i];
+                items.push({
+                    x: tile.c * tileSize + tileSize/2,
+                    y: tile.r * tileSize + tileSize/2,
+                    w: 40, h: 40,
+                    active: true,
+                    data: selectedQuestions[i]
+                });
+            }
+        }
+
+        function startGame() {
+            player.name = document.getElementById('nickname').value || '탐험가';
+            player.job = document.querySelector('input[name="character"]:checked').value;
+            totalQuestions = 10; // 무조건 10개로 고정
+            
+            // 문제 설정
+            selectedQuestions = shuffle([...allDialects]).slice(0, totalQuestions);
+
+            generateDesertMap();
+            placeItems();
+
+            score = 0;
+            startTime = Date.now();
+            wrongAnswers = [];
+            updateHud();
+            
+            uiStart.classList.add('hidden');
+            uiHud.classList.remove('hidden');
+            gameState = 'playing';
+            
+            // 플레이어 시작 위치 (오아시스 바로 아래 모래밭)
+            player.x = Math.floor(mazeCols/2) * tileSize + tileSize/2;
+            player.y = 12 * tileSize + tileSize/2;
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- 5. 키 입력 및 충돌 처리 ---
+        window.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            if(['w', 'a', 's', 'd'].includes(key)) keys[key] = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if(['w', 'a', 's', 'd'].includes(key)) keys[key] = false;
+        });
+
+        function isWall(x, y) {
+            let col = Math.floor(x / tileSize);
+            let row = Math.floor(y / tileSize);
+            if(row < 0 || row >= mazeRows || col < 0 || col >= mazeCols) return true;
+            // 1: 붉은바위, 4: 야자수, 6: 물 은 통과 불가 (선인장(2)은 통과 가능하게 유지)
+            return [1, 4, 6].includes(maze[row][col]);
+        }
+
+        function updatePlayer() {
+            let px = player.x;
+            let py = player.y;
+            player.isMoving = false;
+
+            let dx = 0;
+            let dy = 0;
+            
+            if (keys.w) { dy -= player.speed; player.dir = 'up'; }
+            if (keys.s) { dy += player.speed; player.dir = 'down'; }
+            if (keys.a) { dx -= player.speed; player.dir = 'left'; }
+            if (keys.d) { dx += player.speed; player.dir = 'right'; }
+
+            if (dx !== 0 || dy !== 0) player.isMoving = true;
+
+            // 충돌 박스를 발끝(하단)으로 좁게 설정하여 모서리에 걸리는 현상 제거
+            const hw = 12; // 충돌 너비 절반 (실제 폭 24px)
+            const hh = 8;  // 충돌 높이 절반 (발부분)
+            const yOff = 16; // 발쪽으로 충돌박스 내림
+
+            // X축 미끄러짐(Wall Sliding) 처리
+            if (dx !== 0) {
+                let nextX = px + dx;
+                if (!isWall(nextX - hw, py + yOff - hh) && !isWall(nextX + hw, py + yOff - hh) &&
+                    !isWall(nextX - hw, py + yOff + hh) && !isWall(nextX + hw, py + yOff + hh)) {
+                    px = nextX;
+                }
+            }
+
+            // Y축 미끄러짐(Wall Sliding) 처리
+            if (dy !== 0) {
+                let nextY = py + dy;
+                if (!isWall(px - hw, nextY + yOff - hh) && !isWall(px + hw, nextY + yOff - hh) &&
+                    !isWall(px - hw, nextY + yOff + hh) && !isWall(px + hw, nextY + yOff + hh)) {
+                    py = nextY;
+                }
+            }
+
+            player.x = px;
+            player.y = py;
+
+            // 카메라 업데이트 (플레이어를 화면 중앙에)
+            camera.x = player.x - canvas.width / 2;
+            camera.y = player.y - canvas.height / 2;
+            
+            // 맵 밖으로 카메라가 안 나가게 제한
+            camera.x = Math.max(0, Math.min(camera.x, mazeCols * tileSize - canvas.width));
+            camera.y = Math.max(0, Math.min(camera.y, mazeRows * tileSize - canvas.height));
+
+            // 아이템 충돌 체크
+            for (let i = 0; i < items.length; i++) {
+                let item = items[i];
+                if (item.active && Math.abs(player.x - item.x) < 30 && Math.abs(player.y - item.y) < 30) {
+                    openQuiz(item);
+                    break; 
+                }
+            }
+        }
+
+        // --- 6. 렌더링 로직 (픽셀 캐릭터 그리기 포함) ---
+        function drawDesert() {
+            for(let r = 0; r < mazeRows; r++) {
+                for(let c = 0; c < mazeCols; c++) {
+                    let tileX = c * tileSize;
+                    let tileY = r * tileSize;
+                    
+                    if(tileX + tileSize < camera.x || tileX > camera.x + canvas.width ||
+                       tileY + tileSize < camera.y || tileY > camera.y + canvas.height) continue;
+
+                    let tileType = maze[r][c];
+                    let seed = (r * 31 + c * 17) % 100;
+
+                    // 0: 모래 바닥
+                    ctx.fillStyle = '#f3dfb3'; 
+                    ctx.fillRect(tileX, tileY, tileSize, tileSize);
+                    
+                    if (tileType === 0) {
+                        // 모래 결 디테일
+                        if (seed % 3 === 0) {
+                            ctx.fillStyle = 'rgba(180, 130, 60, 0.15)';
+                            ctx.beginPath(); ctx.roundRect(tileX + 10, tileY + 20, 25, 4, 2); ctx.fill();
+                            ctx.beginPath(); ctx.roundRect(tileX + 35, tileY + 40, 15, 4, 2); ctx.fill();
+                        }
+                    } 
+                    else if (tileType === 6) {
+                        // 6: 오아시스 물결 (애니메이션)
+                        ctx.fillStyle = '#0ea5e9'; // 시원한 파란색
+                        ctx.fillRect(tileX, tileY, tileSize, tileSize);
+                        
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                        let waveOffset = Math.sin(Date.now() / 300 + tileX * 0.1) * 5;
+                        ctx.beginPath(); ctx.roundRect(tileX + 10, tileY + 20 + waveOffset, tileSize - 20, 3, 2); ctx.fill();
+                        ctx.beginPath(); ctx.roundRect(tileX + 20, tileY + 40 - waveOffset, tileSize - 30, 3, 2); ctx.fill();
+                    }
+                    else if (tileType === 3 || tileType === 4) {
+                        // 3: 풀밭 (오아시스)
+                        ctx.fillStyle = '#a3e635'; 
+                        ctx.fillRect(tileX, tileY, tileSize, tileSize);
+                        
+                        ctx.fillStyle = '#84cc16'; // 풀 디테일
+                        if(seed % 2 === 0) ctx.fillRect(tileX + 10, tileY + 10, 5, 10);
+                        if(seed % 3 === 0) ctx.fillRect(tileX + 40, tileY + 30, 6, 8);
+                        
+                        if (tileType === 4) {
+                            // 4: 야자수
+                            // 기둥
+                            ctx.fillStyle = '#78350f';
+                            ctx.fillRect(tileX + 25, tileY + 20, 10, 40);
+                            ctx.fillStyle = '#92400e';
+                            ctx.fillRect(tileX + 25, tileY + 25, 10, 5);
+                            ctx.fillRect(tileX + 25, tileY + 40, 10, 5);
+                            
+                            // 코코넛 추가 (디테일 업그레이드)
+                            ctx.fillStyle = '#451a03';
+                            ctx.beginPath(); ctx.arc(tileX + 25, tileY + 20, 5, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.arc(tileX + 35, tileY + 20, 5, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.arc(tileX + 30, tileY + 25, 4, 0, Math.PI*2); ctx.fill();
+
+                            // 잎사귀 (겹겹이 그라데이션 표현)
+                            ctx.fillStyle = '#14532d'; // 어두운 잎
+                            ctx.beginPath(); ctx.arc(tileX + 30, tileY + 15, 22, 0, Math.PI, true); ctx.fill();
+                            
+                            ctx.fillStyle = '#15803d'; // 밝은 잎
+                            ctx.beginPath(); ctx.arc(tileX + 30, tileY + 20, 20, 0, Math.PI, true); ctx.fill();
+                            
+                            // 나뭇잎 갈라짐 표현
+                            ctx.fillStyle = '#166534';
+                            ctx.fillRect(tileX + 10, tileY + 20, 15, 8);
+                            ctx.fillRect(tileX + 35, tileY + 20, 15, 8);
+                            ctx.fillRect(tileX + 25, tileY + 5, 10, 15);
+                        }
+                    }
+                    else if (tileType === 1) {
+                        // 1: 붉은 협곡 바위 (층층이 쌓인 모양)
+                        let rx = tileX + 5;
+                        let ry = tileY + 10;
+                        let rw = tileSize - 10;
+                        
+                        // 그림자
+                        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                        ctx.beginPath(); ctx.ellipse(tileX+tileSize/2, tileY+tileSize-5, rw/2+2, 10, 0, 0, Math.PI*2); ctx.fill();
+
+                        // 3단 바위
+                        ctx.fillStyle = '#7c2d12'; // 가장 어두운 밑단
+                        ctx.beginPath(); ctx.roundRect(rx, ry + 25, rw, 20, 8); ctx.fill();
+                        ctx.fillStyle = '#9a3412'; // 중간
+                        ctx.beginPath(); ctx.roundRect(rx + 5, ry + 15, rw - 10, 20, 8); ctx.fill();
+                        ctx.fillStyle = '#c2410c'; // 윗단
+                        ctx.beginPath(); ctx.roundRect(rx + 10, ry + 5, rw - 20, 20, 8); ctx.fill();
+                        ctx.fillStyle = '#ea580c'; // 가장 위 하이라이트 (빛)
+                        ctx.beginPath(); ctx.roundRect(rx + 15, ry, rw - 30, 15, 8); ctx.fill();
+                        
+                        // 바위 결 (가로줄)
+                        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                        ctx.fillRect(rx, ry + 35, rw, 3);
+                        ctx.fillRect(rx + 5, ry + 25, rw - 10, 3);
+                    }
+                    else if (tileType === 2) {
+                        // 2: 선인장
+                        let cx = tileX + tileSize/2;
+                        let cy = tileY + tileSize - 10;
+                        
+                        // 그림자
+                        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                        ctx.beginPath(); ctx.ellipse(cx, cy+5, 15, 6, 0, 0, Math.PI*2); ctx.fill();
+                        
+                        // 몸통
+                        ctx.fillStyle = '#22c55e';
+                        ctx.beginPath(); ctx.roundRect(cx - 8, cy - 40, 16, 40, 8); ctx.fill();
+                        
+                        // 가지
+                        ctx.beginPath(); ctx.roundRect(cx - 20, cy - 25, 12, 10, 5); ctx.fill();
+                        ctx.beginPath(); ctx.roundRect(cx - 20, cy - 35, 10, 15, 5); ctx.fill();
+                        
+                        ctx.beginPath(); ctx.roundRect(cx + 8, cy - 15, 12, 10, 5); ctx.fill();
+                        ctx.beginPath(); ctx.roundRect(cx + 10, cy - 25, 10, 15, 5); ctx.fill();
+                        
+                        // 가시
+                        ctx.fillStyle = '#14532d';
+                        ctx.fillRect(cx - 4, cy - 30, 2, 2);
+                        ctx.fillRect(cx + 2, cy - 20, 2, 2);
+                        ctx.fillRect(cx - 18, cy - 30, 2, 2);
+                        ctx.fillRect(cx + 14, cy - 20, 2, 2);
+                        
+                        // 꽃 (확률)
+                        if(seed % 4 === 0) {
+                            ctx.fillStyle = '#ec4899'; // 핑크 꽃
+                            ctx.fillRect(cx - 4, cy - 44, 8, 6);
+                            ctx.fillStyle = '#fde047';
+                            ctx.fillRect(cx - 2, cy - 44, 4, 2);
+                        }
+                    }
+                    else if (tileType === 5) {
+                        // 5: 동물 뼈다귀 장식 (통과 가능)
+                        let cx = tileX + tileSize/2;
+                        let cy = tileY + tileSize/2;
+                        ctx.fillStyle = '#e5e7eb';
+                        ctx.beginPath(); ctx.ellipse(cx, cy, 8, 4, 0, 0, Math.PI*2); ctx.fill(); // 해골
+                        ctx.fillRect(cx - 12, cy + 2, 6, 2); // 뼈
+                        ctx.fillRect(cx + 6, cy + 2, 6, 2);
+                        ctx.fillStyle = '#9ca3af';
+                        ctx.fillRect(cx - 2, cy - 1, 2, 2); // 눈구멍
+                        ctx.fillRect(cx + 2, cy - 1, 2, 2);
+                    }
+                }
+            }
+        }
+
+        function drawAnimals() {
+            let time = Date.now() / 200;
+            animals.forEach(ani => {
+                if(ani.x + 20 < camera.x || ani.x - 20 > camera.x + canvas.width ||
+                   ani.y + 20 < camera.y || ani.y - 20 > camera.y + canvas.height) return;
+
+                let moveX = Math.sin(time * 0.5 + ani.offset) * 10;
+                let moveY = Math.cos(time * 0.5 + ani.offset) * 10;
+                let ax = ani.x + moveX;
+                let ay = ani.y + moveY;
+                let isFlipped = Math.cos(time * 0.5 + ani.offset) > 0;
+
+                ctx.save();
+                ctx.translate(ax, ay);
+                if (isFlipped) ctx.scale(-1, 1); // 방향 전환
+
+                // 그림자
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.beginPath(); ctx.ellipse(0, 5, 10, 4, 0, 0, Math.PI*2); ctx.fill();
+
+                if (ani.type === 'scorpion') {
+                    // 전갈 (보라빛 띄는 짙은 색)
+                    ctx.fillStyle = '#312e81'; 
+                    ctx.fillRect(-6, -4, 12, 6); // 몸통
+                    ctx.fillRect(-8, -2, 4, 6); // 왼쪽 집게
+                    ctx.fillRect(6, -2, 4, 6); // 오른쪽 집게
+                    ctx.fillRect(4, -8, 2, 6); // 꼬리 연결
+                    ctx.fillStyle = '#1e1b4b'; 
+                    ctx.fillRect(6, -10, 4, 4); // 독침 부분
+                    
+                    // 다리
+                    ctx.fillStyle = '#1e1b4b';
+                    let legAnim = Math.sin(time * 3 + ani.offset) * 2;
+                    ctx.fillRect(-4, 2 + legAnim, 2, 4);
+                    ctx.fillRect(0, 2 - legAnim, 2, 4);
+                    ctx.fillRect(4, 2 + legAnim, 2, 4);
+
+                } else if (ani.type === 'snake') {
+                    // 뱀 (똬리를 틀고 머리를 드는 모습)
+                    ctx.fillStyle = '#064e3b'; // 어두운 초록/검정
+                    ctx.beginPath(); ctx.ellipse(0, 2, 8, 4, 0, 0, Math.PI*2); ctx.fill(); // 똬리
+                    
+                    let headBob = Math.sin(time * 2 + ani.offset) * 2;
+                    ctx.fillRect(-4, -10 + headBob, 4, 12); // 목
+                    ctx.fillRect(-6, -12 + headBob, 8, 6); // 머리
+                    
+                    ctx.fillStyle = '#ef4444'; // 혀
+                    if (Math.sin(time * 5 + ani.offset) > 0.5) {
+                        ctx.fillRect(-8, -10 + headBob, 4, 2);
+                    }
+                    ctx.fillStyle = '#fde047'; // 눈
+                    ctx.fillRect(-4, -10 + headBob, 2, 2);
+                }
+                ctx.restore();
+            });
+        }
+
+        function drawItems() {
+            items.forEach(item => {
+                if (!item.active) return;
+                
+                let ix = item.x;
+                let iy = item.y + Math.sin(Date.now() / 200) * 5; // 둥둥 뜨는 효과
+
+                if(ix + 20 < camera.x || ix - 20 > camera.x + canvas.width ||
+                   iy + 40 < camera.y || iy - 40 > camera.y + canvas.height) return;
+
+                // 그림자
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.beginPath(); ctx.ellipse(item.x, item.y + 15, 12, 6, 0, 0, Math.PI*2); ctx.fill();
+
+                // 1. 위쪽 주황색 역삼각형
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath();
+                ctx.moveTo(ix - 8, iy - 35);
+                ctx.lineTo(ix + 8, iy - 35);
+                ctx.lineTo(ix, iy - 25);
+                ctx.closePath();
+                ctx.fill();
+
+                // 2. 물방울 모양 몸체 (하늘색)
+                ctx.fillStyle = '#fff'; // 테두리 느낌
+                ctx.beginPath();
+                ctx.arc(ix, iy, 18, 0, Math.PI * 2);
+                ctx.moveTo(ix - 17, iy - 5);
+                ctx.lineTo(ix, iy - 22);
+                ctx.lineTo(ix + 17, iy - 5);
+                ctx.fill();
+                
+                ctx.fillStyle = '#60a5fa'; // 내부 하늘색
+                ctx.beginPath();
+                ctx.arc(ix, iy, 14, 0, Math.PI * 2);
+                ctx.moveTo(ix - 13, iy - 4);
+                ctx.lineTo(ix, iy - 18);
+                ctx.lineTo(ix + 13, iy - 4);
+                ctx.fill();
+
+                // 3. 물음표 마크 (노란색)
+                ctx.fillStyle = '#fef08a';
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 2;
+                ctx.font = 'bold 22px DungGeunMo';
+                ctx.textAlign = 'center';
+                ctx.fillText('?', ix, iy + 7);
+                ctx.shadowBlur = 0; // 초기화
+            });
+        }
+
+        function drawCharacter(x, y, job, isMoving, name) {
+            let walk = isMoving ? Math.sin(Date.now() / 150) * 4 : 0;
+            let skin = '#fde0c6'; // 피치톤 피부
+            let outline = '#1f1512'; // 부드러운 검은색
+
+            // 그림자
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.beginPath(); ctx.ellipse(x, y + 16, 20, 8, 0, 0, Math.PI*2); ctx.fill();
+
+            // 픽셀 아트 스타일 헬퍼 함수 (검은 테두리 포함)
+            const dr = (dx, dy, w, h, color) => {
+                if(!color) return;
+                ctx.fillStyle = color;
+                ctx.fillRect(x + dx, y + dy, w, h);
+                ctx.strokeStyle = outline;
+                ctx.lineWidth = 2.5; // 픽셀 아트 느낌 강조
+                ctx.strokeRect(x + dx, y + dy, w, h);
+            };
+
+            // 직업별 컬러 설정
+            let shirt, pants, shoes, hat;
+            if(job === 'soldier') { shirt = '#4b5320'; pants = '#3f4718'; shoes = '#1c1917'; hat = '#3f6212'; }
+            else if(job === 'police') { shirt = '#1e3a8a'; pants = '#172554'; shoes = '#000000'; hat = '#1e3a8a'; }
+            else if(job === 'chef') { shirt = '#ffffff'; pants = '#e5e7eb'; shoes = '#1f2937'; hat = '#ffffff'; }
+            else if(job === 'farmer') { shirt = '#93c5fd'; pants = '#92400e'; shoes = '#78350f'; hat = '#d97706'; }
+            else if(job === 'monk') { shirt = '#6b7280'; pants = '#4b5563'; shoes = '#451a03'; hat = 'none'; }
+            else if(job === 'delivery') { shirt = '#374151'; pants = '#111827'; shoes = '#000000'; hat = '#2563eb'; }
+            else if(job === 'doctor') { shirt = '#f8fafc'; pants = '#94a3b8'; shoes = '#334155'; hat = 'none'; }
+            else if(job === 'firefighter') { shirt = '#ea580c'; pants = '#9a3412'; shoes = '#111827'; hat = '#dc2626'; }
+            else if(job === 'student') { shirt = '#fef08a'; pants = '#1e3a8a'; shoes = '#ffffff'; hat = 'none'; }
+            else if(job === 'wizard') { shirt = '#7e22ce'; pants = '#581c87'; shoes = '#000000'; hat = '#6b21a8'; }
+
+            // --- 뒤쪽 팔 (오른팔 - 걷기 애니메이션) ---
+            if(job !== 'monk' && job !== 'delivery' && job !== 'wizard') {
+                // 일반 오른팔
+                dr(10, -18 + walk, 8, 14, shirt); 
+                dr(11, -4 + walk, 6, 6, skin);
+            }
+            if (job === 'wizard') {
+                // 마법봉 든 오른팔
+                dr(10, -22, 8, 14, shirt); 
+                dr(11, -26, 6, 6, skin);
+                dr(12, -45, 4, 25, '#78350f'); // 지팡이
+                dr(10, -50, 8, 8, '#fef08a'); // 지팡이 보석
+            }
+
+            // --- 다리 & 신발 ---
+            dr(-10, -2 - walk, 8, 6, shoes);  // Left shoe
+            dr(2, -2 + walk, 8, 6, shoes);    // Right shoe
+            dr(-8, -12 - walk, 6, 12, pants); // Left leg
+            dr(2, -12 + walk, 6, 12, pants);  // Right leg
+
+            // --- 몸통 ---
+            if (job === 'monk') {
+                dr(-14, -22, 28, 20, shirt); // 승복 (좀 더 넓게)
+                dr(-6, -22, 12, 20, '#78350f'); // 가사 (갈색 띠)
+            } else {
+                dr(-13, -24, 26, 16, shirt);
+            }
+
+            // 직업별 몸통 디테일
+            if(job === 'police') {
+                dr(-4, -24, 8, 14, '#fbbf24'); // 금색 넥타이/단추라인
+                dr(-13, -8, 26, 4, '#000'); // 벨트
+                dr(-4, -9, 8, 6, '#fbbf24'); // 벨트 버클
+            }
+            else if(job === 'chef') {
+                dr(-13, -12, 26, 12, '#ef4444'); // 빨간 앞치마
+                dr(-4, -22, 8, 8, '#ef4444'); // 빨간 스카프
+            }
+            else if(job === 'delivery') {
+                dr(-13, -24, 26, 16, '#2563eb'); // 파란 조끼
+                dr(-6, -20, 12, 4, '#fff'); // 조끼 무늬
+            }
+            else if(job === 'doctor') {
+                dr(-6, -22, 12, 18, '#cbd5e1'); // 열린 가운 사이 옷
+                dr(-8, -20, 4, 12, '#000'); // 청진기 줄
+                dr(4, -20, 4, 12, '#000');
+                dr(-4, -10, 8, 4, '#94a3b8'); // 청진기 끝
+            }
+            else if(job === 'firefighter') {
+                dr(-13, -18, 26, 6, '#fef08a'); // 노란 반사띠
+                dr(-13, -8, 26, 6, '#fef08a');
+            }
+            else if(job === 'student') {
+                dr(-6, -24, 12, 8, '#ffffff'); // 셔츠 카라
+                dr(-2, -22, 4, 12, '#ef4444'); // 빨간 넥타이
+            }
+            else if(job === 'wizard') {
+                dr(-4, -24, 8, 16, '#d8b4fe'); // 망토 안쪽 무늬
+                dr(-13, -10, 26, 4, '#facc15'); // 금빛 벨트
+            }
+
+            // --- 얼굴 (머리) ---
+            dr(-16, -48, 32, 26, skin);
+            
+            // --- 눈 / 입 / 볼터치 ---
+            // 볼터치
+            ctx.fillStyle = 'rgba(244, 114, 182, 0.5)';
+            ctx.fillRect(x - 14, y - 30, 6, 4);
+            ctx.fillRect(x + 8, y - 30, 6, 4);
+
+            if(job === 'farmer' || job === 'monk') {
+                // 감은 눈 (평온한 표정)
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(x - 10, y - 36, 8, 2.5);
+                ctx.fillRect(x + 2, y - 36, 8, 2.5);
+            } else {
+                // 큰 눈 (흰자)
+                dr(-11, -40, 8, 10, '#fff');
+                dr(3, -40, 8, 10, '#fff');
+                // 눈동자
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(x - 8, y - 38, 5, 7);
+                ctx.fillRect(x + 3, y - 38, 5, 7);
+                // 초롱초롱 빛
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(x - 7, y - 37, 2, 2);
+                ctx.fillRect(x + 4, y - 37, 2, 2);
+            }
+
+            if(job === 'chef') {
+                // 웃는 입
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(x, y - 26, 4, 0, Math.PI);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            // --- 머리카락 / 모자 ---
+            if(job === 'soldier') {
+                dr(-16, -50, 32, 6, '#451a03'); // 짧은 머리 베이스
+                dr(-18, -54, 36, 12, hat); // 베레모
+                dr(6, -52, 6, 6, '#fbbf24'); // 배지
+            }
+            else if(job === 'police') {
+                dr(-16, -50, 32, 6, '#1f2937'); // 머리
+                dr(-18, -56, 36, 14, hat); // 경찰모
+                dr(-20, -42, 40, 4, '#1e3a8a'); // 챙
+                dr(-4, -52, 8, 8, '#fbbf24'); // 배지
+            }
+            else if(job === 'chef') {
+                dr(-16, -50, 32, 8, '#1f2937'); // 머리
+                dr(-18, -70, 36, 24, hat); // 요리사 모자 (높음)
+                dr(-14, -76, 28, 6, hat);
+            }
+            else if(job === 'farmer') {
+                dr(-16, -50, 32, 8, '#451a03'); // 머리
+                dr(-26, -50, 52, 14, hat); // 밀짚모자 (크게)
+                dr(-18, -60, 36, 10, hat);
+                dr(-18, -50, 36, 2, '#451a03'); // 모자 끈
+            }
+            else if(job === 'delivery') {
+                dr(-16, -50, 32, 8, '#1f2937'); // 머리
+                dr(-16, -56, 32, 12, hat); // 캡모자
+                dr(-18, -44, 20, 4, hat); // 챙 (앞으로)
+                dr(-4, -52, 12, 4, '#fff'); // 모자 무늬
+            }
+            else if(job === 'doctor' || job === 'student') {
+                dr(-16, -54, 32, 12, '#1f2937'); // 검은 덮은 머리
+                dr(-18, -48, 8, 14, '#1f2937'); // 옆머리
+                dr(10, -48, 8, 14, '#1f2937');
+            }
+            else if(job === 'firefighter') {
+                dr(-16, -50, 32, 6, '#451a03'); 
+                dr(-18, -60, 36, 16, hat); // 소방 헬멧
+                dr(-10, -56, 20, 8, '#fef08a'); // 헬멧 마크
+            }
+            else if(job === 'wizard') {
+                dr(-16, -50, 32, 8, '#93c5fd'); // 은발
+                dr(-22, -54, 44, 10, hat); // 마법사 모자 챙
+                dr(-14, -74, 28, 20, hat); // 모자 기둥
+                dr(-8, -86, 16, 12, hat); // 모자 끝
+            }
+
+            // --- 앞쪽 팔 & 특수 자세 (아이템 들기 등) ---
+            if(job === 'farmer') {
+                // 벼 들고 있는 왼팔
+                dr(-18, -18, 14, 8, shirt);
+                dr(-16, -10, 6, 6, skin);
+                // 벼
+                dr(-28, -16, 24, 8, '#fef08a');
+                dr(-32, -18, 6, 12, '#facc15');
+                dr(-24, -20, 4, 16, '#eab308');
+            } 
+            else if(job === 'monk') {
+                // 합장 (가운데로 모은 손)
+                dr(-10, -14, 8, 10, shirt);
+                dr(2, -14, 8, 10, shirt);
+                dr(-6, -6, 12, 8, skin); 
+            }
+            else if(job === 'delivery') {
+                // 박스 들고 있는 양팔
+                dr(-16, -18, 8, 12, shirt);
+                dr(8, -18, 8, 12, shirt);
+                // 박스
+                dr(-14, -14, 28, 18, '#b45309');
+                dr(-14, -6, 28, 2, '#fcd34d'); // 박스 테이프
+                dr(-12, -10, 8, 4, '#fff'); // 송장
+            }
+            else if (job === 'soldier') {
+                // 거수경례 (오른팔을 머리 위로)
+                dr(-14, -18 - walk, 8, 14, shirt); dr(-13, -4 - walk, 6, 6, skin); // 일반 왼팔
+                dr(10, -36, 8, 20, shirt); // 꺾은 오른팔
+                dr(11, -42, 6, 6, skin);   // 손
+            }
+            else {
+                // 일반 왼팔
+                dr(-14, -18 - walk, 8, 14, shirt); 
+                dr(-13, -4 - walk, 6, 6, skin);
+            }
+
+            // 네임택
+            ctx.font = 'bold 16px DungGeunMo';
+            let textW = ctx.measureText(name).width;
+            ctx.fillStyle = 'rgba(0,0,0,0.7)'; 
+            let nameY = y - 75;
+            if(job==='chef' || job==='wizard') nameY = y - 95;
+            ctx.fillRect(x - textW/2 - 6, nameY, textW + 12, 22);
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.fillText(name, x, nameY + 16);
+        }
+
+        // 분위기가 밝은 사막이므로 어두운 비네팅 제거
+        function drawVignette() {
+            // 밝은 사막이므로 비네팅 효과를 그리지 않습니다.
+        }
+
+        function drawDirectionIndicator() {
+            // 가장 가까운 퀴즈 상자 찾기
+            let nearest = null;
+            let minDist = Infinity;
+            
+            items.forEach(item => {
+                if (!item.active) return;
+                let dist = Math.hypot(item.x - player.x, item.y - player.y);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = item;
+                }
+            });
+
+            // 가장 가까운 상자가 80 이상 떨어져 있으면 무조건 화살표 표시 (거리 제한 해제)
+            if (nearest && minDist > 80) {
+                let angle = Math.atan2(nearest.y - player.y, nearest.x - player.x);
+                let bounce = Math.sin(Date.now() / 150) * 8; // 꿀렁거리는 애니메이션
+                let arrowDist = 70 + bounce; // 플레이어로부터의 거리
+
+                let screenX = (player.x - camera.x) + Math.cos(angle) * arrowDist;
+                let screenY = (player.y - camera.y) + Math.sin(angle) * arrowDist;
+
+                ctx.save();
+                ctx.translate(screenX, screenY);
+                ctx.rotate(angle); // 해당 방향으로 회전
+
+                // 화살표 그리기 (네온 느낌)
+                ctx.shadowColor = '#ef4444';
+                ctx.shadowBlur = 10;
+                ctx.fillStyle = '#f87171'; // 밝은 빨강
+                ctx.strokeStyle = '#7f1d1d';
+                ctx.lineWidth = 3;
+
+                ctx.beginPath();
+                ctx.moveTo(15, 0); // 꼭짓점
+                ctx.lineTo(-10, 12);
+                ctx.lineTo(-5, 0); // 살짝 파인 뒤쪽
+                ctx.lineTo(-10, -12);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // 남은 개수 표시 텍스트 추가 (화살표 근처)
+                let remainCount = items.filter(e => e.active).length;
+                ctx.rotate(-angle); // 글자는 똑바로 보이게 다시 회전
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = '#000';
+                ctx.shadowBlur = 4;
+                ctx.font = 'bold 16px DungGeunMo';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${remainCount}개 남음!`, 0, -25);
+                ctx.shadowBlur = 0;
+
+                ctx.restore();
+            }
+        }
+
+        // 전체 화면 시각 효과 (모래바람 입자)
+        function drawDesertWind() {
+            let time = Date.now() / 1000;
+            ctx.fillStyle = 'rgba(255, 230, 150, 0.4)'; // 모래 색깔 입자
+            
+            for(let i = 0; i < 40; i++) {
+                // 화면 전체를 부드럽게 흐르는 파티클 연산
+                let wx = ((i * 137 + time * 120) % (canvas.width + 200)) - 100;
+                let wy = ((i * 251 + Math.sin(time * 2 + i) * 30) % (canvas.height + 200)) - 100;
+                
+                let pWidth = 30 + (i % 40);
+                let pHeight = 2 + (i % 2);
+                
+                ctx.beginPath();
+                ctx.roundRect(wx, wy, pWidth, pHeight, 2);
+                ctx.fill();
+            }
+        }
+
+        // 태양 눈부심 (오버레이 빛 효과)
+        function drawSunGlare() {
+            let gradient = ctx.createRadialGradient(canvas.width / 2, -50, 0, canvas.width / 2, -50, canvas.height);
+            gradient.addColorStop(0, 'rgba(255, 230, 150, 0.25)'); // 화면 위쪽이 밝게
+            gradient.addColorStop(1, 'rgba(255, 100, 0, 0.0)');   // 아래로 갈수록 투명
+
+            ctx.globalCompositeOperation = 'screen';
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        function gameLoop() {
+            if (gameState === 'playing') {
+                updatePlayer();
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.translate(-camera.x, -camera.y);
+                
+                drawDesert(); 
+                drawAnimals(); // 전갈, 뱀 그리기 추가
+                drawItems();
+                drawCharacter(player.x, player.y, player.job, player.isMoving, player.name);
+                
+                ctx.restore();
+
+                // 화면 고정 UI & 이펙트
+                drawDirectionIndicator();
+                drawDesertWind(); // 모래바람 이펙트 추가
+                drawSunGlare();   // 빛 눈부심 효과 추가
+
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function updateHud() {
+            const activeCount = items.filter(e => e.active).length;
+            document.getElementById('hud-remain').innerText = activeCount;
+            document.getElementById('hud-score').innerText = score;
+        }
+
+        // --- 7. 퀴즈 기능 ---
+        let currentOptions = [];
+        
+        function openQuiz(itemTarget) {
+            gameState = 'quiz';
+            keys = {w:false, a:false, s:false, d:false};
+            currentQuiz = itemTarget;
+            isAnswering = false;
+            
+            const wordData = currentQuiz.data;
+            document.getElementById('quiz-word').innerText = wordData.word;
+
+            let wrongOptions = allDialects.filter(d => d.meaning !== wordData.meaning).map(d => d.meaning);
+            wrongOptions = shuffle(wrongOptions).slice(0, 3);
+            currentOptions = shuffle([wordData.meaning, ...wrongOptions]);
+            
+            for(let i=0; i<4; i++) {
+                document.querySelector(`#ans-${i} .ans-text`).innerText = currentOptions[i];
+            }
+
+            document.querySelectorAll('.quiz-btn').forEach(btn => {
+                btn.classList.remove('correct-anim', 'wrong-anim', 'active');
+            });
+            uiQuiz.classList.remove('hidden');
+        }
+
+        function handleAnswer(index) {
+            if (isAnswering) return;
+            isAnswering = true;
+            
+            const selectedMeaning = currentOptions[index];
+            const correctMeaning = currentQuiz.data.meaning;
+            const btnEl = document.getElementById(`ans-${index}`);
+            
+            btnEl.classList.add('active');
+
+            setTimeout(() => {
+                if (selectedMeaning === correctMeaning) {
+                    btnEl.classList.add('correct-anim');
+                    score++;
+                } else {
+                    btnEl.classList.add('wrong-anim');
+                    
+                    // 오답 목록에 추가
+                    wrongAnswers.push({
+                        word: currentQuiz.data.word,
+                        correct: correctMeaning,
+                        wrong: selectedMeaning
+                    });
+
+                    for(let i=0; i<4; i++) {
+                        if(currentOptions[i] === correctMeaning) {
+                            document.getElementById(`ans-${i}`).classList.add('correct-anim');
+                        }
+                    }
+                }
+                
+                setTimeout(() => { closeQuiz(); }, 1200);
+            }, 200);
+        }
+
+        function closeQuiz() {
+            currentQuiz.active = false;
+            uiQuiz.classList.add('hidden');
+            
+            const activeCount = items.filter(e => e.active).length;
+            
+            if (activeCount === 0) {
+                updateHud(); 
+                endGame();
+            } else {
+                gameState = 'playing';
+                updateHud();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function endGame() {
+            window.VillageBridge?.report(score, totalQuestions, items.filter(item => !item.active).length);
+            gameState = 'end';
+            uiQuiz.classList.add('hidden');
+            uiEnd.classList.remove('hidden');
+            
+            let timeTaken = Math.floor((Date.now() - startTime) / 1000); // 걸린 시간(초) 계산
+            
+            document.getElementById('res-name').innerText = player.name;
+            document.getElementById('res-score').innerText = score;
+            document.getElementById('res-total').innerText = totalQuestions;
+            document.getElementById('res-time').innerText = timeTaken;
+
+            // 오답 노트 렌더링
+            let wrongListHtml = '';
+            if (wrongAnswers.length === 0) {
+                wrongListHtml = '<p class="text-green-600 text-center mt-8 text-lg">완벽합니다!<br>틀린 문제가 하나도 없어요! 🌟</p>';
+            } else {
+                wrongAnswers.forEach(ans => {
+                    wrongListHtml += `
+                    <div class="bg-white p-3 border-2 border-red-200 rounded text-left shadow-[2px_2px_0_0_#fecaca]">
+                        <span class="font-bold text-red-600 text-base">"${ans.word}"</span><br>
+                        정답: <span class="text-green-600 font-bold">${ans.correct}</span><br>
+                        <span class="text-gray-400 text-xs">내 선택: ${ans.wrong}</span>
+                    </div>`;
+                });
+            }
+            document.getElementById('wrong-answers-list').innerHTML = wrongListHtml;
+
+            // 결과 화면에 플레이어 캐릭터 그리기
+            const resCanvas = document.getElementById('result-char-canvas');
+            const resCtx = resCanvas.getContext('2d');
+            resCtx.clearRect(0, 0, resCanvas.width, resCanvas.height);
+            let tempCtx = ctx; 
+            ctx = resCtx;
+            drawCharacter(50, 95, player.job, false, player.name);
+            ctx = tempCtx;
+        }
+
+    </script>
+<script src="../mission-bridge.js"></script>
+</body>
+</html>

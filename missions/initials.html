@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>태극과 오방색 - 초성별 고유어 퀴즈</title>
+    <script src="../vendor/tailwind.js"></script>
+    <style>
+        :root {
+            /* 오방색 (Obangsaek) & 태극기 (Taegeukgi) Color Palette */
+            --obang-cheong: #0047A0;   /* 청 (파랑 - 동쪽/태극 음) */
+            --obang-jeok: #CD2E3A;     /* 적 (빨강 - 남쪽/태극 양) */
+            --obang-hwang: #E5A93B;    /* 황 (노랑 - 중앙/오방정색 황색) */
+            --obang-baek: #FAF8F5;     /* 백 (한지색 - 서쪽/바탕) */
+            --obang-heuk: #1E1E24;     /* 흑 (먹색 - 북쪽/건곤감리) */
+            --hanji-border: #DFD7C8;   /* 한지 테두리 */
+            --dancheong-green: #2B7A68;/* 단청 녹색 포인트 */
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--obang-baek);
+            color: var(--obang-heuk);
+            /* 은은한 한지 질감 + 전통 창호 문살 격자 패턴 */
+            background-image: 
+                linear-gradient(to right, rgba(223, 215, 200, 0.35) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(223, 215, 200, 0.35) 1px, transparent 1px),
+                radial-gradient(circle at 18% 20%, rgba(0, 71, 160, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 82% 80%, rgba(205, 46, 58, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 80% 15%, rgba(229, 169, 59, 0.09) 0%, transparent 40%);
+            background-size: 48px 48px, 48px 48px, 100% 100%, 100% 100%, 100% 100%;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 배경 장식용 은은한 회전 태극 문양 및 꽃잎 애니메이션 */
+        @keyframes slowSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(8deg); }
+        }
+        .bg-taegeuk-watermark {
+            animation: slowSpin 90s linear infinite;
+        }
+        .bg-petal-float {
+            animation: floatSlow 7s ease-in-out infinite;
+        }
+        .bg-petal-float-delayed {
+            animation: floatSlow 9s ease-in-out 2s infinite;
+        }
+
+        .font-batang {
+            font-family: 'Gowun Batang', serif;
+        }
+
+        /* 전통 창호지 카드 스타일 */
+        .hanji-card {
+            background-color: #FFFFFF;
+            border: 2px solid var(--hanji-border);
+            box-shadow: 0 10px 30px -5px rgba(30, 30, 36, 0.08), 0 0 0 4px rgba(250, 248, 245, 0.8);
+            position: relative;
+        }
+
+        /* 오방색 상단 띠 장식 (색동 느낌) */
+        .saekdong-bar {
+            height: 8px;
+            display: flex;
+            width: 100%;
+        }
+        .saekdong-bar div { flex: 1; }
+        .bg-cheong { background-color: var(--obang-cheong); }
+        .bg-jeok { background-color: var(--obang-jeok); }
+        .bg-hwang { background-color: var(--obang-hwang); }
+        .bg-baek { background-color: #EAE4D7; }
+        .bg-heuk { background-color: var(--obang-heuk); }
+
+        /* 선택지 버튼 호버 및 상태 */
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1.5px solid var(--hanji-border);
+            background-color: #FCFBF9;
+        }
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--obang-cheong);
+            background-color: rgba(0, 71, 160, 0.04);
+            transform: translateY(-2px);
+        }
+
+        /* 정답 / 오답 스타일 */
+        .option-correct {
+            border-color: var(--obang-cheong) !important;
+            background-color: rgba(0, 71, 160, 0.08) !important;
+            color: var(--obang-cheong) !important;
+            font-weight: 700;
+        }
+        .option-wrong {
+            border-color: var(--obang-jeok) !important;
+            background-color: rgba(205, 46, 58, 0.08) !important;
+            color: var(--obang-jeok) !important;
+        }
+
+        /* 도장(낙관) 스타일 배지 */
+        .nakgwan-stamp {
+            border: 2px solid var(--obang-jeok);
+            color: var(--obang-jeok);
+            font-family: 'Gowun Batang', serif;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            padding: 2px 8px;
+            background-color: rgba(205, 46, 58, 0.04);
+            letter-spacing: 0.05em;
+        }
+
+        /* 건곤감리 장식 요소 */
+        .trigram-line {
+            height: 3px;
+            background-color: var(--obang-heuk);
+            border-radius: 1px;
+        }
+    </style>
+<style>.hidden{display:none!important}button:focus-visible{outline:3px solid #b77142;outline-offset:3px}</style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between py-6 px-4">
+
+    <!-- 배경 장식 레이어 (클릭 방해 없음) -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+        <!-- 네 모서리 전통 단청/문살 프레임 장식 -->
+        <svg class="absolute top-3 left-3 w-20 h-20 text-[#0047A0]/15" viewBox="0 0 100 100" fill="none">
+            <path d="M5 95V15C5 9.47715 9.47715 5 15 5H95" stroke="currentColor" stroke-width="3"/>
+            <path d="M18 85V25C18 21.134 21.134 18 25 18H85" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="11" y="11" width="14" height="14" stroke="#CD2E3A" stroke-opacity="0.25" stroke-width="1.5"/>
+        </svg>
+        <svg class="absolute top-3 right-3 w-20 h-20 text-[#CD2E3A]/15 rotate-90" viewBox="0 0 100 100" fill="none">
+            <path d="M5 95V15C5 9.47715 9.47715 5 15 5H95" stroke="currentColor" stroke-width="3"/>
+            <path d="M18 85V25C18 21.134 21.134 18 25 18H85" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="11" y="11" width="14" height="14" stroke="#0047A0" stroke-opacity="0.25" stroke-width="1.5"/>
+        </svg>
+        <svg class="absolute bottom-3 left-3 w-20 h-20 text-[#E5A93B]/25 -rotate-90" viewBox="0 0 100 100" fill="none">
+            <path d="M5 95V15C5 9.47715 9.47715 5 15 5H95" stroke="currentColor" stroke-width="3"/>
+            <path d="M18 85V25C18 21.134 21.134 18 25 18H85" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="11" y="11" width="14" height="14" stroke="#1E1E24" stroke-opacity="0.2" stroke-width="1.5"/>
+        </svg>
+        <svg class="absolute bottom-3 right-3 w-20 h-20 text-[#0047A0]/15 rotate-180" viewBox="0 0 100 100" fill="none">
+            <path d="M5 95V15C5 9.47715 9.47715 5 15 5H95" stroke="currentColor" stroke-width="3"/>
+            <path d="M18 85V25C18 21.134 21.134 18 25 18H85" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="11" y="11" width="14" height="14" stroke="#CD2E3A" stroke-opacity="0.25" stroke-width="1.5"/>
+        </svg>
+
+        <!-- 은은하게 회전하는 대형 태극 워터마크 -->
+        <svg class="bg-taegeuk-watermark absolute -top-24 -right-24 w-96 h-96 opacity-[0.045]" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="#CD2E3A"/>
+            <path d="M 5,50 A 45,45 0 0,0 95,50 A 22.5,22.5 0 0,0 50,50 A 22.5,22.5 0 0,1 5,50 Z" fill="#0047A0"/>
+            <circle cx="27.5" cy="50" r="22.5" fill="#CD2E3A"/>
+        </svg>
+
+        <!-- 은은한 무궁화 꽃잎 & 오방색 매듭 점 장식 -->
+        <svg class="bg-petal-float absolute top-1/4 left-[6%] w-14 h-14 opacity-20" viewBox="0 0 60 60" fill="none">
+            <path d="M30 8C35 18 46 20 42 30C38 40 22 40 18 30C14 20 25 18 30 8Z" fill="#CD2E3A" fill-opacity="0.45"/>
+            <path d="M30 52C25 42 14 40 18 30C22 20 38 20 42 30C46 40 35 42 30 52Z" fill="#E5A93B" fill-opacity="0.45"/>
+            <circle cx="30" cy="30" r="4" fill="#CD2E3A"/>
+        </svg>
+
+        <svg class="bg-petal-float-delayed absolute bottom-1/4 right-[7%] w-16 h-16 opacity-20" viewBox="0 0 60 60" fill="none">
+            <circle cx="30" cy="30" r="18" stroke="#0047A0" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <circle cx="30" cy="30" r="10" stroke="#CD2E3A" stroke-width="1.5"/>
+            <circle cx="30" cy="30" r="3" fill="#E5A93B"/>
+        </svg>
+    </div>
+
+    <!-- 상단 헤더: 태극기 모티브 -->
+    <header class="w-full max-w-2xl flex items-center justify-between mb-6 px-2 relative z-10">
+        <div class="flex items-center gap-3">
+            <!-- 미니 태극기 SVG 아이콘 -->
+            <div class="w-12 h-8 bg-white border border-[#DFD7C8] rounded shadow-sm flex items-center justify-center p-1 relative overflow-hidden" title="대한민국 태극기">
+                <svg viewBox="0 0 90 60" class="w-full h-full">
+                    <rect width="90" height="60" fill="#ffffff"/>
+                    <!-- 태극 문양 -->
+                    <g transform="translate(45,30) rotate(33.69)">
+                        <circle r="15" fill="#CD2E3A"/>
+                        <path d="M -15,0 A 15,15 0 0,0 15,0 A 7.5,7.5 0 0,0 0,0 A 7.5,7.5 0 0,1 -15,0 Z" fill="#0047A0"/>
+                        <circle cx="-7.5" cy="0" r="7.5" fill="#CD2E3A"/>
+                    </g>
+                    <!-- 건 (좌상) -->
+                    <g transform="translate(18,12) rotate(-56.31)" fill="#1E1E24">
+                        <rect x="-7.5" y="-5" width="15" height="2.2"/>
+                        <rect x="-7.5" y="-1.1" width="15" height="2.2"/>
+                        <rect x="-7.5" y="2.8" width="15" height="2.2"/>
+                    </g>
+                    <!-- 곤 (우하) -->
+                    <g transform="translate(72,48) rotate(-56.31)" fill="#1E1E24">
+                        <rect x="-7.5" y="-5" width="6.8" height="2.2"/><rect x="0.7" y="-5" width="6.8" height="2.2"/>
+                        <rect x="-7.5" y="-1.1" width="6.8" height="2.2"/><rect x="0.7" y="-1.1" width="6.8" height="2.2"/>
+                        <rect x="-7.5" y="2.8" width="6.8" height="2.2"/><rect x="0.7" y="2.8" width="6.8" height="2.2"/>
+                    </g>
+                    <!-- 감 (우상) -->
+                    <g transform="translate(72,12) rotate(56.31)" fill="#1E1E24">
+                        <rect x="-7.5" y="-5" width="6.8" height="2.2"/><rect x="0.7" y="-5" width="6.8" height="2.2"/>
+                        <rect x="-7.5" y="-1.1" width="15" height="2.2"/>
+                        <rect x="-7.5" y="2.8" width="6.8" height="2.2"/><rect x="0.7" y="2.8" width="6.8" height="2.2"/>
+                    </g>
+                    <!-- 이 (좌하) -->
+                    <g transform="translate(18,48) rotate(56.31)" fill="#1E1E24">
+                        <rect x="-7.5" y="-5" width="15" height="2.2"/>
+                        <rect x="-7.5" y="-1.1" width="6.8" height="2.2"/><rect x="0.7" y="-1.1" width="6.8" height="2.2"/>
+                        <rect x="-7.5" y="2.8" width="15" height="2.2"/>
+                    </g>
+                </svg>
+            </div>
+            <div>
+                <h1 class="font-batang text-xl sm:text-2xl font-bold text-[#1E1E24] tracking-tight">아름다운 우리말 고유어 퀴즈</h1>
+                <p class="text-xs text-[#6B665E]">태극과 오방색(청·적·황·백·흑)의 빛깔을 담은 순우리말 배움터</p>
+            </div>
+        </div>
+        <div class="hidden sm:flex items-center gap-1.5 text-xs font-medium">
+            <span class="w-3 h-3 rounded-full bg-[#0047A0]" title="청(동)"></span>
+            <span class="w-3 h-3 rounded-full bg-[#CD2E3A]" title="적(남)"></span>
+            <span class="w-3 h-3 rounded-full bg-[#E5A93B]" title="황(중앙)"></span>
+            <span class="w-3 h-3 rounded-full bg-[#FAF8F5] border border-gray-300" title="백(서)"></span>
+            <span class="w-3 h-3 rounded-full bg-[#1E1E24]" title="흑(북)"></span>
+        </div>
+    </header>
+
+    <!-- 메인 퀴즈 컨테이너 -->
+    <main class="w-full max-w-2xl hanji-card rounded-2xl overflow-hidden my-auto relative z-10">
+        <!-- 오방색 상단 색동 띠 -->
+        <div class="saekdong-bar">
+            <div class="bg-cheong"></div>
+            <div class="bg-jeok"></div>
+            <div class="bg-hwang"></div>
+            <div class="bg-baek"></div>
+            <div class="bg-heuk"></div>
+        </div>
+
+        <!-- 1. 시작 화면 -->
+        <div id="start-screen" class="p-8 sm:p-10 text-center">
+            <div class="inline-block mb-4">
+                <span class="nakgwan-stamp text-sm">초성별 순우리말</span>
+            </div>
+            <h2 class="font-batang text-2xl sm:text-3xl font-bold text-[#1E1E24] mb-3">
+                우리말의 깊은 뜻을 찾아서
+            </h2>
+            <p class="text-sm sm:text-base text-[#57524A] mb-8 leading-relaxed max-w-md mx-auto">
+                'ㄱ'부터 'ㅎ'까지 정성껏 모은 고유어 10문제가 준비되어 있습니다.<br>
+                태극의 조화와 오방색의 빛깔 속에서 우리말 실력을 뽐내보세요!
+            </p>
+
+            <!-- 오방색 안내 카드 -->
+            <div class="grid grid-cols-5 gap-2 max-w-md mx-auto mb-8 text-xs">
+                <div class="p-2 rounded-lg bg-[#0047A0]/10 border border-[#0047A0]/20 text-[#0047A0] font-bold">청(靑)<br><span class="font-normal text-[11px]">희망·정답</span></div>
+                <div class="p-2 rounded-lg bg-[#CD2E3A]/10 border border-[#CD2E3A]/20 text-[#CD2E3A] font-bold">적(赤)<br><span class="font-normal text-[11px]">열정·낙관</span></div>
+                <div class="p-2 rounded-lg bg-[#E5A93B]/15 border border-[#E5A93B]/30 text-[#9A6B12] font-bold">황(黃)<br><span class="font-normal text-[11px]">중심·도움말</span></div>
+                <div class="p-2 rounded-lg bg-[#FAF8F5] border border-[#DFD7C8] text-[#57524A] font-bold">백(白)<br><span class="font-normal text-[11px]">순수·한지</span></div>
+                <div class="p-2 rounded-lg bg-[#1E1E24]/10 border border-[#1E1E24]/20 text-[#1E1E24] font-bold">흑(黑)<br><span class="font-normal text-[11px]">지혜·건곤감리</span></div>
+            </div>
+
+            <button onclick="startQuiz()" class="w-full sm:w-auto px-10 py-3.5 rounded-xl bg-[#0047A0] hover:bg-[#00367A] text-white font-bold text-base shadow-md transition-all transform hover:-translate-y-0.5 cursor-pointer">
+                퀴즈 시작하기
+            </button>
+        </div>
+
+        <!-- 2. 퀴즈 진행 화면 -->
+        <div id="quiz-screen" class="hidden p-6 sm:p-8">
+            <!-- 상단 진행 상태 & 건곤감리 4괘 표시 -->
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <span id="question-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-[#1E1E24] text-white">
+                        제 1 문항
+                    </span>
+                    <span id="consonant-tag" class="nakgwan-stamp text-xs">초성 ㄱ</span>
+                </div>
+                <div class="text-sm font-bold text-[#0047A0]">
+                    <span id="progress-text">1 / 10</span>
+                </div>
+            </div>
+
+            <!-- 오방색 진행 게이지 -->
+            <div class="w-full h-2.5 bg-[#EAE4D7] rounded-full overflow-hidden mb-6 p-0.5">
+                <div id="progress-bar" class="h-full rounded-full transition-all duration-300" style="width: 10%; background: linear-gradient(90deg, #0047A0 0%, #CD2E3A 50%, #E5A93B 100%);"></div>
+            </div>
+
+            <!-- 문제 영역 -->
+            <div class="bg-[#FAF8F5] border border-[#DFD7C8] rounded-xl p-5 sm:p-6 mb-6 relative">
+                <!-- 모서리 전통 장식 -->
+                <div class="absolute top-2 left-2 w-2.5 h-2.5 border-t-2 border-l-2 border-[#CD2E3A]"></div>
+                <div class="absolute top-2 right-2 w-2.5 h-2.5 border-t-2 border-r-2 border-[#0047A0]"></div>
+                <div class="absolute bottom-2 left-2 w-2.5 h-2.5 border-b-2 border-l-2 border-[#0047A0]"></div>
+                <div class="absolute bottom-2 right-2 w-2.5 h-2.5 border-b-2 border-r-2 border-[#CD2E3A]"></div>
+
+                <p id="question-text" class="font-batang text-lg sm:text-xl font-bold text-[#1E1E24] leading-relaxed whitespace-pre-line">
+                    문제가 여기에 표시됩니다.
+                </p>
+            </div>
+
+            <!-- 선택지 영역 -->
+            <div id="options-container" class="space-y-3 mb-6">
+                <!-- 동적으로 버튼 생성 -->
+            </div>
+
+            <!-- 힌트(도움말) 버튼 및 영역 (오방색 '황' 테마) -->
+            <div class="mb-4">
+                <button id="hint-btn" onclick="toggleHint()" class="text-xs font-bold text-[#9A6B12] bg-[#E5A93B]/15 hover:bg-[#E5A93B]/25 border border-[#E5A93B]/40 px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5">
+                    <span>💡 도움말(힌트) 보기</span>
+                </button>
+                <div id="hint-box" class="hidden mt-2.5 p-3.5 rounded-lg bg-[#E5A93B]/10 border border-[#E5A93B]/30 text-sm text-[#6E4B0A]">
+                    <span class="font-bold">도움말:</span> <span id="hint-text"></span>
+                </div>
+            </div>
+
+            <!-- 해설 영역 (정답 선택 후 표시) -->
+            <div id="rationale-box" class="hidden p-4 rounded-xl mb-6 border text-sm leading-relaxed">
+                <div class="font-bold mb-1 flex items-center gap-1.5" id="rationale-title"></div>
+                <p id="rationale-text" class="text-[#3A3732]"></p>
+            </div>
+
+            <!-- 하단 네비게이션 버튼 -->
+            <div class="flex items-center justify-between pt-2 border-t border-[#EAE4D7]">
+                <button onclick="skipQuestion()" id="skip-btn" class="text-sm text-[#6B665E] hover:text-[#1E1E24] px-3 py-2 cursor-pointer">
+                    건너뛰기
+                </button>
+                <button onclick="nextQuestion()" id="next-btn" class="hidden px-6 py-2.5 rounded-xl bg-[#0047A0] hover:bg-[#00367A] text-white font-bold text-sm shadow transition-colors cursor-pointer">
+                    다음 문제로 →
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. 결과 화면 -->
+        <div id="result-screen" class="hidden p-8 sm:p-10 text-center">
+            <div class="inline-block mb-3">
+                <span class="nakgwan-stamp text-sm">장원급제 결과표</span>
+            </div>
+            <h2 class="font-batang text-2xl sm:text-3xl font-bold text-[#1E1E24] mb-2">
+                고유어 퀴즈 완료!
+            </h2>
+            <p id="result-comment" class="text-sm text-[#57524A] mb-6">
+                우리말의 아름다움을 깊이 이해하고 계시네요!
+            </p>
+
+            <!-- 점수 원형 배지 (태극 색채 적용) -->
+            <div class="w-36 h-36 mx-auto rounded-full border-4 border-[#0047A0] bg-[#FAF8F5] flex flex-col items-center justify-center mb-6 shadow-inner relative">
+                <div class="absolute inset-1 rounded-full border border-dashed border-[#CD2E3A]/50"></div>
+                <span class="text-xs text-[#6B665E] font-medium">나의 점수</span>
+                <div class="font-batang text-4xl font-bold text-[#0047A0] my-0.5">
+                    <span id="final-score">0</span><span class="text-lg text-[#1E1E24]"> / 10</span>
+                </div>
+                <span id="final-grade" class="text-xs font-bold text-[#CD2E3A]">우수</span>
+            </div>
+
+            <!-- 오답 및 전체 복습 리스트 -->
+            <div class="text-left bg-[#FAF8F5] border border-[#DFD7C8] rounded-xl p-4 sm:p-5 mb-6 max-h-64 overflow-y-auto">
+                <h3 class="font-batang font-bold text-sm text-[#1E1E24] mb-3 pb-2 border-b border-[#DFD7C8]">
+                    📜 문항별 풀이 기록
+                </h3>
+                <div id="review-list" class="space-y-3 text-xs sm:text-sm">
+                    <!-- 결과 요약 동적 생성 -->
+                </div>
+            </div>
+
+            <button onclick="restartQuiz()" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#CD2E3A] hover:bg-[#A8222C] text-white font-bold text-sm shadow transition-colors cursor-pointer">
+                다시 도전하기
+            </button>
+        </div>
+    </main>
+
+    <!-- 하단 푸터: 건곤감리 장식 -->
+    <footer class="w-full max-w-2xl mt-6 text-center text-xs text-[#6B665E] flex flex-col items-center gap-2 relative z-10">
+        <div class="flex items-center gap-4 opacity-70">
+            <!-- 건 -->
+            <div class="w-5 flex flex-col gap-0.5" title="건(하늘)">
+                <div class="trigram-line"></div>
+                <div class="trigram-line"></div>
+                <div class="trigram-line"></div>
+            </div>
+            <!-- 곤 -->
+            <div class="w-5 flex flex-col gap-0.5" title="곤(땅)">
+                <div class="flex gap-0.5"><div class="trigram-line flex-1"></div><div class="trigram-line flex-1"></div></div>
+                <div class="flex gap-0.5"><div class="trigram-line flex-1"></div><div class="trigram-line flex-1"></div></div>
+                <div class="flex gap-0.5"><div class="trigram-line flex-1"></div><div class="trigram-line flex-1"></div></div>
+            </div>
+            <span>대한민국 전통 오방색 & 태극기 테마</span>
+            <!-- 감 -->
+            <div class="w-5 flex flex-col gap-0.5" title="감(물)">
+                <div class="flex gap-0.5"><div class="trigram-line flex-1"></div><div class="trigram-line flex-1"></div></div>
+                <div class="trigram-line"></div>
+                <div class="flex gap-0.5"><div class="trigram-line flex-1"></div><div class="trigram-line flex-1"></div></div>
+            </div>
+            <!-- 이 -->
+            <div class="w-5 flex flex-col gap-0.5" title="이(불)">
+                <div class="trigram-line"></div>
+                <div class="flex gap-0.5"><div class="trigram-line flex-1"></div><div class="trigram-line flex-1"></div></div>
+                <div class="trigram-line"></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 기존 고유어 퀴즈 데이터
+        const quizData = [
+            {
+                consonant: "ㄱ",
+                question: "다음 설명에 해당하는 고유어는 무엇인가요?\n\n'송진이 많이 있는 소나무의 가지나 옹이에 붙인 불'",
+                options: [
+                    { text: "관솔불", isCorrect: true, rationale: "송진이 엉긴 소나무 가지나 옹이(관솔)에 불을 붙여 횃불처럼 쓰던 불을 '관솔불'이라고 합니다." },
+                    { text: "곧은길", isCorrect: false, rationale: "'곧은길'은 앞으로 곧게 뻗어 나간 길을 뜻하는 고유어입니다." },
+                    { text: "담금질", isCorrect: false, rationale: "'담금질'은 금속을 높게 가열한 뒤 찬물에 담가 식히는 일을 말합니다." },
+                    { text: "해거름", isCorrect: false, rationale: "'해거름'은 해가 지는 것, 또는 그런 때를 가리키는 말입니다." }
+                ],
+                hint: "초성 'ㄱ'으로 시작하며, 소나무에서 나오는 끈적한 송진과 관련된 불입니다."
+            },
+            {
+                consonant: "ㅁ",
+                question: "고유어 '모로'의 뜻으로 알맞은 것은 무엇인가요?",
+                options: [
+                    { text: "옆으로.", isCorrect: true, rationale: "'모로'는 물건이나 몸이 바르지 않고 비스듬히 '옆으로' 향한 모양을 뜻하는 부사입니다." },
+                    { text: "조금 전에. 이미.", isCorrect: false, rationale: "'조금 전에. 이미.'를 뜻하는 고유어는 '아까'입니다." },
+                    { text: "이치에 따라 마땅히.", isCorrect: false, rationale: "'이치에 따라 마땅히.'를 뜻하는 고유어는 '모름지기'입니다." },
+                    { text: "잇달아 여러 번. 계속해서.", isCorrect: false, rationale: "'잇달아 여러 번. 계속해서.'를 뜻하는 고유어는 '자꾸'입니다." }
+                ],
+                hint: "초성 'ㅁ'의 첫 번째 단어로, 잠을 잘 때 똑바로 눕지 않고 '○○ 눕다'처럼 쓰입니다."
+            },
+            {
+                consonant: "ㅌ",
+                question: "다음 중 한 어머니가 낳은 자녀들의 나이 차이를 이르는 고유어는 무엇인가요?",
+                options: [
+                    { text: "터울", isCorrect: true, rationale: "'터울'은 한 어머니가 낳은 아이들의 나이 차이를 나타내는 순우리말입니다." },
+                    { text: "타래", isCorrect: false, rationale: "'타래'는 실이나 끈을 빙빙 둘러서 감아 놓은 뭉치를 뜻합니다." },
+                    { text: "채비", isCorrect: false, rationale: "'채비'는 어떤 일을 하기 위해 미리 준비를 하는 것을 의미합니다." },
+                    { text: "한통속", isCorrect: false, rationale: "'한통속'은 주로 이로운 일에 서로 마음이 통하는 한 무리를 가리킵니다." }
+                ],
+                hint: "초성 'ㅌ'의 세 번째 단어이며, 형제자매 사이의 간격을 말할 때 주로 씁니다."
+            },
+            {
+                consonant: "ㅎ",
+                question: "서쪽 또는 북서쪽에서 불어오는 바람을 뜻하는 고유어는 무엇인가요?",
+                options: [
+                    { text: "하늬바람", isCorrect: true, rationale: "'하늬바람'은 서쪽이나 북서쪽에서 불어오는 서풍을 이르는 아름다운 우리말입니다." },
+                    { text: "다복솔", isCorrect: false, rationale: "'다복솔'은 가지가 탐스럽고 촘촘하게 많이 퍼진 어린 소나무를 뜻합니다." },
+                    { text: "밤눈", isCorrect: false, rationale: "'밤눈'은 깜깜한 밤에 사물을 볼 수 있는 시력을 말합니다." },
+                    { text: "벼랑", isCorrect: false, rationale: "'벼랑'은 바위나 땅이 매우 가파르게 아래로 깊이 내려가 있는 곳입니다." }
+                ],
+                hint: "초성 'ㅎ'의 첫 번째 단어로, 뱃사람들이 서풍을 부르던 말에서 유래했습니다."
+            },
+            {
+                consonant: "ㄷ",
+                question: "다음 설명에 해당하는 고유어는 무엇인가요?\n\n'금속을 높은 온도로 가열한 다음 찬물에 담가 식히는 일'",
+                options: [
+                    { text: "담금질", isCorrect: true, rationale: "'담금질'은 쇠를 달구어 찬물에 담가 단단하게 만드는 과정을 뜻합니다." },
+                    { text: "판가름", isCorrect: false, rationale: "'판가름'은 옳고 그름, 또는 지고 이김이 분명하게 갈라지는 것을 말합니다." },
+                    { text: "곪다", isCorrect: false, rationale: "'곪다'는 상처에 염증이 생겨 고름이 들게 된다는 뜻의 동사입니다." },
+                    { text: "채비", isCorrect: false, rationale: "'채비'는 어떤 일을 하려고 준비를 갖추는 것을 의미합니다." }
+                ],
+                hint: "초성 'ㄷ'으로 시작하며, 대장간에서 칼이나 농기구를 단단하게 만들 때 하는 작업입니다."
+            },
+            {
+                consonant: "ㅌ",
+                question: "고유어 '투박하다'의 뜻풀이로 가장 적절한 것은 무엇인가요?",
+                options: [
+                    { text: "(모양이) 맵시가 없이 거칠고 두텁다.", isCorrect: true, rationale: "'투박하다'는 생김새나 솜씨가 세련되지 않고 거칠며 두툼하다는 뜻입니다." },
+                    { text: "(물건이) 아주 오래되어 낡다.", isCorrect: false, rationale: "'아주 오래되어 낡다'를 뜻하는 고유어는 '케케묵다'입니다." },
+                    { text: "(살에 닿는 느낌이) 싸늘하게 차다.", isCorrect: false, rationale: "'싸늘하게 차다'는 '차갑다'의 뜻풀이입니다." },
+                    { text: "모질고 거칠다.", isCorrect: false, rationale: "'모질고 거칠다'는 '사납다'의 뜻풀이입니다." }
+                ],
+                hint: "초성 'ㅌ'의 두 번째 단어로, 세련되지 않고  투박한 손이나 그릇 모양을 묘사할 때 씁니다."
+            },
+            {
+                consonant: "ㄹ",
+                question: "다음 빈칸에 들어갈 고유어로 알맞은 것은 무엇인가요?\n\n'어떠한 일을 하거나 상태에 있을 만한 신분이나 자격의 뜻을 나타내는 격 조사인 (  ) 최선을 다했다.'",
+                options: [
+                    { text: "로서", isCorrect: true, rationale: "'로서'는 지위나 신분, 자격을 나타내는 격 조사입니다. (수단이나 방법을 나타낼 때는 '로써'를 씁니다.)" },
+                    { text: "리을", isCorrect: false, rationale: "'리을'은 한글의 닿소리인 'ㄹ'의 이름입니다." },
+                    { text: "아까", isCorrect: false, rationale: "'아까'는 조금 전이나 이미 지난 시간을 나타내는 부사입니다." },
+                    { text: "자꾸", isCorrect: false, rationale: "'자꾸'는 잇달아 여러 번 계속해서라는 뜻의 부사입니다." }
+                ],
+                hint: "초성 'ㄹ'의 두 번째 단어로, '학생○○ 본분을 다하다'처럼 신분이나 자격을 나타낼 때 사용합니다."
+            },
+            {
+                consonant: "ㅌ",
+                question: "다음 중 단어와 그 뜻풀이가 바르게 연결된 것은 무엇인가요?",
+                options: [
+                    { text: "타래 - 실이나 끈을 빙빙 둘러서 감아 놓은 뭉치", isCorrect: true, rationale: "'타래'는 실, 노끈 등을 둥글게 감아 놓은 뭉치를 뜻하는 고유어입니다." },
+                    { text: "나귀 - 날아다니는 모든 짐승들", isCorrect: false, rationale: "'날아다니는 모든 짐승들'은 '날짐승'이며, '나귀'는 말보다 작고 귀가 긴 짐승입니다." },
+                    { text: "살금살금 - 아까워하는 마음 없이", isCorrect: false, rationale: "'아까워하는 마음 없이'는 '아낌없이'이며, '살금살금'은 남모르게 조용히 움직이는 모양입니다." },
+                    { text: "팔팔하다 - 조금 작은 듯하다", isCorrect: false, rationale: "'조금 작은 듯하다'는 '자그마하다'이며, '팔팔하다'는 기운이 넘치고 생기 있는 모습입니다." }
+                ],
+                hint: "실 한 뭉치를 셀 때 '실 한 ○○'라고 부르는 단어를 찾아보세요."
+            },
+            {
+                consonant: "ㅍ",
+                question: "고유어 '판가름'의 의미로 옳은 것은 무엇인가요?",
+                options: [
+                    { text: "옳고 그름, 또는 지고 이김이 분명하게 갈라지는 것", isCorrect: true, rationale: "'판가름'은 승부나 시비가 명확하게 결정되는 일을 뜻합니다." },
+                    { text: "기운이 넘치고 생기 있는 상태", isCorrect: false, rationale: "기운이 넘치는 모습은 '팔팔하다'에 해당하는 설명입니다." },
+                    { text: "바위나 땅이 매우 가파르게 아래로 깊이 내려가 있는 곳", isCorrect: false, rationale: "가파르게 깎아지른 곳은 '벼랑'을 뜻합니다." },
+                    { text: "가지가 탐스럽고 촘촘하게 많이 퍼진 어린 소나무", isCorrect: false, rationale: "탐스러운 어린 소나무는 '다복솔'입니다." }
+                ],
+                hint: "초성 'ㅍ'의 첫 번째 단어로, 승부가 결정 날 때 '승부가 ○○○ 나다'라고 표현합니다."
+            },
+            {
+                consonant: "ㅋ",
+                question: "다음 중 초성 'ㅋ'에 해당하는 고유어와 설명으로 옳은 것은 무엇인가요?",
+                options: [
+                    { text: "크낙새 - 우리나라 특산종인 텃새인데 멸종위기에 처해 있는 새", isCorrect: true, rationale: "'크낙새'는 한국 특산종 딱따구리과 텃새로 천연기념물이자 멸종위기종입니다." },
+                    { text: "케케묵다 - 날아다니는 모든 짐승들을 이르는 말", isCorrect: false, rationale: "'케케묵다'는 물건이나 생각이 아주 오래되어 낡았다는 뜻입니다." },
+                    { text: "크낙새 - 몸이 말보다 조금 작고 귀가 아주 긴 짐승", isCorrect: false, rationale: "말보다 작고 귀가 긴 짐승은 '나귀'입니다." },
+                    { text: "케케묵다 - 금속을 가열한 다음 찬물에 담가 식히는 일", isCorrect: false, rationale: "금속을 식히는 일은 '담금질'입니다." }
+                ],
+                hint: "초성 'ㅋ'의 두 번째 단어로, 큰 울음소리를 내는 우리나라의 희귀한 텃새 이름입니다."
+            }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+        let userHistory = [];
+        let answered = false;
+
+        function startQuiz() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            currentIdx = 0;
+            score = 0;
+            userHistory = [];
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = quizData[currentIdx];
+
+            // 상단 배지 및 진행도 업데이트
+            document.getElementById('question-badge').textContent = `제 ${currentIdx + 1} 문항`;
+            document.getElementById('consonant-tag').textContent = `초성 ${q.consonant}`;
+            document.getElementById('progress-text').textContent = `${currentIdx + 1} / ${quizData.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentIdx + 1) / quizData.length) * 100}%`;
+
+            // 문제 텍스트
+            document.getElementById('question-text').textContent = q.question;
+
+            // 힌트 초기화
+            document.getElementById('hint-box').classList.add('hidden');
+            document.getElementById('hint-text').textContent = q.hint;
+
+            // 해설 및 다음 버튼 초기화
+            document.getElementById('rationale-box').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('skip-btn').classList.remove('hidden');
+
+            // 선택지 렌더링 (보기 순서 섞기)
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            const labels = ['①', '②', '③', '④'];
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 rounded-xl flex items-start gap-3 cursor-pointer';
+                btn.innerHTML = `
+                    <span class="font-batang font-bold text-[#0047A0] mt-0.5">${labels[idx]}</span>
+                    <span class="flex-1 text-sm sm:text-base leading-snug">${opt.text}</span>
+                `;
+                btn.onclick = () => selectOption(btn, opt, shuffledOptions, container);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectOption(selectedBtn, selectedOpt, allOptions, container) {
+            if (answered) return;
+            answered = true;
+
+            const buttons = container.querySelectorAll('button');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                btn.classList.remove('cursor-pointer');
+                if (allOptions[i].isCorrect) {
+                    btn.classList.add('option-correct');
+                }
+            });
+
+            const rationaleBox = document.getElementById('rationale-box');
+            const rationaleTitle = document.getElementById('rationale-title');
+            const rationaleText = document.getElementById('rationale-text');
+
+            if (selectedOpt.isCorrect) {
+                score++;
+                rationaleBox.className = 'p-4 rounded-xl mb-6 border border-[#0047A0]/30 bg-[#0047A0]/5 text-sm leading-relaxed';
+                rationaleTitle.innerHTML = '<span class="text-[#0047A0]">🔵 정답입니다! (청색의 기운)</span>';
+            } else {
+                selectedBtn.classList.add('option-wrong');
+                rationaleBox.className = 'p-4 rounded-xl mb-6 border border-[#CD2E3A]/30 bg-[#CD2E3A]/5 text-sm leading-relaxed';
+                rationaleTitle.innerHTML = '<span class="text-[#CD2E3A]">🔴 아쉽네요, 다시 살펴볼까요?</span>';
+            }
+
+            rationaleText.textContent = selectedOpt.rationale;
+            rationaleBox.classList.remove('hidden');
+
+            const correctObj = quizData[currentIdx].options.find(o => o.isCorrect);
+            userHistory.push({
+                qNum: currentIdx + 1,
+                consonant: quizData[currentIdx].consonant,
+                correctAnswer: correctObj.text,
+                isCorrect: selectedOpt.isCorrect
+            });
+
+            document.getElementById('skip-btn').classList.add('hidden');
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.textContent = currentIdx === quizData.length - 1 ? '결과 확인하기 →' : '다음 문제로 →';
+            nextBtn.classList.remove('hidden');
+        }
+
+        function skipQuestion() {
+            if (answered) return;
+            const correctObj = quizData[currentIdx].options.find(o => o.isCorrect);
+            userHistory.push({
+                qNum: currentIdx + 1,
+                consonant: quizData[currentIdx].consonant,
+                correctAnswer: correctObj.text,
+                isCorrect: false,
+                skipped: true
+            });
+            nextQuestion();
+        }
+
+        function toggleHint() {
+            const box = document.getElementById('hint-box');
+            box.classList.toggle('hidden');
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx < quizData.length) {
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            window.VillageBridge?.report(score, quizData.length, userHistory.length);
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            document.getElementById('final-score').textContent = score;
+
+            const gradeEl = document.getElementById('final-grade');
+            const commentEl = document.getElementById('result-comment');
+
+            if (score >= 9) {
+                gradeEl.textContent = "장원급제 (최우수)";
+                commentEl.textContent = "우리말 고유어의 달인이시네요! 태극의 기운처럼 완벽한 조화입니다.";
+            } else if (score >= 7) {
+                gradeEl.textContent = "우수한 성적";
+                commentEl.textContent = "순우리말의 깊은 뜻을 아주 잘 알고 계십니다. 조금만 더 다듬으면 완벽해요!";
+            } else if (score >= 4) {
+                gradeEl.textContent = "정진하는 배움터";
+                commentEl.textContent = "좋은 출발입니다! 헷갈렸던 고유어들을 한 번 더 복습해 보세요.";
+            } else {
+                gradeEl.textContent = "첫걸음 떼기";
+                commentEl.textContent = "낯선 순우리말이 많았나요? 풀이 기록을 보며 하나씩 익혀보세요!";
+            }
+
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '';
+
+            userHistory.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'flex items-start justify-between gap-2 p-2.5 rounded-lg bg-white border border-[#EAE4D7]';
+                const statusBadge = item.isCorrect
+                    ? '<span class="px-2 py-0.5 rounded text-xs font-bold bg-[#0047A0]/10 text-[#0047A0]">정답</span>'
+                    : (item.skipped
+                        ? '<span class="px-2 py-0.5 rounded text-xs font-bold bg-gray-200 text-gray-600">건너뜀</span>'
+                        : '<span class="px-2 py-0.5 rounded text-xs font-bold bg-[#CD2E3A]/10 text-[#CD2E3A]">오답</span>');
+
+                row.innerHTML = `
+                    <div class="flex-1">
+                        <span class="font-bold text-[#1E1E24]">${item.qNum}번 [초성 ${item.consonant}]</span>
+                        <p class="text-[#57524A] mt-0.5">정답: <strong class="text-[#0047A0]">${item.correctAnswer}</strong></p>
+                    </div>
+                    <div>${statusBadge}</div>
+                `;
+                reviewList.appendChild(row);
+            });
+        }
+
+        function restartQuiz() {
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+    </script>
+<script src="../mission-bridge.js"></script>
+</body>
+</html>

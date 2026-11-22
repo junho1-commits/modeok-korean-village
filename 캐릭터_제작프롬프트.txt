@@ -1,0 +1,5 @@
+Mode: built-in image_gen; transparent_background: true.
+Reference: user-provided school mascot image 결과물.png.
+Final project asset: assets/travelers.png.
+
+Use case: identity-preserve. Asset type: transparent PNG character illustration for a Korean elementary-school learning adventure game. Input image: reference and identity target, two school mascots. Create one compact full-body pair of the SAME two cheerful mascots walking together as travelers in a traditional Korean hanok village. Preserve left mascot's bright yellow flower petal headdress, auburn braided hair, pink outfit with yellow sleeves; preserve right mascot's green triangular mountain hood with white peak, brown bangs, light green shirt and blue pants. Preserve the friendly faces, bold clean dark outlines, flat softly shaded colors. Adapt proportions to cute chibi game sprites, carrying small simple travel satchels, walking pose, facing slightly right, both feet visible. Keep their school book emblem if feasible, no added lettering. Isolated pair centered, minimal gap between them, no scene, no ground, no shadow, no checkerboard: genuinely transparent background. Must be legible at 100px tall.

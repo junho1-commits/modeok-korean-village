@@ -1,0 +1,17 @@
+Bundled runtime dependencies used by the original HTML activities:
+
+Tailwind CSS Play CDN runtime
+Source: https://cdn.tailwindcss.com
+Copyright Tailwind Labs, Inc. — MIT License.
+
+canvas-confetti 1.6.0
+Source: https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js
+Copyright Kiril Vatev — ISC License.
+
+Tone.js 14.8.49
+Source: https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js
+Copyright Yotam Mann and contributors — MIT License.
+
+Dependency bundles are included unchanged as downloaded. License comments included
+in the bundles are retained. The school mascot reference and original six learning
+activities were provided by the user for this project.

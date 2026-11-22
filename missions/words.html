@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소중한 우리말 첩 - 초6 국어 4단원 고유어 학습 앱</title>
+    <!-- Tailwind CSS 로드 -->
+    <script src="../vendor/tailwind.js"></script>
+    <!-- 한국 전통 서책 및 붓글씨 감성을 살리는 구글 웹폰트 로드 (고운돋움, Noto Serif KR) -->
+    <style>
+        /* =========================================================
+           한국 전통 오방색 및 한지 테마 CSS 변수 정의
+           ========================================================= */
+        :root {
+            /* 기본 테마: 청자 & 한지 (쪽빛, 비취빛, 한지빛) */
+            --bg-paper: #FAF6EE;
+            --bg-card: #FFFDF9;
+            --bg-subtle: #F2ECE1;
+            --text-ink: #231F20;
+            --text-muted: #5C554E;
+            --color-primary: #1E3A5F;     /* 쪽빛 (Indigo) */
+            --color-primary-hover: #152944;
+            --color-secondary: #3B7A57;   /* 비취빛 (Celadon Jade) */
+            --color-accent: #C83E37;      /* 다홍빛 (Traditional Crimson) */
+            --color-gold: #D99B26;        /* 치자빛 (Gardenia Ochre) */
+            --border-trad: #D5CBB8;
+            --pattern-opacity: 0.045;
+        }
+
+        /* 테마 2: 단청 & 궁궐 (다홍빛과 치자빛 중심) */
+        [data-theme="dancheong"] {
+            --bg-paper: #FBF4EB;
+            --bg-card: #FFFDFB;
+            --bg-subtle: #F4E6D8;
+            --text-ink: #261A17;
+            --text-muted: #66514B;
+            --color-primary: #A62C2B;     /* 궁궐 단청 붉은빛 */
+            --color-primary-hover: #82201F;
+            --color-secondary: #2A6F68;   /* 단청 뇌록색 */
+            --color-accent: #D99B26;      /* 황금빛 */
+            --color-gold: #C83E37;
+            --border-trad: #DFC7B6;
+        }
+
+        /* 테마 3: 진달래 & 봄빛 (연분홍과 풀빛) */
+        [data-theme="azalea"] {
+            --bg-paper: #FDF6F7;
+            --bg-card: #FFFFFF;
+            --bg-subtle: #F7E8EC;
+            --text-ink: #2B1E23;
+            --text-muted: #6B535B;
+            --color-primary: #B84A62;     /* 진달래빛 */
+            --color-primary-hover: #96384D;
+            --color-secondary: #4E7A51;   /* 새싹 풀빛 */
+            --color-accent: #D9822B;      /* 개나리빛 */
+            --color-gold: #D49A35;
+            --border-trad: #E5CDD4;
+        }
+
+        /* 테마 4: 먹빛 야경 (어두운 밤하늘과 금빛 - 다크 모드) */
+        [data-theme="night"] {
+            --bg-paper: #191B20;
+            --bg-card: #23262E;
+            --bg-subtle: #2D313B;
+            --text-ink: #F5F0E6;
+            --text-muted: #B8B0A2;
+            --color-primary: #E0A948;     /* 달빛 금색 */
+            --color-primary-hover: #C99234;
+            --color-secondary: #58A882;   /* 옥빛 */
+            --color-accent: #E05A52;      /* 주홍빛 */
+            --color-gold: #E0A948;
+            --border-trad: #3E4350;
+            --pattern-opacity: 0.03;
+        }
+
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+            background-color: var(--bg-paper);
+            color: var(--text-ink);
+            /* 한지 섬유질 느낌의 은은한 배경 패턴 */
+            background-image: 
+                radial-gradient(rgba(139, 115, 85, var(--pattern-opacity)) 1px, transparent 0),
+                radial-gradient(rgba(139, 115, 85, var(--pattern-opacity)) 1px, transparent 0);
+            background-size: 28px 28px;
+            background-position: 0 0, 14px 14px;
+            transition: background-color 0.35s ease, color 0.35s ease;
+        }
+
+        .font-serif-kr {
+            font-family: 'Noto Serif KR', serif;
+        }
+
+        /* 전통 낙관(도장) 스타일 */
+        .trad-stamp {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #C83E37;
+            color: #C83E37;
+            font-family: 'Noto Serif KR', serif;
+            font-weight: 900;
+            line-height: 1.1;
+            padding: 4px 6px;
+            border-radius: 4px;
+            box-shadow: inset 0 0 0 1px rgba(200, 62, 55, 0.25);
+            transform: rotate(-3deg);
+            user-select: none;
+        }
+
+        /* 전통 창살 / 서책 이중 테두리 카드 */
+        .hanji-card {
+            background-color: var(--bg-card);
+            border: 1.5px solid var(--border-trad);
+            box-shadow: 0 8px 24px -6px rgba(35, 31, 32, 0.08);
+            transition: all 0.25s ease;
+        }
+
+        .hanji-double-border {
+            position: relative;
+            border: 2px solid var(--color-primary);
+        }
+        .hanji-double-border::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid var(--border-trad);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        /* 플래시카드 3D 뒤집기 애니메이션 */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* 부드러운 등장 애니메이션 */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+            animation: fadeSlideUp 0.35s ease-out forwards;
+        }
+
+        /* 오답 흔들림 애니메이션 */
+        @keyframes gentleShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: gentleShake 0.35s ease-in-out;
+        }
+    </style>
+<style>.hidden{display:none!important}button:focus-visible{outline:3px solid #b77142;outline-offset:3px}</style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-200 selection:text-stone-900">
+
+    <!-- 상단 전통 문양 띠 (오방색 바) -->
+    <div class="w-full h-2 flex">
+        <div class="flex-1 bg-[#1E3A5F]" title="쪽빛(청)"></div>
+        <div class="flex-1 bg-[#C83E37]" title="다홍빛(적)"></div>
+        <div class="flex-1 bg-[#D99B26]" title="치자빛(황)"></div>
+        <div class="flex-1 bg-[#FAF6EE]" title="한지빛(백)"></div>
+        <div class="flex-1 bg-[#231F20]" title="먹빛(흑)"></div>
+    </div>
+
+    <!-- 헤더 영역 -->
+    <header class="w-full max-w-4xl mx-auto px-4 pt-5 pb-3">
+        <div class="hanji-card rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <!-- 로고 및 제목 -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
+                <!-- 전통 구름/매듭 SVG 아이콘 -->
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm" style="background-color: var(--color-primary); color: var(--bg-paper);">
+                    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-serif-kr text-xl sm:text-2xl font-bold tracking-tight">소중한 우리말 첩</h1>
+                        <span class="trad-stamp text-[10px] sm:text-xs">초6 국어</span>
+                    </div>
+                    <p class="text-xs sm:text-sm mt-0.5" style="color: var(--text-muted);">4단원 활동지 속 아름다운 고유어 31선</p>
+                </div>
+            </div>
+
+            <!-- 전통색 테마 선택기 및 효과음 버튼 -->
+            <div class="flex items-center gap-2 flex-wrap justify-center">
+                <span class="text-xs font-medium mr-1" style="color: var(--text-muted);">전통색 옷입히기:</span>
+                <button onclick="setTheme('default')" class="w-7 h-7 rounded-full border-2 border-white shadow-sm transition-transform hover:scale-110 focus:outline-none" style="background: linear-gradient(135deg, #1E3A5F 50%, #3B7A57 50%);" title="청자 & 한지"></button>
+                <button onclick="setTheme('dancheong')" class="w-7 h-7 rounded-full border-2 border-white shadow-sm transition-transform hover:scale-110 focus:outline-none" style="background: linear-gradient(135deg, #A62C2B 50%, #D99B26 50%);" title="단청 & 궁궐"></button>
+                <button onclick="setTheme('azalea')" class="w-7 h-7 rounded-full border-2 border-white shadow-sm transition-transform hover:scale-110 focus:outline-none" style="background: linear-gradient(135deg, #B84A62 50%, #4E7A51 50%);" title="진달래 & 봄빛"></button>
+                <button onclick="setTheme('night')" class="w-7 h-7 rounded-full border-2 border-white shadow-sm transition-transform hover:scale-110 focus:outline-none" style="background: linear-gradient(135deg, #191B20 50%, #E0A948 50%);" title="먹빛 야경"></button>
+                
+                <div class="h-5 w-[1px] mx-1" style="background-color: var(--border-trad);"></div>
+                
+                <!-- 가야금 효과음 토글 -->
+                <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 rounded-xl border text-xs font-medium flex items-center gap-1 transition-colors" style="border-color: var(--border-trad); background-color: var(--bg-subtle);" title="전통 악기 효과음 켜기/끄기">
+                    <span id="soundIcon">🔔</span>
+                    <span class="hidden sm:inline" id="soundLabel">소리 켬</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="flex-1 w-full max-w-4xl mx-auto px-4 py-3">
+        
+        <!-- =========================================================
+             화면 1: 홈 화면 (메뉴 선택)
+             ========================================================= -->
+        <section id="view-home" class="animate-fade-up space-y-5">
+            <!-- 환영 배너 -->
+            <div class="hanji-card hanji-double-border rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden">
+                <!-- 배경 전통 격자 장식 SVG -->
+                <svg class="absolute top-2 left-2 w-10 h-10 opacity-20" style="color: var(--color-primary);" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 20V2h18M8 20V8h12" />
+                </svg>
+                <svg class="absolute bottom-2 right-2 w-10 h-10 opacity-20 rotate-180" style="color: var(--color-primary);" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 20V2h18M8 20V8h12" />
+                </svg>
+
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-bold mb-3" style="background-color: var(--bg-subtle); color: var(--color-primary);">
+                    ✨ 우리 반 활동지 1번 ~ 31번 완벽 수록
+                </div>
+                <h2 class="font-serif-kr text-2xl sm:text-3xl font-bold mb-3 leading-snug">
+                    뜻을 읽고 알맞은 <span style="color: var(--color-accent);">고유어</span>를 찾아라!
+                </h2>
+                <p class="text-sm sm:text-base max-w-xl mx-auto leading-relaxed mb-6" style="color: var(--text-muted);">
+                    우리가 직접 찾은 31개의 아름다운 고유어를 한국 전통 색깔 옷을 입힌 서책에서 재미있게 익히고, 퀴즈를 풀어 <strong>장원급제 상장</strong>에 도전해 보세요!
+                </p>
+
+                <!-- 퀴즈 시작 버튼 그룹 -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button onclick="startQuiz(10)" class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-bold text-base shadow-md transition-transform active:scale-95 flex items-center justify-center gap-2 text-white" style="background-color: var(--color-primary);">
+                        <span>🎯</span>
+                        <span>10문제 도전 퀴즈</span>
+                    </button>
+                    <button onclick="startQuiz(31)" class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-bold text-base shadow-md transition-transform active:scale-95 flex items-center justify-center gap-2 text-white" style="background-color: var(--color-secondary);">
+                        <span>👑</span>
+                        <span>31개 전체 마스터 퀴즈</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 학습 도구 카드 2종 (낱말 카드 / 전체 사전) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- 낱말 뒤집기 카드 -->
+                <div onclick="openFlashcards()" class="hanji-card rounded-2xl p-5 cursor-pointer hover:translate-y-[-2px] flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0" style="background-color: var(--bg-subtle); color: var(--color-gold);">
+                        🃏
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-serif-kr text-lg font-bold">한지 낱말 카드</h3>
+                            <span class="text-xs px-2 py-0.5 rounded-md font-bold" style="background-color: var(--bg-subtle); color: var(--color-primary);">31장</span>
+                        </div>
+                        <p class="text-xs sm:text-sm mt-1" style="color: var(--text-muted);">
+                            카드를 톡! 뒤집어 활동지의 뜻과 내가 만든 예문을 함께 복습해요.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 31개 고유어 목록 사전 -->
+                <div onclick="openDictionary()" class="hanji-card rounded-2xl p-5 cursor-pointer hover:translate-y-[-2px] flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0" style="background-color: var(--bg-subtle); color: var(--color-accent);">
+                        📜
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-serif-kr text-lg font-bold">우리말 고유어 두루마리</h3>
+                            <span class="text-xs px-2 py-0.5 rounded-md font-bold" style="background-color: var(--bg-subtle); color: var(--color-secondary);">검색 가능</span>
+                        </div>
+                        <p class="text-xs sm:text-sm mt-1" style="color: var(--text-muted);">
+                            1번 '곧은길'부터 31번 '해거름'까지 한눈에 찾아보는 작은 사전이에요.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오방색 이야기 작은 팁 -->
+            <div class="hanji-card rounded-2xl p-4 flex items-center gap-3 text-xs sm:text-sm" style="background-color: var(--bg-subtle);">
+                <span class="text-xl">🎨</span>
+                <p style="color: var(--text-muted);">
+                    <strong style="color: var(--text-ink);">전통색 배움터:</strong> 맨 위 색깔 띠는 우리나라 전통 색인 <strong>오방색(청·적·황·백·흑)</strong>이에요. 오른쪽 위 동그라미 버튼을 눌러 앱의 색깔 옷을 갈아입혀 보세요!
+                </p>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             화면 2: 퀴즈 진행 화면
+             ========================================================= -->
+        <section id="view-quiz" class="hidden animate-fade-up space-y-4">
+            <!-- 상단 진행바 및 홈 버튼 -->
+            <div class="hanji-card rounded-2xl p-4 flex items-center justify-between gap-4">
+                <button onclick="goHome()" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold border transition-colors" style="border-color: var(--border-trad); background-color: var(--bg-subtle);">
+                    ← 서재로
+                </button>
+                
+                <div class="flex-1 max-w-md">
+                    <div class="flex justify-between text-xs font-bold mb-1">
+                        <span id="quiz-progress-text">1 / 10 문제</span>
+                        <span id="quiz-score-text" style="color: var(--color-secondary);">맞힌 개수: 0개</span>
+                    </div>
+                    <div class="w-full h-2.5 rounded-full overflow-hidden" style="background-color: var(--bg-subtle);">
+                        <div id="quiz-progress-bar" class="h-full rounded-full transition-all duration-300" style="width: 10%; background-color: var(--color-primary);"></div>
+                    </div>
+                </div>
+
+                <span id="quiz-word-num" class="text-xs font-bold px-2.5 py-1 rounded-lg" style="background-color: var(--bg-subtle); color: var(--color-primary);">
+                    활동지 #01
+                </span>
+            </div>
+
+            <!-- 문제 카드 (활동지 '뜻' 제시) -->
+            <div id="quiz-question-card" class="hanji-card hanji-double-border rounded-2xl p-6 sm:p-8 text-center">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-4" style="background-color: var(--bg-subtle); color: var(--color-primary);">
+                    <span>📖</span>
+                    <span>활동지의 '뜻' 칸 설명</span>
+                </div>
+
+                <h3 id="quiz-meaning-text" class="font-serif-kr text-xl sm:text-2xl font-bold leading-relaxed break-keep my-2 px-2">
+                    "옳고 그름, 또는 승패가 분명하게 갈라지는 것."
+                </h3>
+
+                <!-- 예문 힌트 버튼 및 힌트 상자 -->
+                <div class="mt-5">
+                    <button id="hint-btn" onclick="showHint()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition-all hover:opacity-80" style="border-color: var(--color-gold); color: var(--color-gold); background-color: var(--bg-subtle);">
+                        <span>💡</span>
+                        <span>예문 힌트 보기</span>
+                    </button>
+                    <div id="hint-box" class="hidden mt-3 p-3.5 rounded-xl text-xs sm:text-sm max-w-lg mx-auto border" style="background-color: var(--bg-subtle); border-color: var(--border-trad);">
+                        <span class="font-bold mr-1" style="color: var(--color-primary);">[예문 힌트]</span>
+                        <span id="hint-text"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4지선다 보기 버튼 영역 -->
+            <div id="quiz-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- JS로 보기 4개 생성 -->
+            </div>
+
+            <!-- 정답 해설 및 다음 문제 버튼 -->
+            <div id="quiz-feedback-box" class="hidden hanji-card rounded-2xl p-5 animate-fade-up">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span id="feedback-badge" class="px-2.5 py-0.5 rounded-md text-xs font-bold text-white">정답!</span>
+                            <span id="feedback-word-title" class="font-serif-kr text-lg font-bold"></span>
+                        </div>
+                        <p id="feedback-example-full" class="text-xs sm:text-sm" style="color: var(--text-muted);"></p>
+                    </div>
+                    <button id="next-question-btn" onclick="nextQuestion()" class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm text-white shadow-md transition-transform active:scale-95 shrink-0" style="background-color: var(--color-primary);">
+                        다음 문제 →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             화면 3: 퀴즈 결과 및 장원급제 상장 화면
+             ========================================================= -->
+        <section id="view-result" class="hidden animate-fade-up space-y-5">
+            <!-- 전통 상장 스타일 카드 -->
+            <div class="hanji-card hanji-double-border rounded-2xl p-6 sm:p-10 text-center relative">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs font-bold px-3 py-1 rounded-lg" style="background-color: var(--bg-subtle); color: var(--text-muted);">
+                        초6 국어 4단원 · 소중한 우리말
+                    </span>
+                    <div class="trad-stamp text-sm px-2.5 py-1">장원<br>급제</div>
+                </div>
+
+                <p class="font-serif-kr text-sm font-bold tracking-widest mb-1" style="color: var(--color-primary);">상 장</p>
+                <h2 id="result-rank-title" class="font-serif-kr text-2xl sm:text-3xl font-black mb-3" style="color: var(--color-accent);">
+                    우리말 박사
+                </h2>
+                
+                <div class="my-5 py-4 px-6 rounded-2xl inline-block" style="background-color: var(--bg-subtle);">
+                    <div class="text-xs font-bold mb-1" style="color: var(--text-muted);">최종 점수</div>
+                    <div class="font-serif-kr text-3xl sm:text-4xl font-black" style="color: var(--color-primary);">
+                        <span id="result-score">9</span> <span class="text-lg font-normal">/ <span id="result-total">10</span> 문제</span>
+                    </div>
+                </div>
+
+                <p id="result-message" class="text-sm sm:text-base max-w-md mx-auto leading-relaxed mb-6" style="color: var(--text-muted);">
+                    활동지에 정리한 고유어의 뜻을 아주 정확하게 알고 있네요! 소중한 우리말을 사랑하는 마음이 돋보입니다.
+                </p>
+
+                <!-- 액션 버튼들 -->
+                <div class="flex flex-wrap items-center justify-center gap-3">
+                    <button id="retry-wrong-btn" onclick="retryWrongQuestions()" class="hidden px-5 py-3 rounded-xl font-bold text-sm text-white shadow-sm transition-transform active:scale-95" style="background-color: var(--color-accent);">
+                        🔄 틀린 문제만 다시 풀기
+                    </button>
+                    <button onclick="startQuiz(10)" class="px-5 py-3 rounded-xl font-bold text-sm text-white shadow-sm transition-transform active:scale-95" style="background-color: var(--color-primary);">
+                        🎯 새 10문제 도전하기
+                    </button>
+                    <button onclick="copyResultText()" class="px-5 py-3 rounded-xl font-bold text-sm border transition-colors" style="border-color: var(--border-trad); background-color: var(--bg-subtle);">
+                        📋 결과 복사하기
+                    </button>
+                    <button onclick="goHome()" class="px-5 py-3 rounded-xl font-bold text-sm border transition-colors" style="border-color: var(--border-trad);">
+                        🏠 서재로 돌아가기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 오답 및 풀이 요약 -->
+            <div id="result-review-container" class="hanji-card rounded-2xl p-5 sm:p-6">
+                <h3 class="font-serif-kr text-lg font-bold mb-3 flex items-center gap-2">
+                    <span>📝</span>
+                    <span>이번 퀴즈 낱말 되돌아보기</span>
+                </h3>
+                <div id="result-review-list" class="space-y-2.5">
+                    <!-- JS로 풀이 기록 표시 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             화면 4: 한지 낱말 카드 (플래시카드) 화면
+             ========================================================= -->
+        <section id="view-flashcards" class="hidden animate-fade-up space-y-4">
+            <div class="hanji-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+                <button onclick="goHome()" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold border" style="border-color: var(--border-trad); background-color: var(--bg-subtle);">
+                    ← 서재로
+                </button>
+                <h2 class="font-serif-kr text-lg font-bold">한지 낱말 카드 복습</h2>
+                <div class="flex items-center gap-2">
+                    <button id="filter-star-btn" onclick="toggleStarFilter()" class="px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors" style="border-color: var(--border-trad); background-color: var(--bg-subtle);">
+                        ⭐ 별표만 보기 (0)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 카드 본체 -->
+            <div class="max-w-lg mx-auto">
+                <div class="flex justify-between items-center text-xs font-bold mb-2 px-1" style="color: var(--text-muted);">
+                    <span id="fc-counter">1 / 31 번째 고유어</span>
+                    <span>카드를 누르면 뜻과 예문이 나와요!</span>
+                </div>
+
+                <div id="flashcard-element" onclick="flipFlashcard()" class="flip-card perspective-1000 w-full h-80 sm:h-96 cursor-pointer select-none">
+                    <div class="flip-card-inner">
+                        <!-- 앞면: 고유어 낱말 -->
+                        <div class="flip-card-front hanji-card hanji-double-border p-6 flex flex-col items-center justify-between">
+                            <div class="w-full flex justify-between items-center">
+                                <span id="fc-num-front" class="text-xs font-bold px-2.5 py-1 rounded-lg" style="background-color: var(--bg-subtle); color: var(--color-primary);">#01</span>
+                                <button id="fc-star-btn" onclick="event.stopPropagation(); toggleCurrentStar();" class="text-2xl p-1 transition-transform hover:scale-125" title="헷갈리는 낱말 별표 표시">
+                                    ☆
+                                </button>
+                            </div>
+
+                            <div class="text-center my-auto">
+                                <span class="text-xs font-bold tracking-widest block mb-2" style="color: var(--text-muted);">아름다운 우리말</span>
+                                <h3 id="fc-word-front" class="font-serif-kr text-4xl sm:text-5xl font-black tracking-wide" style="color: var(--color-primary);">
+                                    곧은길
+                                </h3>
+                            </div>
+
+                            <div class="text-xs font-medium flex items-center gap-1" style="color: var(--text-muted);">
+                                <span>👆 터치해서 뜻 확인하기</span>
+                            </div>
+                        </div>
+
+                        <!-- 뒷면: 뜻과 예문 -->
+                        <div class="flip-card-back hanji-card p-6 flex flex-col justify-between border-2" style="border-color: var(--color-secondary); background-color: var(--bg-subtle);">
+                            <div class="flex justify-between items-center border-b pb-3" style="border-color: var(--border-trad);">
+                                <span id="fc-word-back" class="font-serif-kr text-xl font-bold" style="color: var(--color-secondary);">곧은길</span>
+                                <span class="trad-stamp text-[10px]">고유어</span>
+                            </div>
+
+                            <div class="my-auto space-y-4 text-left">
+                                <div>
+                                    <span class="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1 text-white" style="background-color: var(--color-primary);">활동지 뜻</span>
+                                    <p id="fc-meaning-back" class="font-serif-kr text-base sm:text-lg font-bold leading-snug">
+                                        앞으로 곧게 뻗어 나간 길.
+                                    </p>
+                                </div>
+                                <div class="p-3 rounded-xl" style="background-color: var(--bg-card);">
+                                    <span class="text-xs font-bold block mb-1" style="color: var(--color-accent);">✍️ 내가 만든 예문</span>
+                                    <p id="fc-example-back" class="text-xs sm:text-sm leading-relaxed">
+                                        "길을 따라가다 만나니 앞으로 곧은길이 뻗어 있었다."
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="text-center text-xs" style="color: var(--text-muted);">
+                                👆 다시 누르면 앞면으로 돌아갑니다
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 이전 / 다음 버튼 -->
+                <div class="flex items-center justify-between gap-3 mt-4">
+                    <button onclick="prevFlashcard()" class="flex-1 py-3.5 rounded-xl font-bold text-sm hanji-card hover:opacity-80 active:scale-95">
+                        ◀ 이전 낱말
+                    </button>
+                    <button onclick="shuffleFlashcards()" class="px-4 py-3.5 rounded-xl font-bold text-sm hanji-card hover:opacity-80 active:scale-95" title="순서 섞기">
+                        🔀 섞기
+                    </button>
+                    <button onclick="nextFlashcard()" class="flex-1 py-3.5 rounded-xl font-bold text-sm text-white shadow-sm active:scale-95" style="background-color: var(--color-primary);">
+                        다음 낱말 ▶
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             화면 5: 31개 고유어 두루마리 사전 화면
+             ========================================================= -->
+        <section id="view-dictionary" class="hidden animate-fade-up space-y-4">
+            <div class="hanji-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <button onclick="goHome()" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold border shrink-0" style="border-color: var(--border-trad); background-color: var(--bg-subtle);">
+                        ← 서재로
+                    </button>
+                    <h2 class="font-serif-kr text-lg font-bold">우리말 고유어 두루마리 (31선)</h2>
+                </div>
+
+                <!-- 검색 입력창 -->
+                <div class="relative w-full sm:w-64">
+                    <input id="dict-search-input" type="text" oninput="renderDictionary()" placeholder="낱말이나 뜻 검색..." class="w-full pl-9 pr-3 py-2 rounded-xl text-sm border focus:outline-none" style="background-color: var(--bg-subtle); border-color: var(--border-trad); color: var(--text-ink);">
+                    <span class="absolute left-3 top-2.5 text-xs">🔍</span>
+                </div>
+            </div>
+
+            <div id="dictionary-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <!-- JS로 31개 사전 카드 렌더링 -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 토스트 알림 메시지 (alert() 대신 사용) -->
+    <div id="toast-message" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-xl text-sm font-bold text-white shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50" style="background-color: #231F20;">
+        알림 메시지
+    </div>
+
+    <!-- 하단 푸터 -->
+    <footer class="w-full max-w-4xl mx-auto px-4 py-5 text-center text-xs" style="color: var(--text-muted);">
+        <p>초등학교 6학년 국어 4단원 '소중한 우리말' · 우리 반 고유어 활동지 학습 앱</p>
+    </footer>
+
+    <script>
+        /* =========================================================
+           1. 활동지 사진 속 고유어 31개 데이터 (01번 ~ 31번)
+           ========================================================= */
+        const WORDS_DATA = [
+            { id: 1, word: "곧은길", meaning: "앞으로 곧게 뻗어 나간 길.", example: "길을 따라가다 만나니 앞으로 곧은길이 뻗어 있었다.", maskedExample: "길을 따라가다 만나니 앞으로 [ 〇〇〇 ]이 뻗어 있었다." },
+            { id: 2, word: "곪다", meaning: "상처에 염증이 생겨 고름이 들게 되다.", example: "상처가 덧나더니 안에 곪아 버렸다.", maskedExample: "상처가 덧나더니 안에 [ 〇〇 ] 버렸다." },
+            { id: 3, word: "관솔불", meaning: "송진이 많이 있는 소나무의 가지나 옹이에 붙인 불.", example: "깜깜한 밤에 관솔불이 빛나고 있다.", maskedExample: "깜깜한 밤에 [ 〇〇〇 ]이 빛나고 있다." },
+            { id: 4, word: "나귀", meaning: "몸이 말보다 조금 작고 귀가 아주 길며, 힘이 세어 사람이나 짐을 싣는 데에 쓰는 집짐승.", example: "나귀에 올라타 멋지게도 달렸다.", maskedExample: "[ 〇〇 ]에 올라타 멋지게도 달렸다." },
+            { id: 5, word: "날짐승", meaning: "날아다니는 모든 짐승.", example: "숲을 지나던 길에 날짐승들을 만났다.", maskedExample: "숲을 지나던 길에 [ 〇〇〇 ]들을 만났다." },
+            { id: 6, word: "다복솔", meaning: "가지가 탐스럽고 촘촘하게 많이 퍼진 어린 소나무.", example: "여기저기 다복솔이 우거져 있다.", maskedExample: "여기저기 [ 〇〇〇 ]이 우거져 있다." },
+            { id: 7, word: "담금질", meaning: "쇠붙이를 뜨거운 불로 가열한 다음 찬물에 담가 식히는 일.", example: "장인이 쇠를 불에 달궈 담금질을 했다.", maskedExample: "장인이 쇠를 불에 달궈 [ 〇〇〇 ]을 했다." },
+            { id: 8, word: "리을", meaning: "한글의 닿소리인 'ㄹ'의 이름.", example: "이름에 리을이 유난히 많았다.", maskedExample: "이름에 [ 〇〇 ]이 유난히 많았다." },
+            { id: 9, word: "로서", meaning: "어떠한 일을 하거나 상태에 있도록 한 신분이나 자격의 뜻.", example: "나는 초등학교 6학년 학생으로서 책임을 다한다.", maskedExample: "나는 초등학교 6학년 학생[ 〇〇 ] 책임을 다한다." },
+            { id: 10, word: "모로", meaning: "옆으로.", example: "게가 모로 기어간다.", maskedExample: "게가 [ 〇〇 ] 기어간다." },
+            { id: 11, word: "모름지기", meaning: "이치에 따라 마땅히.", example: "잘못을 했다면 모름지기 그에 대한 책임을 져야 한다.", maskedExample: "잘못을 했다면 [ 〇〇〇〇 ] 그에 대한 책임을 져야 한다." },
+            { id: 12, word: "밤눈", meaning: "깜깜한 밤에 사물을 볼 수 있는 시력.", example: "밤눈이 어두운 탓에 주변이 잘 보이지 않는다.", maskedExample: "[ 〇〇 ]이 어두운 탓에 주변이 잘 보이지 않는다." },
+            { id: 13, word: "벼랑", meaning: "바위나 땅이 깎아 세운 듯이 가파르게 아래로 뻗어 내려간 곳.", example: "가파른 벼랑의 바위틈에서 이름 모를 꽃이 피어났다.", maskedExample: "가파른 [ 〇〇 ]의 바위틈에서 이름 모를 꽃이 피어났다." },
+            { id: 14, word: "살금살금", meaning: "남 모르게 조용히 움직이는 모양을 나타낸다.", example: "밤늦은 시간이라 아랫집을 배려해 거실에서도 살금살금 걸었다.", maskedExample: "밤늦은 시간이라 아랫집을 배려해 거실에서도 [ 〇〇〇〇 ] 걸었다." },
+            { id: 15, word: "사납다", meaning: "모질고 거칠다.", example: "그 개는 낯선 사람이 다가가면 사납게 짖는다.", maskedExample: "그 개는 낯선 사람이 다가가면 [ 〇〇게 ] 짖는다." },
+            { id: 16, word: "아까", meaning: "조금 전에. 이미.", example: "아까 먹은 점심이 정말 맛있었어요.", maskedExample: "[ 〇〇 ] 먹은 점심이 정말 맛있었어요." },
+            { id: 17, word: "아낌없이", meaning: "아까워하는 마음 없이.", example: "부모님은 자식들에게 아낌없이 사랑을 주신다.", maskedExample: "부모님은 자식들에게 [ 〇〇〇〇 ] 사랑을 주신다." },
+            { id: 18, word: "자꾸", meaning: "잇달아 여러 번. 계속해서.", example: "자꾸 같은 실수를 반복해서 속상해요.", maskedExample: "[ 〇〇 ] 같은 실수를 반복해서 속상해요." },
+            { id: 19, word: "자그마하다", meaning: "조금 작은 듯하다.", example: "합격을 축하하며 자그마하게 잔치를 열었다.", maskedExample: "합격을 축하하며 [ 〇〇〇〇게 ] 잔치를 열었다." },
+            { id: 20, word: "차갑다", meaning: "(살에 닿는 느낌이) 싸늘하게 차다.", example: "냉장고에서 꺼낸 물이 차갑다.", maskedExample: "냉장고에서 꺼낸 물이 [ 〇〇〇 ]." },
+            { id: 21, word: "채비", meaning: "준비를 하는 것.", example: "아들은 수학여행 갈 채비를 다 마쳤는지 들뜬 표정으로 가방을 확인했다.", maskedExample: "아들은 수학여행 갈 [ 〇〇 ]를 다 마쳤는지 들뜬 표정으로 가방을 확인했다." },
+            { id: 22, word: "케케묵다", meaning: "(물건이) 아주 오래되어 낡다.", example: "창고 구석에서 케케묵은 책더미를 꺼냈다.", maskedExample: "창고 구석에서 [ 〇〇〇은 ] 책더미를 꺼냈다." },
+            { id: 23, word: "크낙새", meaning: "우리나라 특산종인 텃새인데 멸종 위기에 처해 있다.", example: "천연기념물인 크낙새는 남한에서 자취를 감췄다.", maskedExample: "천연기념물인 [ 〇〇〇 ]는 남한에서 자취를 감췄다." },
+            { id: 24, word: "타래", meaning: "실이나 끈을 빙빙 돌려서 감아놓은 뭉치.", example: "할머니께서 엉킨 털실 타래를 차분히 풀고 계신다.", maskedExample: "할머니께서 엉킨 털실 [ 〇〇 ]를 차분히 풀고 계신다." },
+            { id: 25, word: "투박하다", meaning: "(모양이) 맵시가 없이 거칠고 투텁다.", example: "이것은 모양이 투박하다.", maskedExample: "이것은 모양이 [ 〇〇〇〇 ]." },
+            { id: 26, word: "터울", meaning: "한 어머니가 낳은 자녀들의 나이의 차이.", example: "이 집의 자매의 터울은 2살이다.", maskedExample: "이 집의 자매의 [ 〇〇 ]은 2살이다." },
+            { id: 27, word: "판가름", meaning: "옳고 그름, 또는 승패가 분명하게 갈라지는 것.", example: "우리는 판가름을 하기로 했다.", maskedExample: "우리는 [ 〇〇〇 ]을 하기로 했다." },
+            { id: 28, word: "팔팔하다", meaning: "기운이 넘치고 활발하다.", example: "저 아이는 팔팔하다.", maskedExample: "저 아이는 [ 〇〇〇〇 ]." },
+            { id: 29, word: "하늬바람", meaning: "서쪽 또는 북서쪽에서 불어오는 바람.", example: "저녁에 하늬바람이 불어 시원하다.", maskedExample: "저녁에 [ 〇〇〇〇 ]이 불어 시원하다." },
+            { id: 30, word: "함속", meaning: "정해진 일에 매우 마음이 쏠리는 한 묶음.", example: "저 사람은 함속이 크다.", maskedExample: "저 사람은 [ 〇〇 ]이 크다." },
+            { id: 31, word: "해거름", meaning: "해가 지는 것. 곧 저물 무렵.", example: "해거름이 되었을 때는 진짜 예뻐진다.", maskedExample: "[ 〇〇〇 ]이 되었을 때는 진짜 예뻐진다." }
+        ];
+
+        /* =========================================================
+           2. 앱 전역 상태 변수
+           ========================================================= */
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        // 퀴즈 상태
+        let quizQuestions = [];
+        let currentQuizIdx = 0;
+        let quizScore = 0;
+        let quizAnswered = false;
+        let quizHistory = []; // { wordObj, userAnswer, isCorrect }
+
+        // 낱말 카드 상태
+        let flashcardList = [...WORDS_DATA];
+        let currentFcIdx = 0;
+        let starredIds = new Set();
+        let showOnlyStarred = false;
+
+        /* =========================================================
+           3. 전통 오음계(궁상각치우) 웹 오디오 효과음 생성기
+           ========================================================= */
+        function playTraditionalTone(type) {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                // 가야금 뜯는 듯한 부드러운 삼각파/사인파 조합
+                osc.type = 'triangle';
+
+                if (type === 'click') {
+                    // 궁(C5) 짧은 맑은 소리
+                    osc.frequency.setValueAtTime(523.25, now);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.18);
+                } else if (type === 'correct') {
+                    // 궁-각-치(C5 - E5 - G5) 화음 아르페지오
+                    const notes = [523.25, 659.25, 783.99];
+                    notes.forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.08);
+                        g.gain.setValueAtTime(0.15, now + i * 0.08);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.45);
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.start(now + i * 0.08);
+                        o.stop(now + i * 0.08 + 0.45);
+                    });
+                } else if (type === 'wrong') {
+                    // 낮은 둔탁한 소리
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.linearRampToValueAtTime(175, now + 0.25);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.28);
+                }
+            } catch (e) {
+                // 오디오 미지원 환경 무시
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundIcon').textContent = soundEnabled ? '🔔' : '🔕';
+            document.getElementById('soundLabel').textContent = soundEnabled ? '소리 켬' : '소리 끔';
+            if (soundEnabled) playTraditionalTone('click');
+            showToast(soundEnabled ? '전통 가야금 효과음을 켰어요.' : '효과음을 껐어요.');
+        }
+
+        /* =========================================================
+           4. 전통색 테마 변경 및 화면 전환 유틸리티
+           ========================================================= */
+        function setTheme(themeName) {
+            playTraditionalTone('click');
+            if (themeName === 'default') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', themeName);
+            }
+            const themeLabels = {
+                'default': '청자 & 한지 빛깔로 갈아입었어요!',
+                'dancheong': '궁궐 단청 빛깔로 갈아입었어요!',
+                'azalea': '진달래 & 봄빛으로 갈아입었어요!',
+                'night': '고즈넉한 먹빛 야경으로 갈아입었어요!'
+            };
+            showToast(themeLabels[themeName]);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-message');
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            clearTimeout(window.toastTimer);
+            window.toastTimer = setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2200);
+        }
+
+        function switchView(viewId) {
+            const sections = ['view-home', 'view-quiz', 'view-result', 'view-flashcards', 'view-dictionary'];
+            sections.forEach(id => {
+                const el = document.getElementById(id);
+                if (id === viewId) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goHome() {
+            playTraditionalTone('click');
+            switchView('view-home');
+        }
+
+        /* =========================================================
+           5. 퀴즈 로직 (활동지의 '뜻'을 보고 고유어 맞히기)
+           ========================================================= */
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function startQuiz(count, customList = null) {
+            window.VillageBridge?.review(!!customList);
+            playTraditionalTone('click');
+            const pool = customList ? customList : shuffleArray(WORDS_DATA).slice(0, count);
+            quizQuestions = pool;
+            currentQuizIdx = 0;
+            quizScore = 0;
+            quizHistory = [];
+            switchView('view-quiz');
+            renderCurrentQuestion();
+        }
+
+        function renderCurrentQuestion() {
+            quizAnswered = false;
+            const currentWord = quizQuestions[currentQuizIdx];
+            const total = quizQuestions.length;
+
+            // 상단 진행 표시 업데이트
+            document.getElementById('quiz-progress-text').textContent = `${currentQuizIdx + 1} / ${total} 문제`;
+            document.getElementById('quiz-score-text').textContent = `맞힌 개수: ${quizScore}개`;
+            document.getElementById('quiz-progress-bar').style.width = `${((currentQuizIdx + 1) / total) * 100}%`;
+            document.getElementById('quiz-word-num').textContent = `활동지 #${String(currentWord.id).padStart(2, '0')}`;
+
+            // 활동지 뜻 표시
+            document.getElementById('quiz-meaning-text').textContent = `"${currentWord.meaning}"`;
+
+            // 힌트 초기화
+            document.getElementById('hint-box').classList.add('hidden');
+            document.getElementById('hint-btn').classList.remove('hidden');
+            document.getElementById('hint-text').textContent = currentWord.maskedExample;
+
+            // 해설 상자 숨기기
+            document.getElementById('quiz-feedback-box').classList.add('hidden');
+
+            // 4지선다 보기 생성 (정답 1개 + 활동지 내 다른 고유어 3개)
+            const distractors = shuffleArray(WORDS_DATA.filter(w => w.id !== currentWord.id)).slice(0, 3);
+            const options = shuffleArray([currentWord, ...distractors]);
+
+            const optionsGrid = document.getElementById('quiz-options-grid');
+            optionsGrid.innerHTML = '';
+
+            const labels = ['가', '나', '다', '라'];
+            options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'hanji-card rounded-2xl p-4 sm:p-5 text-left flex items-center gap-3.5 transition-all hover:translate-y-[-2px] active:scale-98 cursor-pointer';
+                btn.dataset.wordId = opt.id;
+                btn.onclick = () => handleOptionSelect(opt, btn);
+
+                btn.innerHTML = `
+                    <span class="w-9 h-9 rounded-xl flex items-center justify-center font-serif-kr font-bold text-sm shrink-0" style="background-color: var(--bg-subtle); color: var(--color-primary);">
+                        ${labels[idx]}
+                    </span>
+                    <span class="font-serif-kr text-lg sm:text-xl font-bold">${opt.word}</span>
+                `;
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function showHint() {
+            playTraditionalTone('click');
+            document.getElementById('hint-btn').classList.add('hidden');
+            document.getElementById('hint-box').classList.remove('hidden');
+        }
+
+        function handleOptionSelect(selectedObj, clickedBtn) {
+            if (quizAnswered) return;
+            quizAnswered = true;
+
+            const currentWord = quizQuestions[currentQuizIdx];
+            const isCorrect = selectedObj.id === currentWord.id;
+
+            // 기록 저장
+            quizHistory.push({
+                wordObj: currentWord,
+                userAnswer: selectedObj.word,
+                isCorrect
+            });
+
+            // 모든 보기 버튼 스타일 업데이트
+            const allBtns = document.getElementById('quiz-options-grid').querySelectorAll('button');
+            allBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:translate-y-[-2px]');
+                const id = Number(btn.dataset.wordId);
+
+                if (id === currentWord.id) {
+                    // 정답 표시 (비취빛 초록)
+                    btn.style.backgroundColor = '#3B7A57';
+                    btn.style.color = '#FFFFFF';
+                    btn.style.borderColor = '#3B7A57';
+                    btn.querySelector('span').style.backgroundColor = 'rgba(255,255,255,0.2)';
+                    btn.querySelector('span').style.color = '#FFFFFF';
+                } else if (btn === clickedBtn && !isCorrect) {
+                    // 사용자가 고른 오답 표시 (다홍빛 붉은색)
+                    btn.style.backgroundColor = '#C83E37';
+                    btn.style.color = '#FFFFFF';
+                    btn.style.borderColor = '#C83E37';
+                    btn.classList.add('animate-shake');
+                    btn.querySelector('span').style.backgroundColor = 'rgba(255,255,255,0.2)';
+                    btn.querySelector('span').style.color = '#FFFFFF';
+                } else {
+                    btn.style.opacity = '0.55';
+                }
+            });
+
+            // 피드백 상자 표시
+            const feedbackBox = document.getElementById('quiz-feedback-box');
+            const badge = document.getElementById('feedback-badge');
+            const wordTitle = document.getElementById('feedback-word-title');
+            const exampleFull = document.getElementById('feedback-example-full');
+
+            if (isCorrect) {
+                quizScore++;
+                playTraditionalTone('correct');
+                badge.textContent = '⭕ 정답이에요!';
+                badge.style.backgroundColor = '#3B7A57';
+            } else {
+                playTraditionalTone('wrong');
+                badge.textContent = '❌ 아쉬워요!';
+                badge.style.backgroundColor = '#C83E37';
+            }
+
+            document.getElementById('quiz-score-text').textContent = `맞힌 개수: ${quizScore}개`;
+            wordTitle.textContent = `${currentWord.word} (#${String(currentWord.id).padStart(2, '0')})`;
+            exampleFull.textContent = `예문: "${currentWord.example}"`;
+
+            const nextBtn = document.getElementById('next-question-btn');
+            nextBtn.textContent = (currentQuizIdx === quizQuestions.length - 1) ? '장원급제 결과 보기 →' : '다음 문제 →';
+
+            feedbackBox.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            playTraditionalTone('click');
+            if (currentQuizIdx < quizQuestions.length - 1) {
+                currentQuizIdx++;
+                renderCurrentQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            window.VillageBridge?.report(quizScore, quizQuestions.length, quizHistory.length);
+            switchView('view-result');
+            const total = quizQuestions.length;
+            const ratio = quizScore / total;
+
+            document.getElementById('result-score').textContent = quizScore;
+            document.getElementById('result-total').textContent = total;
+
+            let rankTitle = '우리말 새싹';
+            let message = '조금만 더 복습하면 모든 고유어를 완벽하게 익힐 수 있어요! 낱말 카드로 다시 한번 살펴볼까요?';
+
+            if (ratio === 1) {
+                rankTitle = '세종대왕 수제자 (장원급제)';
+                message = '와아! 한 문제도 틀리지 않고 모두 맞혔어요! 우리말을 사랑하고 아끼는 마음이 정말 대단합니다!';
+            } else if (ratio >= 0.8) {
+                rankTitle = '우리말 박사';
+                message = '활동지에 정리한 고유어의 뜻을 아주 정확하게 알고 있네요! 소중한 우리말 실력이 돋보입니다.';
+            } else if (ratio >= 0.5) {
+                rankTitle = '한글 지킴이';
+                message = '절반 이상 훌륭하게 맞혔어요! 헷갈렸던 고유어만 한 번 더 복습하면 완벽해질 거예요.';
+            }
+
+            document.getElementById('result-rank-title').textContent = rankTitle;
+            document.getElementById('result-message').textContent = message;
+
+            // 틀린 문제가 있을 경우 '틀린 문제만 다시 풀기' 버튼 표시
+            const wrongItems = quizHistory.filter(h => !h.isCorrect);
+            const retryBtn = document.getElementById('retry-wrong-btn');
+            if (wrongItems.length > 0) {
+                retryBtn.classList.remove('hidden');
+                retryBtn.textContent = `🔄 틀린 ${wrongItems.length}문제만 다시 풀기`;
+            } else {
+                retryBtn.classList.add('hidden');
+            }
+
+            // 풀이 요약 목록 렌더링
+            const reviewList = document.getElementById('result-review-list');
+            reviewList.innerHTML = '';
+            quizHistory.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2';
+                row.style.borderColor = 'var(--border-trad)';
+                row.style.backgroundColor = 'var(--bg-subtle)';
+
+                row.innerHTML = `
+                    <div class="flex items-start gap-2.5">
+                        <span class="text-base mt-0.5">${item.isCorrect ? '⭕' : '❌'}</span>
+                        <div>
+                            <div class="font-serif-kr font-bold text-base">
+                                ${index + 1}. ${item.wordObj.word}
+                                ${!item.isCorrect ? `<span class="text-xs font-normal ml-2 px-2 py-0.5 rounded bg-red-100 text-red-700">내가 고른 답: ${item.userAnswer}</span>` : ''}
+                            </div>
+                            <p class="text-xs mt-0.5" style="color: var(--text-muted);">${item.wordObj.meaning}</p>
+                        </div>
+                    </div>
+                `;
+                reviewList.appendChild(row);
+            });
+        }
+
+        function retryWrongQuestions() {
+            const wrongWords = quizHistory.filter(h => !h.isCorrect).map(h => h.wordObj);
+            if (wrongWords.length > 0) {
+                startQuiz(wrongWords.length, wrongWords);
+            }
+        }
+
+        function copyResultText() {
+            const rank = document.getElementById('result-rank-title').textContent;
+            const score = document.getElementById('result-score').textContent;
+            const total = document.getElementById('result-total').textContent;
+            const textToCopy = `[초6 국어 4단원 · 소중한 우리말 첩]\n등급: ${rank}\n점수: ${score} / ${total} 문제 정답!`;
+
+            const tempArea = document.createElement('textarea');
+            tempArea.value = textToCopy;
+            document.body.appendChild(tempArea);
+            tempArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('퀴즈 결과를 클립보드에 복사했어요! 친구에게 공유해 보세요.');
+            } catch (err) {
+                showToast('복사하기를 지원하지 않는 환경이에요.');
+            }
+            document.body.removeChild(tempArea);
+        }
+
+        /* =========================================================
+           6. 한지 낱말 카드 (플래시카드) 로직
+           ========================================================= */
+        function openFlashcards() {
+            playTraditionalTone('click');
+            showOnlyStarred = false;
+            flashcardList = [...WORDS_DATA];
+            currentFcIdx = 0;
+            updateStarFilterButton();
+            switchView('view-flashcards');
+            renderFlashcard();
+        }
+
+        function renderFlashcard() {
+            const cardEl = document.getElementById('flashcard-element');
+            cardEl.classList.remove('flipped');
+
+            if (flashcardList.length === 0) {
+                document.getElementById('fc-counter').textContent = '0 / 0 번째 고유어';
+                document.getElementById('fc-word-front').textContent = '별표 낱말 없음';
+                return;
+            }
+
+            const item = flashcardList[currentFcIdx];
+            document.getElementById('fc-counter').textContent = `${currentFcIdx + 1} / ${flashcardList.length} 번째 고유어`;
+            document.getElementById('fc-num-front').textContent = `활동지 #${String(item.id).padStart(2, '0')}`;
+            document.getElementById('fc-word-front').textContent = item.word;
+            document.getElementById('fc-word-back').textContent = item.word;
+            document.getElementById('fc-meaning-back').textContent = item.meaning;
+            document.getElementById('fc-example-back').textContent = `"${item.example}"`;
+
+            const starBtn = document.getElementById('fc-star-btn');
+            if (starredIds.has(item.id)) {
+                starBtn.textContent = '⭐';
+            } else {
+                starBtn.textContent = '☆';
+            }
+        }
+
+        function flipFlashcard() {
+            if (flashcardList.length === 0) return;
+            playTraditionalTone('click');
+            document.getElementById('flashcard-element').classList.toggle('flipped');
+        }
+
+        function nextFlashcard() {
+            if (flashcardList.length === 0) return;
+            playTraditionalTone('click');
+            currentFcIdx = (currentFcIdx + 1) % flashcardList.length;
+            renderFlashcard();
+        }
+
+        function prevFlashcard() {
+            if (flashcardList.length === 0) return;
+            playTraditionalTone('click');
+            currentFcIdx = (currentFcIdx - 1 + flashcardList.length) % flashcardList.length;
+            renderFlashcard();
+        }
+
+        function shuffleFlashcards() {
+            if (flashcardList.length <= 1) return;
+            playTraditionalTone('click');
+            flashcardList = shuffleArray(flashcardList);
+            currentFcIdx = 0;
+            renderFlashcard();
+            showToast('낱말 카드 순서를 골고루 섞었어요!');
+        }
+
+        function toggleCurrentStar() {
+            if (flashcardList.length === 0) return;
+            playTraditionalTone('click');
+            const item = flashcardList[currentFcIdx];
+            if (starredIds.has(item.id)) {
+                starredIds.delete(item.id);
+                showToast(`'${item.word}' 별표를 해제했어요.`);
+            } else {
+                starredIds.add(item.id);
+                showToast(`'${item.word}'에 별표를 표시했어요!`);
+            }
+            updateStarFilterButton();
+            renderFlashcard();
+        }
+
+        function updateStarFilterButton() {
+            const btn = document.getElementById('filter-star-btn');
+            btn.textContent = showOnlyStarred
+                ? `📚 전체 보기 (31)`
+                : `⭐ 별표만 보기 (${starredIds.size})`;
+        }
+
+        function toggleStarFilter() {
+            playTraditionalTone('click');
+            if (!showOnlyStarred) {
+                if (starredIds.size === 0) {
+                    showToast('먼저 카드 오른쪽 위의 ☆ 를 눌러 헷갈리는 낱말을 표시해 주세요!');
+                    return;
+                }
+                showOnlyStarred = true;
+                flashcardList = WORDS_DATA.filter(w => starredIds.has(w.id));
+            } else {
+                showOnlyStarred = false;
+                flashcardList = [...WORDS_DATA];
+            }
+            currentFcIdx = 0;
+            updateStarFilterButton();
+            renderFlashcard();
+        }
+
+        /* =========================================================
+           7. 31개 고유어 두루마리 사전 로직
+           ========================================================= */
+        function openDictionary() {
+            playTraditionalTone('click');
+            document.getElementById('dict-search-input').value = '';
+            switchView('view-dictionary');
+            renderDictionary();
+        }
+
+        function renderDictionary() {
+            const keyword = document.getElementById('dict-search-input').value.trim().toLowerCase();
+            const listEl = document.getElementById('dictionary-list');
+            listEl.innerHTML = '';
+
+            const filtered = WORDS_DATA.filter(item =>
+                item.word.includes(keyword) ||
+                item.meaning.includes(keyword) ||
+                item.example.includes(keyword)
+            );
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="col-span-full hanji-card rounded-2xl p-8 text-center" style="color: var(--text-muted);">
+                        검색어와 일치하는 활동지 고유어가 없어요.
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'hanji-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-2';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold px-2 py-0.5 rounded" style="background-color: var(--bg-subtle); color: var(--color-primary);">
+                                    #${String(item.id).padStart(2, '0')}
+                                </span>
+                                <h3 class="font-serif-kr text-xl font-bold" style="color: var(--color-primary);">${item.word}</h3>
+                            </div>
+                            <span class="trad-stamp text-[10px]">고유어</span>
+                        </div>
+                        <p class="text-sm font-medium leading-snug mb-2">${item.meaning}</p>
+                    </div>
+                    <div class="text-xs p-2.5 rounded-xl" style="background-color: var(--bg-subtle); color: var(--text-muted);">
+                        <strong style="color: var(--color-secondary);">예문:</strong> ${item.example}
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+    </script>
+<script src="../mission-bridge.js"></script>
+</body>
+</html>
