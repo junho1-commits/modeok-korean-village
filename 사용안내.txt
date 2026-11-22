@@ -1,5 +1,8 @@
 모덕 우리말 유람 · 한옥마을 모험
 
+학생용 접속 주소: https://junho1-commits.github.io/modeok-korean-village/
+GitHub 저장소: https://github.com/junho1-commits/modeok-korean-village
+
 1. 웹에 올리기
 압축파일의 내용을 풀어서 index.html, game.js, game-core.js, style.css,
 mission-bridge.js, assets/, missions/, vendor/를 같은 구조로 올리세요.
