@@ -5,9 +5,9 @@ GitHub 저장소: https://github.com/junho1-commits/modeok-korean-village
 
 1. 웹에 올리기
 압축파일의 내용을 풀어서 index.html, game.js, game-core.js, style.css,
-mission-bridge.js, assets/, missions/, vendor/를 같은 구조로 올리세요.
+mission-bridge.js, score-config.js, score-sync.js, assets/, missions/, vendor/를 같은 구조로 올리세요.
 Netlify, GitHub Pages, Cloudflare Pages 등 정적 웹 호스팅에서 실행됩니다.
-별도의 서버 프로그램, 계정, 데이터베이스나 빌드 과정이 필요하지 않습니다.
+게임은 정적 호스팅에서 실행합니다. 점수 기록은 교사의 Google Sheets와 Apps Script 웹 앱을 연결합니다.
 학생에게는 index.html이 있는 사이트 주소를 안내하세요.
 미션 HTML만 따로 열면 지도와 점수 연동이 되지 않습니다.
 
@@ -32,7 +32,10 @@ Netlify, GitHub Pages, Cloudflare Pages 등 정적 웹 호스팅에서 실행됩
 안전하게 멈추려면 퀴즈 위쪽의 '지도에 저장하고 돌아가기' 버튼을 누르세요.
 브라우저를 강제 종료하면 마지막 자동 저장 이후 약 1~2초의 기록이 사라질 수 있습니다.
 다른 기기와 자동 동기화되지 않으며, 시크릿 모드나 사이트 데이터 삭제 시 기록이 지워질 수 있습니다.
-이름은 구별을 위한 별명으로 쓰며 외부 서버에 전송하지 않습니다.
+학생 이름을 필수로 입력합니다. 연결 후 이름과 미션별 점수·진행 상황을 선생님의 비공개 Google Sheets에 기록합니다.
+정식 도전, 회복 복습, 자유 복습을 구분하여 모든 완료 결과를 기록합니다. 개별 답안은 보내지 않습니다.
+인터넷이 끊기면 기기에 전송 대기 기록을 보관합니다. 실제 저장 확인 전에는 창을 유지하고 재접속해 주세요.
+자세한 설정은 구글시트_연결안내.txt를 참고하세요.
 여러 학생이 같은 크롬 프로필을 공유하면 하나의 여행 기록을 공유합니다.
 
 4. 원본 자료

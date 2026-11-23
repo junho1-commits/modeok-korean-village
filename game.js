@@ -29,6 +29,26 @@
     if (G.valid(loaded)) state = loaded;
     else if (loaded) toast('기존 기록을 읽지 못했어요. 새 여행을 시작해 주세요.');
   } catch (e) { toast('기존 기록을 읽지 못했어요. 새 여행을 시작할 수 있어요.'); }
+  let scoreStorage;
+  try { scoreStorage = window.localStorage; } catch (e) { scoreStorage = { getItem() { throw e; }, setItem() { throw e; } }; }
+  const scoreSync = VillageScores.create({
+    storage: scoreStorage, endpoint: (window.VILLAGE_SCORE_CONFIG || {}).endpoint,
+    transport: VillageScores.browserTransport, onChange: showScoreStatus
+  });
+  function showScoreStatus(info) {
+    let message = !info.configured ? '선생님 기록장 연결 준비 중' : info.busy ? `선생님 기록장에 저장 중 · ${info.pending}건` : info.pending ? `선생님 기록장 저장 대기 · ${info.pending}건` : info.lastSaved ? '선생님 기록장에 저장했어요' : '미션을 마치면 선생님 기록장에 저장해요';
+    if (!info.configured && info.pending) message += ` · ${info.pending}건 대기`;
+    if (info.error) message = `${info.error} · ${info.pending}건 대기`;
+    if (!info.persisted && info.pending) message += ' · 이 창을 닫지 말고 다시 저장해 주세요';
+    document.querySelectorAll('[data-score-status]').forEach(element => element.textContent = message);
+    $('score-retry').hidden = !info.pending || !info.configured;
+    $('score-retry').disabled = info.busy;
+  }
+  $('score-retry').onclick = () => scoreSync.flush();
+  window.addEventListener('online', () => scoreSync.flush());
+  window.addEventListener('storage', event => { if (event.key === 'modeok-score-outbox-v1') scoreSync.flush(); });
+  setInterval(() => { if (scoreSync.status().pending) scoreSync.flush(); }, 60000);
+  scoreSync.flush();
   function openDialog(id) { if (!$(id).open) $(id).showModal(); }
   document.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', () => $(button.dataset.close).close()));
   $('help-btn').onclick = () => openDialog('help-dialog');
@@ -41,11 +61,22 @@
   }));
   $('welcome-form').onsubmit = event => {
     event.preventDefault();
+    const name = $('nickname').value.trim();
+    if (!name || /[\x00-\x1f\x7f]/.test(name)) { $('welcome-error').textContent = '선생님이 알아볼 수 있도록 이름을 입력해 주세요.'; $('nickname').focus(); return; }
     const ids = [...document.querySelectorAll('input[name="mission"]:checked')].map(input => input.value);
     if (!ids.length) { $('welcome-error').textContent = '함께 여행할 미션을 하나 이상 골라 주세요.'; return; }
-    state = G.create($('nickname').value, ids); save();
+    state = G.create(name, ids); state.studentNameConfirmed = true; save();
     $('welcome-error').textContent = ''; $('welcome-dialog').close();
     render(); animateTraveler(true); toast('미션 순서를 섞었어요. 첫 번째 관문에서 만나요!');
+  };
+  $('identity-form').onsubmit = event => {
+    event.preventDefault();
+    const name = $('student-name').value.trim();
+    if (!name || /[\x00-\x1f\x7f]/.test(name)) { $('identity-error').textContent = '이름을 입력해 주세요.'; return; }
+    state.name = name; state.studentNameConfirmed = true;
+    if (!state.journeyId) state.journeyId = crypto.randomUUID();
+    save(); render(); $('identity-dialog').close();
+    toast('이제부터 마치는 미션의 점수를 선생님 기록장에 저장해요.');
   };
   function render() {
     const order = state ? state.order : G.MISSIONS.map(m => m.id);
@@ -146,6 +177,7 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   function launch(id) {
+    if (!state.studentNameConfirmed) return openDialog('identity-dialog');
     const prior = state.active;
     if (prior && prior.status === 'playing' && prior.id !== id) {
       toast('진행 중인 관문을 먼저 마친 뒤 다른 관문을 복습해 주세요.'); return;
@@ -210,7 +242,8 @@
       const result = G.accept(state, data);
       if (result) {
         if (result.mode === 'challenge') $('mission-mode').textContent = `${state.order.indexOf(result.id) + 1}번째 관문 · 라이프 ${state.hearts}개`;
-        save(); render(); resultPanel(result);
+        save(); scoreSync.enqueue(VillageScores.entry(state, result));
+        scoreSync.flush(); render(); resultPanel(result);
       }
     } else if (data.type === 'practice-note') toast('틀린 문제 복습은 도장을 주지 않아요. 지도 화면에서 전체 미션에 다시 도전해요.');
   });
@@ -230,4 +263,6 @@
   });
   window.addEventListener('pagehide', () => { send('save-now'); });
   render();
+  if (!state) openDialog('welcome-dialog');
+  else if (!state.studentNameConfirmed) openDialog('identity-dialog');
 })();

@@ -26,5 +26,5 @@ test('all local page resources exist and no runtime asset requires a remote CDN'
     assert.doesNotMatch(html,/<script[^>]*src=["']https?:/);
     assert.doesNotMatch(html,/https:\/\/(?:fonts\.googleapis\.com|cdn\.tailwindcss\.com|cdnjs\.cloudflare\.com)/);
   }
-  for (const file of ['game.js','game-core.js','mission-bridge.js']) new vm.Script(fs.readFileSync(path.join(root,file),'utf8'),{filename:file});
+  for (const file of ['game.js','game-core.js','mission-bridge.js','score-config.js','score-sync.js','google-apps-script/Code.gs']) new vm.Script(fs.readFileSync(path.join(root,file),'utf8'),{filename:file});
 });

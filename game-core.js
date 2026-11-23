@@ -26,7 +26,7 @@
   function create(name, ids = MISSIONS.map(m => m.id)) {
     const selected = [...new Set(ids)].filter(id => MISSIONS.some(m => m.id === id));
     if (!selected.length) throw new Error('미션을 하나 이상 선택하세요.');
-    return { version: 2, name: String(name || '우리말 여행자').trim().slice(0, 16), order: shuffle(selected), hearts: 3,
+    return { version: 2, journeyId: token(), name: String(name || '우리말 여행자').trim().slice(0, 16), order: shuffle(selected), hearts: 3,
       cleared: {}, history: [], active: null, createdAt: Date.now(), updatedAt: Date.now() };
   }
   function current(state) { return state.order.find(id => !state.cleared[id]) || null; }
@@ -44,7 +44,7 @@
     if (![correct, total, answered].every(Number.isInteger) || total < 10 || total > 200 || correct < 0 || correct > total || answered !== total) return null;
     if (active.mode !== 'review' && current(state) !== active.id) return null;
     const passed = correct * 10 >= total * 9;
-    const result = { id: active.id, correct, total, passed, accuracy: correct * 100 / total, mode: active.mode, at: Date.now() };
+    const result = { id: active.id, attemptId: active.token, correct, total, passed, accuracy: correct * 100 / total, mode: active.mode, at: Date.now() };
     if (active.mode === 'challenge') {
       if (passed) state.cleared[active.id] = result;
       else state.hearts = Math.max(0, state.hearts - 1);
