@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#244b43">
-  <meta name="description" content="모덕초 친구들과 떠나는 우리말 한옥마을 모험. 무작위 미션을 풀고 정답률 90% 이상으로 여행 도장을 모아 보세요.">
+  <meta name="description" content="모덕초 친구들과 떠나는 우리말 한옥마을 모험. 사투리부터 미션을 풀고 정답률 85% 이상으로 여행 도장을 모아 보세요.">
   <meta property="og:title" content="모덕 우리말 유람 · 한옥마을 모험">
   <meta property="og:description" content="여섯 가지 우리말 미션, 라이프 3개! 관문을 통과하며 우리말 여행 도장을 모아요.">
   <meta property="og:url" content="https://junho1-commits.github.io/modeok-korean-village/">
@@ -12,10 +12,10 @@
   <title>모덕 우리말 유람 · 한옥마을 모험</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  <script src="game-core.js?v=20261123-scores-1" defer></script>
-  <script src="score-config.js?v=20261123-scores-1" defer></script>
-  <script src="score-sync.js?v=20261123-scores-1" defer></script>
-  <script src="game.js?v=20261123-scores-2" defer></script>
+  <script src="game-core.js?v=20261123-85-dialect-1" defer></script>
+  <script src="score-config.js?v=20261123-85-dialect-1" defer></script>
+  <script src="score-sync.js?v=20261123-85-dialect-1" defer></script>
+  <script src="game.js?v=20261123-85-dialect-1" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -29,7 +29,7 @@
     </section>
     <section class="journey-layout" aria-label="우리말 여행 지도">
       <div class="map-card">
-        <div class="map-heading"><span><i></i> 우리말 한옥마을</span><span class="map-guide">길을 따라 하나씩, 정답률 90% 이상</span></div>
+        <div class="map-heading"><span><i></i> 우리말 한옥마을</span><span class="map-guide">길을 따라 하나씩, 정답률 85% 이상</span></div>
         <div class="map-scroll"><div class="map-world" id="map-world">
           <svg class="landscape" viewBox="0 0 1100 720" role="img" aria-label="산과 시냇물, 한옥 여섯 채가 있는 우리말 마을 지도">
             <defs>
@@ -58,20 +58,20 @@
           <div id="map-stops"></div><div class="travelers" id="travelers"><img src="assets/travelers.png" alt="꽃 모자와 산 모자를 쓴 모덕초 여행 친구들"><span>함께 가자!</span></div>
           <div class="map-compass" aria-hidden="true">✧<small>우리말 따라</small></div>
         </div></div>
-        <div class="map-legend"><span><i class="legend-dot current"></i>지금 도전</span><span><i class="legend-dot cleared"></i>통과한 관문</span><span><i class="legend-dot locked"></i>아직 잠긴 관문</span><span class="legend-note">미션 순서는 새 여행마다 달라져요</span></div>
+        <div class="map-legend"><span><i class="legend-dot current"></i>지금 도전</span><span><i class="legend-dot cleared"></i>통과한 관문</span><span><i class="legend-dot locked"></i>아직 잠긴 관문</span><span class="legend-note">사투리 먼저 · 나머지 관문은 무작위</span></div>
       </div>
       <aside class="sidebar">
-        <div class="next-card"><p class="eyebrow" id="next-kicker">첫 번째 발걸음</p><div class="place-icon" aria-hidden="true">🏮</div><h2 id="next-title">우리말 마을로<br>떠나 볼까요?</h2><p id="next-desc">여섯 관문에서 우리말의 보물을 찾아요.</p><div class="rule-chips"><span>통과 90%</span><span>라이프 3개</span></div><button class="primary" id="continue-btn">여행 시작하기</button><p class="checkpoint-note" id="checkpoint-note">여행 기록은 자동으로 저장돼요.</p></div>
+        <div class="next-card"><p class="eyebrow" id="next-kicker">첫 번째 발걸음</p><div class="place-icon" aria-hidden="true">🏮</div><h2 id="next-title">우리말 마을로<br>떠나 볼까요?</h2><p id="next-desc">여섯 관문에서 우리말의 보물을 찾아요.</p><div class="rule-chips"><span>통과 85%</span><span>라이프 3개</span></div><button class="primary" id="continue-btn">여행 시작하기</button><p class="checkpoint-note" id="checkpoint-note">여행 기록은 자동으로 저장돼요.</p></div>
         <div class="stamps-card"><div class="section-heading"><h2>나의 여행 도장</h2><span id="stamp-count">0 / 6</span></div><div class="stamps" id="stamps"></div><p>관문을 통과할 때마다<br>도장 하나가 수첩에 새겨져요.</p></div>
       </aside>
     </section>
     <footer class="page-footer"><span>작은 낱말 하나에도, 우리만의 빛깔이 있어요.</span><span>모덕초 · 우리말 여행 수첩</span></footer>
   </main>
-  <dialog id="welcome-dialog" aria-labelledby="welcome-title"><form id="welcome-form"><button class="dialog-close" type="button" data-close="welcome-dialog" aria-label="닫기">×</button><img class="welcome-mascots" src="assets/travelers.png" alt="모덕초 여행 친구들"><p class="eyebrow">우리말 보물을 찾아 떠나요</p><h2 id="welcome-title">반가워요, 여행자!</h2><p>미션은 무작위 순서로 만나요.<br>각 관문에서 <strong>정답률 90% 이상</strong>이면 다음 길이 열려요.</p><label class="name-label" for="nickname">학생 이름 <small>선생님이 알아볼 수 있게 적어요</small></label><input id="nickname" name="studentName" maxlength="16" placeholder="예: 홍길동" autocomplete="off" required aria-describedby="name-notice"><p id="name-notice" class="small-note">입력한 이름과 미션별 점수를 선생님의 비공개 구글 기록장에 저장해요.</p><details class="mission-choice"><summary>여행에 담을 HTML 미션 선택 <span>기본 6개</span></summary><div id="mission-options"></div></details><p class="small-note">라이프는 미션 통과 실패 시 1개 줄어요.<br>모두 소진하면 복습을 90% 이상 마쳐 3개를 회복해요.</p><button type="submit" class="primary">여행 출발!</button><p id="welcome-error" role="alert"></p></form></dialog>
+  <dialog id="welcome-dialog" aria-labelledby="welcome-title"><form id="welcome-form"><button class="dialog-close" type="button" data-close="welcome-dialog" aria-label="닫기">×</button><img class="welcome-mascots" src="assets/travelers.png" alt="모덕초 여행 친구들"><p class="eyebrow">우리말 보물을 찾아 떠나요</p><h2 id="welcome-title">반가워요, 여행자!</h2><p>사투리(방언) 미션부터 시작해요.<br>나머지 미션은 무작위 순서로 만나요.<br>각 관문에서 <strong>정답률 85% 이상</strong>이면 다음 길이 열려요.</p><label class="name-label" for="nickname">학생 이름 <small>선생님이 알아볼 수 있게 적어요</small></label><input id="nickname" name="studentName" maxlength="16" placeholder="예: 홍길동" autocomplete="off" required aria-describedby="name-notice"><p id="name-notice" class="small-note">입력한 이름과 미션별 점수를 선생님의 비공개 구글 기록장에 저장해요.</p><details class="mission-choice"><summary>여행에 담을 HTML 미션 선택 <span>기본 6개</span></summary><div id="mission-options"></div></details><p class="small-note">라이프는 미션 통과 실패 시 1개 줄어요.<br>모두 소진하면 복습을 85% 이상 마쳐 3개를 회복해요.</p><button type="submit" class="primary">여행 출발!</button><p id="welcome-error" role="alert"></p></form></dialog>
   <dialog id="identity-dialog" aria-labelledby="identity-title"><form id="identity-form"><p class="eyebrow">이어 하던 여행이 있어요</p><h2 id="identity-title">학생 이름을 알려 주세요.</h2><p>도장과 라이프는 이어 가요.<br>지금부터 마치는 미션의 이름과 점수를 선생님의 비공개 구글 기록장에 저장해요.</p><label class="name-label" for="student-name">학생 이름</label><input id="student-name" maxlength="16" placeholder="예: 홍길동" autocomplete="off" required><p id="identity-error" role="alert"></p><button class="primary" type="submit">이 이름으로 이어 하기</button></form></dialog>
-  <dialog id="help-dialog" aria-labelledby="help-title"><button class="dialog-close" data-close="help-dialog" aria-label="닫기">×</button><p class="eyebrow">우리말 여행 길잡이</p><h2 id="help-title">천천히 배워도 괜찮아요.</h2><ol class="help-list"><li>원하는 HTML 자료를 골라 여행을 시작해요. 선택한 미션 순서는 무작위로 정해져요.</li><li>현재 관문을 눌러 자료 안의 퀴즈를 끝까지 풀어요. 최소 10문제이며, 엽전 등 보너스 점수는 통과 판정에 쓰지 않아요.</li><li>정답률이 <strong>90% 이상</strong>이면 도장을 받고 다음 길이 열려요. 25문제는 23개 이상 맞혀야 해요.</li><li>90% 미만이면 라이프가 하나 줄어요. 0개일 때는 현재 관문을 복습하여 90% 이상을 얻으면 라이프 3개가 회복돼요. 이후 정식 도전으로 통과해요.</li><li>지도 버튼으로 돌아와도 기록은 남아요. 같은 기기·크롬 프로필·사이트 주소에서 이어 할 수 있어요. 시크릿 모드나 브라우저 기록 삭제 시에는 기록이 지워질 수 있어요.</li></ol><button class="primary" data-close="help-dialog">알겠어요</button></dialog>
+  <dialog id="help-dialog" aria-labelledby="help-title"><button class="dialog-close" data-close="help-dialog" aria-label="닫기">×</button><p class="eyebrow">우리말 여행 길잡이</p><h2 id="help-title">천천히 배워도 괜찮아요.</h2><ol class="help-list"><li>원하는 HTML 자료를 골라 여행을 시작해요. 사투리(방언)를 선택하면 첫 관문이 되고 나머지 미션은 무작위로 정해져요.</li><li>현재 관문을 눌러 자료 안의 퀴즈를 끝까지 풀어요. 최소 10문제이며, 엽전 등 보너스 점수는 통과 판정에 쓰지 않아요.</li><li>정답률이 <strong>85% 이상</strong>이면 도장을 받고 다음 길이 열려요. 25문제는 22개 이상 맞혀야 해요.</li><li>85% 미만이면 라이프가 하나 줄어요. 0개일 때는 현재 관문을 복습하여 85% 이상을 얻으면 라이프 3개가 회복돼요. 이후 정식 도전으로 통과해요.</li><li>지도 버튼으로 돌아와도 기록은 남아요. 같은 기기·크롬 프로필·사이트 주소에서 이어 할 수 있어요. 시크릿 모드나 브라우저 기록 삭제 시에는 기록이 지워질 수 있어요.</li></ol><button class="primary" data-close="help-dialog">알겠어요</button></dialog>
   <dialog id="reset-dialog" aria-labelledby="reset-title"><p class="eyebrow">새로운 여행 준비</p><h2 id="reset-title">처음부터 새로 떠날까요?</h2><p>현재 기기의 도장, 라이프, 풀이 기록이 초기화돼요.<br>선생님 기록장에 저장된 점수와 전송 대기 기록은 남아요.<br>다른 학생이라면 새 여행에서 자신의 이름을 입력해요.</p><div class="button-row"><button class="secondary" data-close="reset-dialog">계속 이어 하기</button><button class="primary" id="confirm-reset">새 여행 준비</button></div></dialog>
-  <dialog id="mission-dialog" aria-labelledby="mission-title"><div class="mission-toolbar"><div><span id="mission-mode">우리말 관문</span><h2 id="mission-title"></h2></div><span id="mission-target">통과 기준 90%</span><button id="map-return" class="secondary">지도에 저장하고 돌아가기</button></div><div class="mission-loading" id="mission-loading" role="status">미션을 준비하고 있어요…</div><iframe id="mission-frame" title="우리말 HTML 미션" src="about:blank" allow="autoplay" sandbox="allow-scripts allow-same-origin allow-modals allow-forms allow-pointer-lock"></iframe><div id="result-panel" class="result-panel" hidden><div class="result-inner"><p class="eyebrow" id="result-kicker"></p><div class="result-emblem" id="result-emblem">✿</div><h2 id="result-title"></h2><p id="result-detail"></p><p class="result-number" id="result-number"></p><p id="result-message"></p><p class="small-note" data-score-status role="status"></p><div class="result-actions"><button id="result-next" class="primary"></button><button id="review-answers" class="secondary">풀이 살펴보기</button><button id="result-map" class="quiet">지도로 돌아가기</button></div></div></div><div class="mission-bottom"><span>미션을 끝까지 풀면 결과가 자동으로 지도에 기록돼요.</span><button id="show-result" class="quiet" hidden>기록된 결과 보기</button></div></dialog>
+  <dialog id="mission-dialog" aria-labelledby="mission-title"><div class="mission-toolbar"><div><span id="mission-mode">우리말 관문</span><h2 id="mission-title"></h2></div><span id="mission-target">통과 기준 85%</span><button id="map-return" class="secondary">지도에 저장하고 돌아가기</button></div><div class="mission-loading" id="mission-loading" role="status">미션을 준비하고 있어요…</div><iframe id="mission-frame" title="우리말 HTML 미션" src="about:blank" allow="autoplay" sandbox="allow-scripts allow-same-origin allow-modals allow-forms allow-pointer-lock"></iframe><div id="result-panel" class="result-panel" hidden><div class="result-inner"><p class="eyebrow" id="result-kicker"></p><div class="result-emblem" id="result-emblem">✿</div><h2 id="result-title"></h2><p id="result-detail"></p><p class="result-number" id="result-number"></p><p id="result-message"></p><p class="small-note" data-score-status role="status"></p><div class="result-actions"><button id="result-next" class="primary"></button><button id="review-answers" class="secondary">풀이 살펴보기</button><button id="result-map" class="quiet">지도로 돌아가기</button></div></div></div><div class="mission-bottom"><span>미션을 끝까지 풀면 결과가 자동으로 지도에 기록돼요.</span><button id="show-result" class="quiet" hidden>기록된 결과 보기</button></div></dialog>
   <div id="toast" class="toast" role="status" hidden></div>
 </body>
 </html>

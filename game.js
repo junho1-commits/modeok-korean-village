@@ -70,7 +70,7 @@
     if (!ids.length) { $('welcome-error').textContent = '함께 여행할 미션을 하나 이상 골라 주세요.'; return; }
     state = G.create(name, ids); state.studentNameConfirmed = true; save();
     $('welcome-error').textContent = ''; $('welcome-dialog').close();
-    render(); animateTraveler(true); toast('미션 순서를 섞었어요. 첫 번째 관문에서 만나요!');
+    render(); animateTraveler(true); toast(state.order[0] === 'dialect' ? '사투리(방언) 관문부터 여행을 시작해요!' : '선택한 미션으로 여행을 시작해요!');
   };
   $('identity-form').onsubmit = event => {
     event.preventDefault();
@@ -118,7 +118,7 @@
       if (!isCurrent && !cleared) stop.setAttribute('aria-disabled', 'true');
       stop.onclick = () => {
         if (!state) { openDialog('welcome-dialog'); return; }
-        if (!cleared && !isCurrent) { toast('앞 관문에서 정답률 90% 이상을 얻으면 이 길이 열려요.'); return; }
+        if (!cleared && !isCurrent) { toast('앞 관문에서 정답률 85% 이상을 얻으면 이 길이 열려요.'); return; }
         launch(id);
       };
       return stop;
@@ -136,7 +136,7 @@
       $('next-kicker').textContent = `여행의 ${index + 1}번째 관문`;
       $('next-title').textContent = m.place; $('next-desc').textContent = m.title + ' · ' + m.tag;
       $('continue-btn').textContent = hearts === 0 ? '복습으로 라이프 회복' : active && active.id === current && active.status === 'playing' ? '멈춘 곳부터 이어 하기' : '이 관문 도전하기';
-      $('checkpoint-note').textContent = hearts === 0 ? '복습 90% 이상으로 회복한 뒤 정식 도전해요.' : '90% 이상이면 다음 길이 열려요.';
+      $('checkpoint-note').textContent = hearts === 0 ? '복습 85% 이상으로 회복한 뒤 정식 도전해요.' : '85% 이상이면 다음 길이 열려요.';
     }
     if (state && !savingFailed) $('save-state').textContent = '이 기기에 자동 저장된 여행이에요';
     animateTraveler(false);
@@ -190,7 +190,7 @@
     save(); closing = false;
     $('mission-title').textContent = mission(id).title;
     $('mission-mode').textContent = active.mode === 'practice' ? '라이프 회복을 위한 복습' : active.mode === 'review' ? '통과한 관문 자유 복습' : `${state.order.indexOf(id) + 1}번째 관문 · 라이프 ${state.hearts}개`;
-    $('mission-target').textContent = active.mode === 'practice' ? '90% 이상이면 라이프 회복' : '통과 기준 정답률 90%';
+    $('mission-target').textContent = active.mode === 'practice' ? '85% 이상이면 라이프 회복' : '통과 기준 정답률 85%';
     $('result-panel').hidden = true; $('show-result').hidden = true;
     $('mission-loading').textContent = '미션을 준비하고 있어요…'; $('mission-loading').hidden = false;
     $('mission-frame').src = `missions/${mission(id).file}?journey=${encodeURIComponent(active.token)}&mission=${id}`;
@@ -220,9 +220,9 @@
     $('result-kicker').textContent = mode === 'review' ? '이미 통과한 관문 · 자유 복습' : mode === 'practice' ? '마음 든든, 다시 준비하는 시간' : '우리말 여행 수첩에 기록했어요';
     $('result-emblem').textContent = passed ? mission(result.id).seal : '힘';
     $('result-title').textContent = mode === 'practice' ? (passed ? '라이프 3개를 회복했어요!' : '한 번 더 익혀 볼까요?') : mode === 'review' ? '복습을 마쳤어요!' : passed ? '다음 길이 열렸어요!' : '배움은 한 걸음씩!';
-    $('result-detail').textContent = `${result.total}문제 중 ${result.correct}문제 정답 · 통과 기준 90%`;
+    $('result-detail').textContent = `${result.total}문제 중 ${result.correct}문제 정답 · 통과 기준 85%`;
     $('result-number').textContent = formatAccuracy(result.accuracy) + '%';
-    $('result-message').textContent = mode === 'review' ? '복습은 도장과 라이프에 영향을 주지 않아요.' : mode === 'practice' ? (passed ? '이제 같은 관문에 정식 도전해 도장을 받아 보세요.' : '라이프는 더 줄지 않아요. 풀이를 살펴보고 다시 복습해요.') : passed ? (G.current(state) ? '여행 도장이 새겨졌어요. 다음 한옥으로 함께 가요.' : '모든 도장을 모았어요! 우리말 유람을 완주했어요.') : state.hearts > 0 ? `라이프가 1개 줄어 ${state.hearts}개 남았어요. 풀이를 살펴보고 다시 도전해요.` : '라이프를 모두 썼어요. 이 관문을 복습해 90% 이상을 얻으면 라이프 3개가 회복돼요.';
+    $('result-message').textContent = mode === 'review' ? '복습은 도장과 라이프에 영향을 주지 않아요.' : mode === 'practice' ? (passed ? '이제 같은 관문에 정식 도전해 도장을 받아 보세요.' : '라이프는 더 줄지 않아요. 풀이를 살펴보고 다시 복습해요.') : passed ? (G.current(state) ? '여행 도장이 새겨졌어요. 다음 한옥으로 함께 가요.' : '모든 도장을 모았어요! 우리말 유람을 완주했어요.') : state.hearts > 0 ? `라이프가 1개 줄어 ${state.hearts}개 남았어요. 풀이를 살펴보고 다시 도전해요.` : '라이프를 모두 썼어요. 이 관문을 복습해 85% 이상을 얻으면 라이프 3개가 회복돼요.';
     $('result-next').textContent = mode === 'review' ? '지도로 돌아가기' : mode === 'practice' ? (passed ? '정식 도전하기' : '다시 복습하기') : passed ? (G.current(state) ? '다음 관문으로 가기' : '완주한 지도 보기') : state.hearts === 0 ? '라이프 회복 복습하기' : '이 관문 다시 도전';
     $('result-next').onclick = () => {
       if (mode === 'review' || (passed && mode === 'challenge')) returnToMap();

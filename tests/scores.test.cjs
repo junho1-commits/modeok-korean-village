@@ -94,3 +94,12 @@ test('server stores formula-looking student names as literal text',()=>{
   const b=backend();b.post({...completed().item,studentName:'=1+1'});
   assert.equal(b.rows[1][1],"'=1+1");
 });
+
+test('sheet pass/fail uses the same exact 85 percent threshold as the game',()=>{
+  for(const [correct,total,passed] of [[17,20,true],[16,20,false],[22,25,true],[21,25,false],[28,33,false]]) {
+    const b=backend(),item={...completed().item,correct,total,completed:passed,clearedCount:passed?1:0};
+    assert.match(b.post(item),/"ok":true/);
+    assert.equal(b.rows[1][6],passed?'통과':'미통과');
+    assert.equal(G.passes(correct,total),passed);
+  }
+});

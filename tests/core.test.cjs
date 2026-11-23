@@ -15,10 +15,30 @@ test('only the first uncleared mission can be started', () => {
   G.begin(s, s.order[0]); result(s, 9, 10); G.begin(s, s.order[1]);
   assert.equal(G.current(s), s.order[1]); assert.equal(s.hearts, 3);
 });
-test('90 percent is inclusive, actual ratio is used rather than rounded percentage', () => {
-  for (const [c,n,pass] of [[9,10,true],[8,10,false],[22,25,false],[23,25,true],[27,30,true],[26,29,false],[28,31,true],[27,31,false]]) {
+test('85 percent is inclusive, actual ratio is used rather than rounded percentage', () => {
+  for (const [c,n,pass] of [[17,20,true],[16,20,false],[9,10,true],[8,10,false],[22,25,true],[21,25,false],[26,30,true],[25,30,false],[28,33,false],[34,40,true]]) {
     const s=G.create('학생',['words']); G.begin(s,'words'); assert.equal(result(s,c,n).passed,pass,`${c}/${n}`);
   }
+});
+
+test('dialect starts every new journey that includes it; the remaining selected missions stay shuffled', () => {
+  const seen = new Set();
+  for (let i=0;i<40;i++) {
+    const s=G.create('학생'); assert.equal(s.order[0],'dialect');
+    assert.equal(new Set(s.order).size,6); seen.add(s.order.slice(1).join());
+  }
+  assert.ok(seen.size>1);
+  assert.deepEqual(G.create('학생',['words','dialect']).order,['dialect','words']);
+  assert.deepEqual(G.create('학생',['words']).order,['words']);
+});
+
+test('85 percent clears, restores saved progress, and recovers lives in practice', () => {
+  const s=G.create('학생',['words']);
+  for(let i=0;i<3;i++){G.begin(s,'words');result(s,16,20);}
+  assert.equal(G.begin(s,'words').mode,'practice');result(s,17,20);
+  assert.equal(s.hearts,3);assert.equal(G.current(s),'words');
+  G.begin(s,'words');result(s,17,20);
+  assert.equal(G.current(s),null);assert.ok(G.valid(JSON.parse(JSON.stringify(s))));
 });
 test('three failed missions consume exactly three lives; practice cannot unlock a stage', () => {
   const s=G.create('학생',['words']);

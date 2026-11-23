@@ -1,5 +1,6 @@
 /** 이 프로젝트는 점수 기록용 스프레드시트에 연결하여 사용합니다. */
 const SHEET_NAME = '점수 기록';
+const PASS_PERCENT = 85;
 const HEADERS = ['기록 시각', '학생 이름', '미션', '맞힌 문제', '전체 문제', '점수(100점)', '통과 여부', '활동 구분', '획득 도장', '선택 관문', '남은 라이프', '완주 여부', '풀이 시각', '여행 ID', '도전 ID', '기록 ID'];
 const MISSIONS = {words:'소중한 우리말 첩', dialect:'사투리 오아시스 탐험', school:'우리말 한옥 서당', exam:'우리말 순화어 과거시험', initials:'초성별 고유어 퀴즈', master:'도전! 우리말 달인'};
 const MODES = {challenge:'정식 도전', practice:'라이프 회복 복습', review:'자유 복습'};
@@ -54,7 +55,7 @@ function doPost(e) {
       const count = sheet.getLastRow() - 1;
       const duplicate = count > 0 && sheet.getRange(2, 16, count, 1).createTextFinder(p.eventId).matchEntireCell(true).useRegularExpression(false).findNext();
       if (!duplicate) {
-        const passed = p.correct * 10 >= p.total * 9;
+        const passed = p.correct * 100 >= p.total * PASS_PERCENT;
         // Prefix formula-looking names so a name is always stored as plain text.
         const name = /^[=+\-@']/.test(p.studentName.trim()) ? "'" + p.studentName.trim() : p.studentName.trim();
         const row = [new Date(), name, MISSIONS[p.missionId], p.correct, p.total, Math.round(p.correct * 1000 / p.total) / 10,
@@ -77,5 +78,5 @@ function doPost(e) {
 }
 
 function doGet() {
-  return ContentService.createTextOutput(JSON.stringify({service:'modeok-village-scores', version:1, ready:!!PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID')})).setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify({service:'modeok-village-scores', version:2, passPercent:PASS_PERCENT, ready:!!PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID')})).setMimeType(ContentService.MimeType.JSON);
 }
