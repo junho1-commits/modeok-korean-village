@@ -21,7 +21,7 @@ test('all local page resources exist and no runtime asset requires a remote CDN'
     for (const [,reference] of html.matchAll(/(?:src|href)=["']([^"']+)["']/g)) {
       if (/^(?:https?:|data:|about:|#|javascript:)/.test(reference)) continue;
       if (reference==='./') continue;
-      assert.ok(fs.existsSync(path.resolve(path.dirname(file),reference)),path.basename(file)+': '+reference);
+      assert.ok(fs.existsSync(path.resolve(path.dirname(file),reference.split(/[?#]/)[0])),path.basename(file)+': '+reference);
     }
     assert.doesNotMatch(html,/<script[^>]*src=["']https?:/);
     assert.doesNotMatch(html,/https:\/\/(?:fonts\.googleapis\.com|cdn\.tailwindcss\.com|cdnjs\.cloudflare\.com)/);
