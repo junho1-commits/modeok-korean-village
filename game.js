@@ -53,7 +53,10 @@
   document.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', () => $(button.dataset.close).close()));
   $('help-btn').onclick = () => openDialog('help-dialog');
   $('new-btn').onclick = () => openDialog(state ? 'reset-dialog' : 'welcome-dialog');
-  $('confirm-reset').onclick = () => { $('reset-dialog').close(); openDialog('welcome-dialog'); };
+  $('confirm-reset').onclick = () => {
+    $('reset-dialog').close(); $('nickname').value = ''; $('welcome-error').textContent = '';
+    openDialog('welcome-dialog');
+  };
   $('mission-options').replaceChildren(...G.MISSIONS.map(m => {
     const label = document.createElement('label'), input = document.createElement('input');
     input.type = 'checkbox'; input.value = m.id; input.name = 'mission'; input.checked = true;
